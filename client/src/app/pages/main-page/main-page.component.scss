@@ -1,6 +1,8 @@
 .container {
     min-height: 100vh;
     height: auto;
+    background-image: url(../../../assets/1008548-widescreen-deep-blue-background-1920x1200.jpg);
+    background-size: cover;
 }
 
 .justified {
@@ -11,8 +13,24 @@
 }
 
 .button {
-    margin-top: 10px;
+    margin-top: 5%;
     text-align: center;
+    font-size: 200%;
+    border-radius: 30px;
+    padding: 3% 10%;
+    border: 5px solid black;
+    margin: 4% 4%;
+    background-color: white;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    width: 200%;
+    height: 5%;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: lightgrey;
+    width: 205%;
+    height: 20%;
 }
 
 .team-name {
@@ -30,15 +48,16 @@
     text-align: center;
 }
 
-.footer-item p :nth-child(even) {
-    color: orange;
-}
-.footer-item p :nth-child(odd) {
-    color: blue;
+.footer-item p {
+    color: whitesmoke;
 }
 
 .server-message {
     justify-content: center;
     width: 20%;
     min-width: min-content;
+}
+
+.logo {
+    margin-top: 5%;
 }
