@@ -27,10 +27,22 @@
     cursor: pointer;
 }
 
+.button:disabled {
+    border: 5px solid gray;
+    background-color: silver;
+    color: gray;
+    pointer-events: none;
+    cursor: default;
+}
+
 .button:hover {
     background-color: lightgrey;
     width: 205%;
     height: 20%;
+}
+
+.button:active {
+    background-color: darkgray;
 }
 
 .team-name {
