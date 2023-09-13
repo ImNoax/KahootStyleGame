@@ -1,0 +1,125 @@
+@import url(../main-page/main-page.component.scss);
+
+.title {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 300%;
+    padding-top: 5%;
+    color: white;
+}
+
+.fields {
+    background-color: transparent;
+    padding: 2%;
+    margin-top: 3%;
+    text-align: center;
+}
+
+.field {
+    width: 30%;
+    border-color: lightgray;
+    border-style: solid;
+    border-width: 1.5px;
+    height: 20px;
+    margin-bottom: 2%;
+}
+
+.field::placeholder {
+    color: lightgray;
+    vertical-align: top;
+}
+
+#description {
+    width: 50%;
+    height: 100px;
+}
+
+#time_field {
+    width: 35px;
+}
+
+button {
+    text-align: center;
+    font-size: 25px;
+    border-radius: 30px;
+    border: 5px solid black;
+    background-color: white;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    width: 20%;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: lightgrey;
+    width: 22%;
+    font-size: 28px;
+}
+
+.button:active {
+    background-color: darkgray;
+}
+
+.navigation {
+    margin-top: 5%;
+    margin-left: 75%;
+    width: 12%;
+}
+
+.navigation:hover {
+    width: 13%;
+}
+
+.logo-container img {
+    height: 40px;
+    cursor: pointer;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th,
+td {
+    border: 2px solid black;
+    padding: 8px;
+    background-color: #ffffff;
+    opacity: 0.9;
+}
+
+td {
+    border: none;
+    border-bottom: 1px solid black;
+}
+
+th {
+    background-color: #534e4e;
+    text-align: center;
+    font-size: 200%;
+    color: #ffffff;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.nom-jeu {
+    text-align: left;
+}
+
+.nom-jeu::after {
+    content: '';
+    display: flex;
+    width: 15px;
+    height: 15px;
+    background-image: url(https://www.pngkit.com/png/full/367-3670169_delete-comments-clip-art.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-left: 95%;
+}
+
+.nom-jeu:hover::after {
+    cursor: pointer;
+}

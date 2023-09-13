@@ -1,0 +1,20 @@
+<div class="container">
+    <h1 class="title">Administration des jeux</h1>
+    <div class="fields">
+        <table>
+            <thead>
+                <tr>
+                    <th>Liste de jeux</th>
+                    <th>Détails</th>
+                </tr>
+            </thead>
+            <tr *ngFor="let jeu of jeux">
+                <td>{{ jeu.name }}</td>
+                <td><!-- Deuxième colonne (vide pour le moment) --></td>
+            </tr>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <button class="navigation" routerLink="/home">Retourner</button>
+</div>
