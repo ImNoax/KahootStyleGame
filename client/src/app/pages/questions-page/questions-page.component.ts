@@ -12,14 +12,15 @@ export class QuestionsPageComponent {
     questionTypeStyle: object;
 
     questions: Question[] = [
-        { text: 'Orange', type: 'QCM' },
-        { text: 'Pomme', type: 'QCM' },
-        { text: 'Banane', type: 'QCM' },
+        { text: 'Orange?', type: 'QCM' },
+        { text: 'Pomme?' , type: 'QCM' },
+        { text: 'Banane?', type: 'QCL' },
+        { text: 'Citron?', type: 'QCM' }
     ];
 
     setQuestionStyle(question: Question) {
         if (question.type === 'QCM') return { background: '#78B9DE' };
-        return { background: '#A1F27B' };
+        return { background: '#F2BB7B' };
     }
 
     drop(event: CdkDragDrop<Question[]>) {
