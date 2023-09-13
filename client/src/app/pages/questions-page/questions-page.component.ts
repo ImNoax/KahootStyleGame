@@ -13,9 +13,9 @@ export class QuestionsPageComponent {
 
     questions: Question[] = [
         { text: 'Orange?', type: 'QCM' },
-        { text: 'Pomme?' , type: 'QCM' },
+        { text: 'Pomme?', type: 'QCM' },
         { text: 'Banane?', type: 'QCL' },
-        { text: 'Citron?', type: 'QCM' }
+        { text: 'Citron?', type: 'QCM' },
     ];
 
     setQuestionStyle(question: Question) {
