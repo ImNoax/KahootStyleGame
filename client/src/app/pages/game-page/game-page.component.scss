@@ -21,11 +21,42 @@
 #timer {
     text-align: center;
     font-weight: bold;
-    font-size: xx-large;
+    font-size: x-large;
     color: white;
     padding: 6px;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 30px;
+    margin-top: 20px;
     width: fit-content;
+}
+
+.question-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 60px;
+    width: 100%;
+}
+
+#question {
+    font-size: 2rem;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+}
+
+#pointage {
+    position: fixed;
+    right: 8%;
+    top: 32%;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: black;
+    font-family: 'Arial', sans-serif;
+    margin-left: auto;
+    background-color: white;
 }
