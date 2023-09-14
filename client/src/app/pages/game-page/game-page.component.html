@@ -1,6 +1,9 @@
 <div class="container">
-    <app-sidebar id="sidebar"></app-sidebar>
-    <section class="play-area-container">
-        <app-play-area class="play-area" tabindex="0"></app-play-area>
-    </section>
+    <button id="quit-button" routerLink="/home">
+        <mat-icon id="leave-icon">exit_to_app</mat-icon> Quitter
+    </button>
+    <div id="timer">
+        <app-timer></app-timer>
+    </div>
+
 </div>

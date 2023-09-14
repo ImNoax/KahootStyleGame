@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { TimeService } from '../../services/time.service';
 
 @Component({
   selector: 'app-timer',
@@ -6,22 +7,17 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
   styleUrls: ['./timer.component.scss']
 })
 export class TimerComponent implements OnInit, OnDestroy {
-  remainingTime: number = 60;  // in seconds
-  private intervalId: any;
+  constructor(private timeService: TimeService) { }
 
   ngOnInit() {
-    this.intervalId = setInterval(() => {
-      this.remainingTime--;
-
-      if (this.remainingTime <= 0) {
-        clearInterval(this.intervalId);
-      }
-    }, 1000);
+    this.timeService.startTimer(60);
   }
 
   ngOnDestroy() {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-    }
+    this.timeService.stopTimer();
+  }
+
+  get currentTime() {
+    return this.timeService.time;
   }
 }

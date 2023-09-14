@@ -1,20 +1,31 @@
 .container {
     height: 100%;
+    background-image: url(../../../assets/constants/dark_theater_stage.jpg);
+    background-size: cover;
     display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
-.play-area-container {
-    overflow: auto;
-    flex: 1 1 auto;
+#quit-button {
+    background-color: white;
+    color: black;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 2rem;
+    margin-left: auto;
+    margin-top: 2.5%;
+    margin-right: 2.5%;
 }
 
-.play-area {
-    display: grid;
-    outline: none;
-    height: 100vh;
-}
-
-#sidebar {
-    flex-basis: 350px;
-    min-width: 200px;
+#timer {
+    text-align: center;
+    font-weight: bold;
+    font-size: xx-large;
+    color: white;
+    padding: 6px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+    width: fit-content;
 }

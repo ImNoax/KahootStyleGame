@@ -1,1 +1,8 @@
-<p id="timer"> {{ remainingTime }} s </p>
+<div id="timer">
+    Temps restant : {{ currentTime }} secondes
+
+    <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="(currentTime/60)*100"></div>
+    </div>
+
+</div>
