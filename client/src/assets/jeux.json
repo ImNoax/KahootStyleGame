@@ -1,0 +1,63 @@
+[
+    {
+        "id": 1,
+        "name": "Game 1",
+        "description": "This is the description for Game 1",
+        "timePerQuestion": 30,
+        "questions": [
+            {
+                "id": 1,
+                "question": "What is the capital of France?",
+                "type": "QCM",
+                "scorePoint": 10,
+                "responses": [
+                    { "answer": "Paris", "isCorrect": true },
+                    { "answer": "London", "isCorrect": false },
+                    { "answer": "Berlin", "isCorrect": false },
+                    { "answer": "Madrid", "isCorrect": false }
+                ]
+            },
+            {
+                "id": 2,
+                "question": "Which of these is not a color?",
+                "scorePoint": 10,
+                "responses": [
+                    { "answer": "Blue", "isCorrect": false },
+                    { "answer": "Apple", "isCorrect": true },
+                    { "answer": "Green", "isCorrect": false },
+                    { "answer": "Yellow", "isCorrect": false }
+                ]
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "name": "Game 2",
+        "description": "This is the description for Game 2",
+        "type": "Multiple Choice",
+        "timePerQuestion": 25,
+        "questions": [
+            {
+                "id": 1,
+                "question": "What is 2 + 2?",
+                "scorePoint": 5,
+                "responses": [
+                    { "answer": "3", "isCorrect": false },
+                    { "answer": "4", "isCorrect": true },
+                    { "answer": "5", "isCorrect": false }
+                ]
+            },
+            {
+                "id": 2,
+                "question": "Which is the largest planet?",
+                "scorePoint": 15,
+                "responses": [
+                    { "answer": "Earth", "isCorrect": false },
+                    { "answer": "Mars", "isCorrect": false },
+                    { "answer": "Jupiter", "isCorrect": true },
+                    { "answer": "Venus", "isCorrect": false }
+                ]
+            }
+        ]
+    }
+]
