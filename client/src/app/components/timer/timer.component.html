@@ -2,7 +2,7 @@
     Temps restant : {{ currentTime }} secondes
 
     <div class="progress-bar">
-        <div class="progress-fill" [style.width.%]="(currentTime/60)*100"></div>
+        <div class="progress-fill" [style.width.%]="(currentTime/totalTime)*100"></div>
     </div>
 
 </div>
