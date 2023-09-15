@@ -1,5 +1,5 @@
 <div class="container">
-    <h1 class="title">Administration des jeux</h1>
+    <app-header [title]="'Administration des jeux'"></app-header>
     <div class="fields">
         <table>
             <thead>
@@ -69,7 +69,7 @@
             </tbody>
         </table>
     </div>
-    <button mat-raised-button color="primary" class="adminbutton">Ajouter un nouveau jeu</button>
+    <button mat-raised-button color="primary" class="adminbutton" routerLink="/creation">Ajouter un nouveau jeu</button>
     <button mat-raised-button color="primary" class="adminbutton">Importer un nouveau jeu</button>
     <br />
     <button mat-raised-button color="primary" class="navigation" routerLink="/home">Retourner</button>

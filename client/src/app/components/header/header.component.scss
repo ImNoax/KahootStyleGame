@@ -1,3 +1,4 @@
+@import url('../../pages/main-page/main-page.component.scss');
 header {
     width: 100%;
     padding-top: 2%;
@@ -8,17 +9,24 @@ header {
     align-items: center;
     justify-content: center;
     position: relative;
+    background-color: rgb(black, 0.6);
 }
 
 .button {
+    margin: 0%;
     position: absolute;
-    left: 2%;
+    top: 30%;
+    left: 5%;
+    width: 200px;
+    font-size: 18px;
+    padding: 1.5%;
 }
 
 .title {
     color: white;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Georgia, 'Times New Roman', Times, serif;
     font-weight: bold;
+    font-size: 30px;
 }
 
 h1 {

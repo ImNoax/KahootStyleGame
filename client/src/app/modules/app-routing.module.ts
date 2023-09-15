@@ -1,10 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AdminJeuPageComponent } from '@app/pages/admin-jeu-page/admin-jeu-page.component';
+import { CreationJeuComponent } from '@app/pages/creation-jeu/creation-jeu.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
-import { CreationJeuComponent } from '@app/pages/creation-jeu/creation-jeu.component';
+import { QuestionsPageComponent } from '@app/pages/questions-page/questions-page.component';
 
 const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -13,6 +14,7 @@ const routes: Routes = [
     { path: 'material', component: MaterialPageComponent },
     { path: 'creation', component: CreationJeuComponent },
     { path: 'admin', component: AdminJeuPageComponent },
+    { path: 'questions', component: QuestionsPageComponent },
     { path: '**', redirectTo: '/home' },
 ];
 
