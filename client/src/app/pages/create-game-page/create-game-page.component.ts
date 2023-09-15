@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { jeux } from '../jeux';
+import { jeux } from '@app/pages/jeux';
 
 @Component({
     selector: 'app-create-game-page',
