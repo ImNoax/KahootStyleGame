@@ -13,6 +13,7 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
+import { CreateGamePageComponent } from './pages/create-game-page/create-game-page.component';
 import { CreationJeuComponent } from './pages/creation-jeu/creation-jeu.component';
 import { HeaderComponent } from './components/header/header.component';
 import { QuestionsPageComponent } from './pages/questions-page/questions-page.component';
@@ -32,11 +33,15 @@ import { QuestionsPageComponent } from './pages/questions-page/questions-page.co
         MaterialPageComponent,
         PlayAreaComponent,
         SidebarComponent,
+        CreateGamePageComponent,
+    ],
+    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule,
         CreationJeuComponent,
         HeaderComponent,
         QuestionsPageComponent,
+        DragDropModule,
     ],
-    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, DragDropModule],
+
     providers: [],
     bootstrap: [AppComponent],
 })
