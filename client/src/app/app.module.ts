@@ -8,6 +8,7 @@ import { PlayAreaComponent } from '@app/components/play-area/play-area.component
 import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
 import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
+import { AdminJeuPageComponent } from '@app/pages/admin-jeu-page/admin-jeu-page.component';
 import { AppComponent } from '@app/pages/app/app.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
@@ -25,6 +26,7 @@ import { QuestionsPageComponent } from './pages/questions-page/questions-page.co
 @NgModule({
     declarations: [
         AppComponent,
+        AdminJeuPageComponent,
         GamePageComponent,
         MainPageComponent,
         MaterialPageComponent,
