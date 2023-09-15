@@ -1,5 +1,5 @@
 <div class="container">
-    <h1 class="title">Création d'un jeu-questionnaire</h1>
+    <app-header [title]="'Création d\'un jeu'"></app-header>
     <div class="fields">
         <form>
             <label for="title">Nom du jeu</label><br />
@@ -11,10 +11,8 @@
             <p id="units">secondes</p>
             <p id="note">Note: Les questions à réponse libre (QRL) ont un temps fixé à 60 secondes.</p>
         </form>
-        <button>Modifier la liste de questions</button>
+        <button class="questions-button" mat-raised-button color="primary" routerLink="/questions">Modifier la liste de questions</button>
     </div>
-    <div class="buttons-nav">
-        <button class="navigation" routerLink="/home">Retourner</button>
-        <button class="navigation" routerLink="/home">Enregistrer</button>
-    </div>
+    <button mat-raised-button color="primary" class="navigation" routerLink="/admin">Retourner</button>
+    <button mat-raised-button color="primary" class="navigation" routerLink="/admin">Enregistrer</button>
 </div>
