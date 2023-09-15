@@ -71,6 +71,7 @@ button:hover {
 }
 
 .navigation:hover {
+    background-color: #0f0a36;
     width: 13%;
 }
 
@@ -116,11 +117,11 @@ th {
 }
 
 .adminbutton:hover {
-    background-color: lightgrey;
+    background-color: #0f0a36;
 }
 
 .adminbutton:active {
-    background-color: darkgray;
+    background-color: #0f0a36;
 }
 
 .adminbutton + .adminbutton {
@@ -141,7 +142,6 @@ th {
     background-repeat: no-repeat;
     margin-left: 95%;
 }
-
 .nom-jeu:hover::after {
     cursor: pointer;
 }
