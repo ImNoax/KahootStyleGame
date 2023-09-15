@@ -1,0 +1,44 @@
+<div class="container">
+    <app-header [title]="pageTitle"></app-header>
+
+    <div class="center">
+        <div id="questions-background">
+                <div id="game-name">
+                    <h4>Nom du jeu</h4>
+                    <p>Questionnaire sur les dindes</p>
+                </div>
+
+                <div cdkDropList id="questions-list" (cdkDropListDropped)="drop($event)">
+                    <div class="question-box" [ngStyle]="setQuestionStyle(question)"
+                        *ngFor="let question of questions; index as i" cdkDrag>
+                        <div class="left-section">
+                            <i class="handle fa-solid fa-bars fa-lg" cdkDragHandle></i>
+                            <div class="question-text">
+                                {{i + 1}}. {{question.text}}
+                            </div>
+                        </div>
+
+                        <div class="question-type">{{question.type}}</div>
+                        
+                        <div class="right-section">
+                            <div class="setting-icon">
+                                <i class="fa-solid fa-gear fa-lg"></i>
+                            </div>
+
+                            <div class="delete-icon">
+                                <i class="fa-solid fa-xmark fa-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                
+                <button class="question-insertion" mat-raised-button color="primary">Ajouter une question</button>
+        </div>
+    </div>
+
+    <div id="nav">
+        <button mat-raised-button color="primary">Retourner</button>
+        <button mat-raised-button color="primary">Enregistrer</button>
+    </div>
+</div>
