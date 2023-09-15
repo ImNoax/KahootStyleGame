@@ -8,8 +8,8 @@
                     <th>Détails</th>
                 </tr>
             </thead>
-            <tr *ngFor="let jeu of jeux">
-                <td>{{ jeu.name }}</td>
+            <tr *ngFor="let game of games | async">
+                <td>{{ game.name }}</td>
                 <td><!-- Deuxième colonne (vide pour le moment) --></td>
             </tr>
             <tbody></tbody>
