@@ -1,5 +1,7 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { QuestionCreationPopupComponent } from '@app/components/question-creation-popup/question-creation-popup.component';
 import { Question } from '@app/interfaces/question';
 
 @Component({
@@ -9,7 +11,6 @@ import { Question } from '@app/interfaces/question';
 })
 export class QuestionsPageComponent {
     pageTitle: string = 'Liste des questions';
-    questionTypeStyle: object;
 
     questions: Question[] = [
         { text: 'Orange?', type: 'QCM' },
@@ -18,12 +19,19 @@ export class QuestionsPageComponent {
         { text: 'Citron?', type: 'QCM' },
     ];
 
-    setQuestionStyle(question: Question) {
+    constructor(private dialog: MatDialog) {}
+
+    setQuestionStyle(question: Question): object {
         if (question.type === 'QCM') return { background: '#78B9DE' };
         return { background: '#F2BB7B' };
     }
 
-    drop(event: CdkDragDrop<Question[]>) {
+    drop(event: CdkDragDrop<Question[]>): void {
         moveItemInArray(this.questions, event.previousIndex, event.currentIndex);
+    }
+
+    openDialog(): void {
+        // ajouter disableClose: true après définition des routes
+        this.dialog.open(QuestionCreationPopupComponent, { width: '75%', height: '80%', backdropClass: 'backdropBackground' });
     }
 }

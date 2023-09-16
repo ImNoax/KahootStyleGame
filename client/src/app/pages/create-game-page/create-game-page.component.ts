@@ -8,12 +8,11 @@ import { Observable } from 'rxjs';
     styleUrls: ['./create-game-page.component.scss'],
 })
 export class CreateGamePageComponent implements OnInit {
-    games!: Observable<{ id: number, name: string, description: string, timePerQuestion: number, questions: object }[]>;
-    
-    constructor(private gameHandler: GameHandlingService) {
-    }
+    games!: Observable<{ id: number; name: string; description: string; timePerQuestion: number; questions: object }[]>;
+
+    constructor(private gameHandler: GameHandlingService) {}
 
     ngOnInit(): void {
-      this.games = this.gameHandler.getGames();
+        this.games = this.gameHandler.getGames();
     }
 }
