@@ -20,7 +20,6 @@ import { CreationJeuComponent } from './pages/creation-jeu/creation-jeu.componen
 import { HeaderComponent } from './components/header/header.component';
 import { QuestionsPageComponent } from './pages/questions-page/questions-page.component';
 
-
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -43,9 +42,7 @@ import { QuestionsPageComponent } from './pages/questions-page/questions-page.co
         QuestionsPageComponent,
         CreateGamePageComponent,
     ],
-    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule,
-        DragDropModule,
-    ],
+    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, DragDropModule],
 
     providers: [],
     bootstrap: [AppComponent],
