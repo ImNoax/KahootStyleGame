@@ -1,0 +1,55 @@
+@import url(../main-page/main-page.component.scss);
+@import url(../admin-jeu-page/admin-jeu-page.component.scss);
+
+.fields {
+    background-color: rgb(white, 0.6);
+    padding: 2%;
+    margin-top: 0%;
+    text-align: center;
+}
+
+form {
+    margin-left: 35%;
+    text-align: start;
+}
+
+#units {
+    display: inline;
+}
+
+.field {
+    width: 30%;
+    border-color: lightgray;
+    border-style: solid;
+    border-width: 1.5px;
+    margin-bottom: 1%;
+}
+
+.field::placeholder {
+    color: lightgray;
+    vertical-align: top;
+}
+
+#description {
+    width: 50%;
+    height: 100px;
+}
+
+#time_field {
+    width: 35px;
+}
+
+#note {
+    font-size: 12px;
+    padding-bottom: 2%;
+}
+
+.questions-button {
+    padding: 1.5%;
+    margin: 0%;
+    font-size: 24px;
+}
+
+.navigation + .navigation {
+    left: 85%;
+}

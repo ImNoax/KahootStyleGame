@@ -1,20 +1,69 @@
 .container {
     height: 100%;
+    background-image: url(../../../assets/constants/dark_theater_stage.jpg);
+    background-size: cover;
     display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
-.play-area-container {
-    overflow: auto;
-    flex: 1 1 auto;
+#quit-button {
+    background-color: white;
+    color: black;
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: auto;
+    margin-top: 2.5%;
+    margin-right: 2.5%;
+    font-size: 25px;
+    border-radius: 30px;
+    border: 5px solid black;
+    background-color: white;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+
 }
 
-.play-area {
-    display: grid;
-    outline: none;
-    height: 100vh;
+#top-page {
+    text-align: center;
+    font-weight: bold;
+    font-size: x-large;
+    color: white;
+    padding: 6px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    width: fit-content;
 }
 
-#sidebar {
-    flex-basis: 350px;
-    min-width: 200px;
+.question-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 60px;
+    width: 100%;
+}
+
+#question {
+    font-size: 100%;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+}
+
+#pointage {
+    position: fixed;
+    right: 8%;
+    top: 32%;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: black;
+    margin-left: auto;
+
+    border-radius: 5px;
+    background-color: white;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }

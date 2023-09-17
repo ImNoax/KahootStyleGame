@@ -1,0 +1,102 @@
+@import url(../main-page/main-page.component.scss);
+
+.fields {
+    background-color: transparent;
+    padding: 2%;
+    margin-top: 3%;
+    text-align: center;
+}
+
+.field {
+    width: 30%;
+    border-color: lightgray;
+    border-style: solid;
+    border-width: 1.5px;
+    height: 20px;
+    margin-bottom: 2%;
+}
+
+.field::placeholder {
+    color: lightgray;
+    vertical-align: top;
+}
+
+#description {
+    width: 50%;
+    height: 100px;
+}
+
+#time_field {
+    width: 35px;
+}
+
+.navigation {
+    position: absolute;
+    left: 5%;
+    top: 85%;
+    margin: 0%;
+    padding: 1.5%;
+    width: 150px;
+    font-size: 22px;
+}
+
+.logo-container img {
+    height: 40px;
+    cursor: pointer;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th,
+td {
+    border: 2px solid black;
+    padding: 8px;
+    background-color: #ffffff;
+    opacity: 0.9;
+}
+
+td {
+    border: none;
+    border-bottom: 1px solid black;
+}
+
+th {
+    background-color: #534e4e;
+    text-align: center;
+    font-size: 200%;
+    color: #ffffff;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.adminbutton {
+    margin-left: 5%;
+    margin-top: 1%;
+    padding: 1.5%;
+    height: 60px;
+    font-size: 25px;
+}
+
+.adminbutton + .adminbutton {
+    margin-left: 40%;
+}
+
+.nom-jeu {
+    text-align: left;
+}
+
+.nom-jeu::after {
+    content: '';
+    display: flex;
+    width: 15px;
+    height: 15px;
+    background-image: url(https://www.pngkit.com/png/full/367-3670169_delete-comments-clip-art.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-left: 95%;
+}
+.nom-jeu:hover::after {
+    cursor: pointer;
+}
