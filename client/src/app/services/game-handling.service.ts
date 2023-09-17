@@ -1,15 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Jeu } from '@common/jeu';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root',
 })
 export class GameHandlingService {
-
-    constructor(private http: HttpClient) {
-    }
+    constructor(private http: HttpClient) {}
 
     getGames() {
-        return this.http.get<{ id: number, name: string, description: string, timePerQuestion: number, questions: object }[]>('assets/jeux.json');
+        return this.http.get<Jeu[]>('assets/jeux.json');
     }
 }

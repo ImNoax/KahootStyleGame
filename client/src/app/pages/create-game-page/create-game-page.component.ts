@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GameHandlingService } from '@app/services/game-handling.service';
-import { Observable } from 'rxjs';
+import { Jeu } from '@common/jeu';
 
 @Component({
     selector: 'app-create-game-page',
@@ -8,12 +8,13 @@ import { Observable } from 'rxjs';
     styleUrls: ['./create-game-page.component.scss'],
 })
 export class CreateGamePageComponent implements OnInit {
-    games!: Observable<{ id: number, name: string, description: string, timePerQuestion: number, questions: object }[]>;
-    
-    constructor(private gameHandler: GameHandlingService) {
-    }
+    games: Jeu[];
+
+    constructor(private gameHandler: GameHandlingService) {}
 
     ngOnInit(): void {
-      this.games = this.gameHandler.getGames();
+        this.gameHandler.getGames().subscribe((games: Jeu[]) => {
+            this.games = games;
+        });
     }
 }
