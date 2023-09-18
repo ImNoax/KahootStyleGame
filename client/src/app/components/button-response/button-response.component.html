@@ -1,10 +1,12 @@
 <div class="buttons-parent">
     <div class="buttons-container">
-        <button class="btn">hello test test test test test test test test test tests test test test test test
-            test test test test test test test test test test
-            test....</button>
-        <button class="btn">test</button>
-        <button class="btn">test3</button>
-        <button class="btn">test4</button>
+        <button *ngFor="let button of buttons" 
+                [id]="button.id.toString()" 
+                [style.backgroundColor]="button.color" 
+                (click)="onButtonClick(button)" 
+                class="btn">
+            test{{ button.id }}
+        </button>
     </div>
 </div>
+<button class="validate-btn" (click)="sendInfo()">Soumettre</button>
