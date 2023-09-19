@@ -1,13 +1,11 @@
 [
     {
-        "id": 1,
         "title": "Game 1",
         "description": "This is the description for Game 1",
         "duration": 30,
         "lastModification": "2018-11-13",
         "questions": [
             {
-                "id": 1,
                 "text": "What is the capital of France?",
                 "points": 10,
                 "type": "QCM",
@@ -31,7 +29,6 @@
                 ]
             },
             {
-                "id": 2,
                 "text": "Which of these is not a color?",
                 "points": 10,
                 "type": "QCM",
@@ -57,14 +54,12 @@
         ]
     },
     {
-        "id": 2,
         "title": "Game 2",
         "description": "This is the description for Game 2",
         "duration": 25,
         "lastModification": "2018-11-13",
         "questions": [
             {
-                "id": 1,
                 "text": "What is 2 + 2?",
                 "points": 20,
                 "type": "QCM",
@@ -84,7 +79,6 @@
                 ]
             },
             {
-                "id": 2,
                 "text": "Which is the largest planet?",
                 "points": 30,
                 "type": "QCM",
