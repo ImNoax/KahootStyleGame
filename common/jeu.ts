@@ -5,10 +5,14 @@ export type Jeu = {
     timePerQuestion: number,
     questions: {
         id: number,
-        question: string,
+        text: string,
         type: string,
         scorePoint: number,
-        responses: {
+        responses?: {
+            answer: string,
+            isCorrect: boolean
+        }[],
+        choices?: {
             answer: string,
             isCorrect: boolean
         }[]
