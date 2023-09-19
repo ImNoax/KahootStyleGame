@@ -27,6 +27,7 @@ export class GameController {
         this.router.get('/:id', async (req: Request, res: Response) => {
             const file: string = await this.gameManager.exportGame(Number(req.params.id));
 
+            // 2e argument: Supprimer le fichier après téléchargement
             res.download(file, async () => {
                 await this.fileManager.deleteFile(file);
             });
@@ -38,8 +39,14 @@ export class GameController {
             res.json(games);
         });
 
-        this.router.post('/:id', async (req: Request, res: Response) => {
-            const games: Jeu[] = await this.gameManager.addGame(Number(req.params.id), req.body);
+        this.router.patch('/visibility/:id', async (req: Request, res: Response) => {
+            const games: Jeu[] = await this.gameManager.modifyGameVisibility(Number(req.params.id), req.body);
+
+            res.json(games);
+        });
+
+        this.router.post('/', async (req: Request, res: Response) => {
+            const games: Jeu[] = await this.gameManager.addGame(req.body);
 
             res.status(StatusCodes.CREATED).json(games);
         });

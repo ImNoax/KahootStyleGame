@@ -31,7 +31,16 @@ export class GameManagerService {
         return games;
     }
 
-    async addGame(id: number, newGame: Jeu): Promise<Jeu[]> {
+    async modifyGameVisibility(id: number, newVisibility: { isVisible: boolean }): Promise<Jeu[]> {
+        const games: Jeu[] = await this.getGames();
+        games[id].isVisible = newVisibility.isVisible;
+
+        this.fileManager.writeJsonFile('./data/jeux.json', JSON.stringify(games));
+
+        return games;
+    }
+
+    async addGame(newGame: Jeu): Promise<Jeu[]> {
         const games: Jeu[] = await this.getGames();
         games.push(newGame);
 

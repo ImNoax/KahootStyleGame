@@ -4,7 +4,6 @@ enum QuestionType {
 }
 
 export interface Question {
-    id: number,
     text: string,
     points: number,
     type: QuestionType,
@@ -15,7 +14,6 @@ export interface Question {
 }
 
 export interface Jeu {
-    id: number,
     title: string,
     description: string,
     duration: number,
