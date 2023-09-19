@@ -18,6 +18,6 @@ export interface Jeu {
     description: string,
     duration: number,
     lastModification: string,
-    isVisible?: boolean
+    isVisible?: boolean,
     questions: Question[],
 }
