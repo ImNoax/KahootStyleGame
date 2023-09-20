@@ -2,9 +2,12 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
+import { QuestionCreationPopupComponent } from '@app/components/question-creation-popup/question-creation-popup.component';
 import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
 import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
@@ -41,6 +44,7 @@ import { QuestionsPageComponent } from './pages/questions-page/questions-page.co
         HeaderComponent,
         QuestionsPageComponent,
         CreateGamePageComponent,
+        QuestionCreationPopupComponent,
     ],
     imports: [
         AppMaterialModule,
@@ -51,6 +55,9 @@ import { QuestionsPageComponent } from './pages/questions-page/questions-page.co
         HttpClientModule,
         DragDropModule,
         ReactiveFormsModule,
+        DragDropModule,
+        MatSlideToggleModule,
+        MatInputModule,
     ],
 
     providers: [],
