@@ -1,9 +1,9 @@
 <div class="buttons-parent">
     <div class="buttons-container">
-        <button *ngFor="let button of buttons" [id]="button.id.toString()" [style.backgroundColor]="button.color"
-            (click)="onButtonClick(button)" class="btn">
+        <button *ngFor="let button of buttons" [style.backgroundColor]="button.color" (click)="onButtonClick(button)"
+            class="btn">
             {{ button.text }}
         </button>
     </div>
 </div>
-<button class="validate-btn" (click)="sendInfo()">Soumettre</button>
+<button class="validate-btn" (click)="verifyResponsesAndCallUpdate()">Soumettre</button>

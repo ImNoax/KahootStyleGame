@@ -1,26 +1,35 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { TimeService } from '@app/services/time.service';
+import { GameHandlingService } from '@angular/../../client/src/app/services/game-handling.service';
+import { Jeu } from '@common/jeu';
 
-const TOTALTIME = 60;
-const TIME = 60;
 @Component({
     selector: 'app-timer',
     templateUrl: './timer.component.html',
     styleUrls: ['./timer.component.scss'],
 })
 export class TimerComponent implements OnInit, OnDestroy {
-    constructor(private timeService: TimeService) {}
+    games: Jeu[] = [];
+
+    constructor(private timeService: TimeService, private gameService: GameHandlingService) { }
 
     get currentTime() {
         return this.timeService.time;
     }
 
     get totalTime() {
-        return TOTALTIME;
+        return this.games[this.gameService.currentGameId].duration;
     }
 
     ngOnInit() {
-        this.timeService.startTimer(TIME);
+        this.gameService.getGames().subscribe((data: Jeu[]) => {
+            this.games = data;
+            this.updateTimer();
+        });
+    }
+
+    updateTimer() {
+        this.timeService.startTimer(this.games[this.gameService.currentGameId].duration);
     }
 
     ngOnDestroy() {

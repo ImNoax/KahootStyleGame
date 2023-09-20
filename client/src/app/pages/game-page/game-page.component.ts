@@ -16,8 +16,12 @@ export class GamePageComponent {
         this.gameService.getGames().subscribe((data: Jeu[]) => {
             this.games = data;
             if (this.games.length > 0) {
-                this.currentQuestion = this.games[0].questions[0].text;
+                this.currentQuestion = this.games[this.gameService.currentGameId].questions[this.gameService.currentQuestionId].text;
             }
         });
+    }
+
+    updateQuestion() {
+        this.currentQuestion = this.games[this.gameService.currentGameId].questions[this.gameService.currentQuestionId].text;
     }
 }

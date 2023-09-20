@@ -6,9 +6,20 @@ import { Jeu } from '@common/jeu';
     providedIn: 'root',
 })
 export class GameHandlingService {
-    constructor(private http: HttpClient) {}
+    currentGameId: number = 0;
+    currentQuestionId: number = 0;
+
+    constructor(private http: HttpClient) { }
 
     getGames() {
         return this.http.get<Jeu[]>('assets/jeux.json');
+    }
+
+    setCurrentGameId(id: number) {
+        this.currentGameId = id;
+    }
+
+    setCurrentQuestionId(id: number) {
+        this.currentQuestionId = id;
     }
 }
