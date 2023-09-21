@@ -10,18 +10,26 @@ import { Jeu } from '@common/jeu';
 export class GamePageComponent {
     games: Jeu[] = [];
     currentQuestion: string = '';
+    Score: number = 0;
+    currentQuestionScore: number;
     constructor(private gameService: GameHandlingService) { }
 
     ngOnInit(): void {
+        this.gameService.setCurrentQuestionId(0);
         this.gameService.getGames().subscribe((data: Jeu[]) => {
             this.games = data;
             if (this.games.length > 0) {
                 this.currentQuestion = this.games[this.gameService.currentGameId].questions[this.gameService.currentQuestionId].text;
+                this.currentQuestionScore = this.games[this.gameService.currentGameId].questions[this.gameService.currentQuestionId].points;
             }
         });
     }
 
     updateQuestion() {
         this.currentQuestion = this.games[this.gameService.currentGameId].questions[this.gameService.currentQuestionId].text;
+    }
+
+    incrementScore(amount: number) {
+        this.Score += amount;
     }
 }

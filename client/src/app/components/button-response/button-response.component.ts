@@ -2,12 +2,14 @@ import { Component } from '@angular/core';
 import { GameHandlingService } from '@angular/../../client/src/app/services/game-handling.service';
 import { Jeu } from '@common/jeu';
 import { GamePageComponent } from "@angular/../../client/src/app/pages/game-page/game-page.component";
+import { TimeService } from '@app/services/time.service';
 
 interface Button {
   color: string;
   selected: boolean;
   text: string;
   isCorrect: boolean;
+  Id: number;
 }
 
 interface Choice {
@@ -25,13 +27,20 @@ export class ButtonResponseComponent {
   buttons: Button[] = [];
   games: Jeu[] = [];
 
-  constructor(private gameService: GameHandlingService, private gamePage: GamePageComponent) { }
+  constructor(private gameService: GameHandlingService, private gamePage: GamePageComponent, private timeService: TimeService) { }
 
   ngOnInit(): void {
     this.gameService.getGames().subscribe((data: Jeu[]) => {
       this.games = data;
       this.updateButtons();
     });
+    this.timeService.timerEnded.subscribe(() => {
+      this.onTimerEnded();
+    });
+  }
+
+  onTimerEnded() {
+    this.verifyResponsesAndCallUpdate();
   }
 
   updateButtons() {
@@ -41,12 +50,13 @@ export class ButtonResponseComponent {
 
     if (questionOfInterest.choices) {
       this.buttons = [];
-      questionOfInterest.choices.forEach((choice: Choice) => {
+      questionOfInterest.choices.forEach((choice: Choice, butonIndex: number) => {
         this.buttons.push({
           color: 'white',
           selected: false,
           text: choice.answer,
-          isCorrect: choice.isCorrect
+          isCorrect: choice.isCorrect,
+          Id: butonIndex + 1
         });
       });
     }
@@ -61,9 +71,7 @@ export class ButtonResponseComponent {
     let clickedChoicesCount = 0;
     let correctChoicesCount = 0;
     let isAnswerCorrect = true;
-
     this.buttons.forEach(button => {
-
       if (button.isCorrect) {
         correctChoicesCount++
       }
@@ -79,18 +87,27 @@ export class ButtonResponseComponent {
     if (clickedChoicesCount !== correctChoicesCount) {
       isAnswerCorrect = false;
     }
-
-
     if (isAnswerCorrect) {
+      this.gamePage.incrementScore(this.games[this.gameService.currentGameId].questions[this.gameService.currentQuestionId].points);
       console.log("la reponse est bonne");
       this.UpdateGameQuestions();
-
     }
     else {
       console.log("Mauvaise reponse ")
       this.UpdateGameQuestions();
     }
+  }
 
+  PlayerEntries(event: KeyboardEvent) {
+    if (event.key === "Enter") {
+      this.verifyResponsesAndCallUpdate();
+    }
+    else {
+      if (parseInt(event.key) >= 1 && parseInt(event.key) <= this.buttons.length) {
+        const button = this.buttons[parseInt(event.key) - 1];
+        this.onButtonClick(button);
+      }
+    }
   }
 
   UpdateGameQuestions() {
@@ -98,13 +115,16 @@ export class ButtonResponseComponent {
     {
       alert("Fin de la partie !")
     } else {
-      //ajuster pointage
       this.gameService.setCurrentQuestionId(++this.gameService.currentQuestionId);
       this.updateButtons();
       this.gamePage.updateQuestion();
+      this.timeService.stopTimer();
+      this.timeService.startTimer(this.games[this.gameService.currentGameId].duration);
     }
   }
 
 }
+
+
 
 

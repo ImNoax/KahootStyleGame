@@ -24,12 +24,8 @@ export class TimerComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this.gameService.getGames().subscribe((data: Jeu[]) => {
             this.games = data;
-            this.updateTimer();
+            this.timeService.startTimer(this.games[this.gameService.currentGameId].duration);
         });
-    }
-
-    updateTimer() {
-        this.timeService.startTimer(this.games[this.gameService.currentGameId].duration);
     }
 
     ngOnDestroy() {
