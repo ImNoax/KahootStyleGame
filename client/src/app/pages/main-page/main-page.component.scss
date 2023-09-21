@@ -12,22 +12,19 @@
     align-items: center;
 }
 
-.button {
-    margin-top: 5%;
+button {
     text-align: center;
-    font-size: 200%;
+    font-size: 30px;
     border-radius: 30px;
-    padding: 3% 10%;
+    padding: 10% 10%;
     border: 5px solid black;
     margin: 4% 4%;
-    background-color: white;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    width: 200%;
-    height: 5%;
+    width: 350px;
     cursor: pointer;
 }
 
-.button:disabled {
+button:disabled {
     border: 5px solid gray;
     background-color: silver;
     color: gray;
@@ -35,20 +32,18 @@
     cursor: default;
 }
 
-.button:hover {
-    background-color: lightgrey;
-    width: 205%;
-    height: 20%;
-}
-
-.button:active {
-    background-color: darkgray;
+button:hover {
+    transform: scale(0.95);
+    background-color: #0f0a36;
 }
 
 .team-name {
     margin-top: 0.25em;
     margin-bottom: 0.25em;
-    color: green;
+    color: darkcyan;
+    background-color: rgb(black, 0.4);
+    width: 100px;
+    margin-left: 45%;
 }
 
 .header-item {

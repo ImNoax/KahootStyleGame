@@ -1,5 +1,5 @@
 <div class="container">
-    <h1 class="title">Administration des jeux</h1>
+    <app-header title="Création d'une partie"></app-header>
     <div class="fields">
         <table>
             <thead>
@@ -8,13 +8,13 @@
                     <th>Détails</th>
                 </tr>
             </thead>
-            <tr *ngFor="let jeu of jeux">
-                <td>{{ jeu.name }}</td>
+            <tr *ngFor="let game of games">
+                <td>{{ game.name }}</td>
                 <td><!-- Deuxième colonne (vide pour le moment) --></td>
             </tr>
             <tbody></tbody>
         </table>
     </div>
 
-    <button class="button" routerLink="/home">Retourner</button>
+    <button class="navigation" mat-raised-button color="primary" routerLink="/home">Retourner</button>
 </div>

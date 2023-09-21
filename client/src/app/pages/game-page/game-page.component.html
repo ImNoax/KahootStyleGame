@@ -6,10 +6,10 @@
         <app-timer></app-timer>
         <div class="question-container">
             <div id="question">
-                Quelle est la couleur du ciel?
+                {{ currentQuestion }} (+{{currentQuestionScore}})
             </div>
             <div id="pointage">
-                pointage: 0
+                Score: {{ score}}
             </div>
         </div>
         <div id="buttons">
