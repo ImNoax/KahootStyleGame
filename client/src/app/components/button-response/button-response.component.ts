@@ -3,6 +3,8 @@ import { GameHandlingService } from '@angular/../../client/src/app/services/game
 import { Jeu } from '@common/jeu';
 import { GamePageComponent } from "@angular/../../client/src/app/pages/game-page/game-page.component";
 import { TimeService } from '@app/services/time.service';
+import { Router } from '@angular/router';
+
 
 interface Button {
   color: string;
@@ -27,7 +29,7 @@ export class ButtonResponseComponent {
   games: Jeu[] = [];
   @ViewChild('buttonFocus', { static: false }) buttonFocus: ElementRef;
 
-  constructor(private gameService: GameHandlingService, private gamePage: GamePageComponent, private timeService: TimeService) { }
+  constructor(private gameService: GameHandlingService, private gamePage: GamePageComponent, private timeService: TimeService, private router: Router) { }
 
   ngOnInit(): void {
     this.gameService.getGames().subscribe((data: Jeu[]) => {
@@ -93,11 +95,15 @@ export class ButtonResponseComponent {
     }
     if (isAnswerCorrect) {
       this.gamePage.incrementScore(this.games[this.gameService.currentGameId].questions[this.gameService.currentQuestionId].points);
-      console.log("la reponse est bonne");
-      this.UpdateGameQuestions();
+
+      setTimeout(() => { // a enlever plustard car les alerts bloque la update du view de angular 
+        alert("bonne reponse");
+        this.UpdateGameQuestions();
+      }, 100);
+
     }
     else {
-      console.log("Mauvaise reponse ")
+      alert("mauvaise reponse")
       this.UpdateGameQuestions();
     }
   }
@@ -117,7 +123,8 @@ export class ButtonResponseComponent {
   UpdateGameQuestions() {
     if (this.gameService.currentQuestionId === ((this.games[this.gameService.currentGameId]).questions.length - 1))// on verifie si c'est la derniere question de la game
     {
-      alert("Fin de la partie !")
+      alert("Fin de la partie !");
+      this.router.navigate(['/home']);
     } else {
       this.gameService.setCurrentQuestionId(++this.gameService.currentQuestionId);
       this.updateButtons();
