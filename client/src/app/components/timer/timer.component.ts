@@ -18,7 +18,7 @@ export class TimerComponent implements OnInit, OnDestroy {
     }
 
     get totalTime() {
-        return this.games[this.gameService.currentGameId].duration;
+        return this.games[this.gameService.currentGameId]?.duration;
     }
 
     ngOnInit() {

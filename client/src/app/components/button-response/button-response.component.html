@@ -1,4 +1,4 @@
-<div class="buttons-parent" (keydown)="PlayerEntries($event)" tabindex="0" autofocus>
+<div class="buttons-parent" (keydown)="PlayerEntries($event)" #buttonFocus tabindex="0" autofocus>
     <div class="buttons-container">
         <button *ngFor="let button of buttons" [style.backgroundColor]="button.color" (click)="onButtonClick(button)"
             class="btn">

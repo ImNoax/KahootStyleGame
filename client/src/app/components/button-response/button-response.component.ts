@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { GameHandlingService } from '@angular/../../client/src/app/services/game-handling.service';
 import { Jeu } from '@common/jeu';
 import { GamePageComponent } from "@angular/../../client/src/app/pages/game-page/game-page.component";
@@ -16,7 +16,6 @@ interface Choice {
   answer: string;
   isCorrect: boolean;
 }
-
 @Component({
   selector: 'app-button-response',
   templateUrl: './button-response.component.html',
@@ -26,6 +25,7 @@ interface Choice {
 export class ButtonResponseComponent {
   buttons: Button[] = [];
   games: Jeu[] = [];
+  @ViewChild('buttonFocus', { static: false }) buttonFocus: ElementRef;
 
   constructor(private gameService: GameHandlingService, private gamePage: GamePageComponent, private timeService: TimeService) { }
 
@@ -37,6 +37,10 @@ export class ButtonResponseComponent {
     this.timeService.timerEnded.subscribe(() => {
       this.onTimerEnded();
     });
+  }
+
+  ngAfterViewInit(): void {
+    this.buttonFocus.nativeElement.focus();
   }
 
   onTimerEnded() {

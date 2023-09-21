@@ -49,6 +49,28 @@
                         "isCorrect": false
                     }
                 ]
+            },
+            {
+                "text": "Which planet is the closest to the sun?",
+                "points": 10,
+                "choices": [
+                    {
+                        "answer": "Mercury",
+                        "isCorrect": true
+                    },
+                    {
+                        "answer": "Earth",
+                        "isCorrect": false
+                    },
+                    {
+                        "answer": "Venus",
+                        "isCorrect": false
+                    },
+                    {
+                        "answer": "Mars",
+                        "isCorrect": false
+                    }
+                ]
             }
         ]
     },
