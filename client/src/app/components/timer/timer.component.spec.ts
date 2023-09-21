@@ -10,7 +10,6 @@ describe('TimerComponent', () => {
         TestBed.configureTestingModule({
             declarations: [TimerComponent],
             imports: [HttpClientTestingModule],
-
         });
         fixture = TestBed.createComponent(TimerComponent);
         component = fixture.componentInstance;

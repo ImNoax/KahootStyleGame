@@ -9,7 +9,7 @@ export class GameHandlingService {
     currentGameId: number = 0;
     currentQuestionId: number = 0;
 
-    constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient) {}
 
     getGames() {
         return this.http.get<Jeu[]>('assets/jeux.json');
