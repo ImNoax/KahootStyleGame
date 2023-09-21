@@ -1,8 +1,8 @@
-<div class="buttons-parent" (keydown)="PlayerEntries($event)" #buttonFocus tabindex="0" autofocus>
+<div class="buttons-parent" (keydown)="playerEntries($event)" #buttonFocus tabindex="0" autofocus>
     <div class="buttons-container">
         <button *ngFor="let button of buttons" [style.backgroundColor]="button.color" (click)="onButtonClick(button)"
             class="btn">
-            {{ button.Id }} ){{ button.text }}
+            {{ button.id }} ){{ button.text }}
         </button>
     </div>
 </div>

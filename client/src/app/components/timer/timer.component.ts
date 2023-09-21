@@ -11,7 +11,10 @@ import { Jeu } from '@common/jeu';
 export class TimerComponent implements OnInit, OnDestroy {
     games: Jeu[] = [];
 
-    constructor(private timeService: TimeService, private gameService: GameHandlingService) { }
+    constructor(
+        private timeService: TimeService,
+        private gameService: GameHandlingService,
+    ) {}
 
     get currentTime() {
         return this.timeService.time;

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { GameHandlingService } from '@angular/../../client/src/app/services/game-handling.service';
 import { Jeu } from '@common/jeu';
 
@@ -7,12 +7,12 @@ import { Jeu } from '@common/jeu';
     templateUrl: './game-page.component.html',
     styleUrls: ['./game-page.component.scss'],
 })
-export class GamePageComponent {
+export class GamePageComponent implements OnInit {
     games: Jeu[] = [];
     currentQuestion: string = '';
-    Score: number = 0;
+    score: number = 0;
     currentQuestionScore: number;
-    constructor(private gameService: GameHandlingService) { }
+    constructor(private gameService: GameHandlingService) {}
 
     ngOnInit(): void {
         this.gameService.setCurrentQuestionId(0);
@@ -30,6 +30,6 @@ export class GamePageComponent {
     }
 
     incrementScore(amount: number) {
-        this.Score += amount;
+        this.score += amount;
     }
 }
