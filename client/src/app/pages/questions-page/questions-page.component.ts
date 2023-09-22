@@ -11,7 +11,6 @@ import { Question, QuestionType } from '@common/jeu';
     templateUrl: './questions-page.component.html',
     styleUrls: ['./questions-page.component.scss'],
 })
-
 export class QuestionsPageComponent implements OnInit {
     pageTitle: string = 'Liste des questions';
     questionsFormArray: FormArray;
@@ -20,7 +19,7 @@ export class QuestionsPageComponent implements OnInit {
         private dialog: MatDialog,
         private fb: FormBuilder,
         private formManager: FormManagerService,
-        ) {}
+    ) {}
 
     ngOnInit(): void {
         this.questionsFormArray = this.formManager.questions;
@@ -33,22 +32,22 @@ export class QuestionsPageComponent implements OnInit {
 
     drop(event: CdkDragDrop<Question[]>): void {
         moveItemInArray(this.questionsFormArray.controls, event.previousIndex, event.currentIndex);
-        const questions: {answer: string, isCorrect: boolean}[] = this.formManager.questions.value;
-        
+        const questions: { answer: string; isCorrect: boolean }[] = this.formManager.questions.value;
+
         // Sources: https://stackoverflow.com/questions/49273499/angular-formarray-contents-order
-                    https://www.freecodecamp.org/news/swap-two-array-elements-in-javascript/
+        // www.freecodecamp.org/news/swap-two-array-elements-in-javascript/
         [questions[event.previousIndex], questions[event.currentIndex]] = [questions[event.currentIndex], questions[event.previousIndex]];
         this.formManager.questions.setValue(questions);
     }
 
     openQuestionCreator(): void {
         this.saveQuestionsForm();
-        
+
         // ajouter disableClose: true après définition des routes
         this.dialog.open(QuestionCreationPopupComponent, {
-            width: '75%', 
-            height: '80%', 
-            backdropClass: 'backdropBackground' 
+            width: '75%',
+            height: '80%',
+            backdropClass: 'backdropBackground',
         });
     }
 
@@ -58,7 +57,7 @@ export class QuestionsPageComponent implements OnInit {
 
     saveQuestionsForm() {
         const questionsForm: FormGroup = this.fb.group({
-            questions: this.questionsFormArray
+            questions: this.questionsFormArray,
         });
         this.formManager.saveGameForm(questionsForm);
     }
