@@ -1,6 +1,6 @@
 <div class="container">
-    <app-header [title]="'Création d\'un jeu'"></app-header>
-    <form class="fields" [formGroup]="myForm" (ngSubmit)="onSubmit(myForm)">
+    <app-header title="Création d'un jeu"></app-header>
+    <form class="fields" [formGroup]="myForm" (ngSubmit)="onSubmit()">
         <label for="title">Nom du jeu</label><br />
         <input
             [ngClass]="{ incorrect: isNameDuplicate }"
@@ -11,11 +11,11 @@
             name="title"
             (keyup)="verifyName($event)"
             [attr.maxlength]="maxCharName"
-            formControlName="name"
+            formControlName="title"
         />
         <br />
         <span class="note" id="incorrectName" *ngIf="isNameDuplicate">Nom déjà utilisé</span>
-        <span class="note" id="charCounterName">{{ myForm.value.name.length }}/{{ maxCharName }}</span>
+        <span class="note" id="charCounterName">{{ myForm.value.title.length }}/{{ maxCharName }}</span>
         <br />
         <br />
         <label for="description">Description</label><br />
@@ -32,7 +32,7 @@
         <span class="note" id="charCounterDesc">{{ myForm.value.description.length }}/{{ maxCharDesc }}</span
         ><br />
         <label for="time">Temps alloué pour les questions à choix multiples (QCM) (10 à 60 secondes)</label><br />
-        <input class="field" id="time_field" type="number" name="time" value="qcmTime" formControlName="time" min="10" max="60" />
+        <input class="field" id="time_field" type="number" name="time" value="qcmTime" formControlName="duration" min="10" max="60" />
         <p id="units">secondes</p>
         <p class="note">Note: Les questions à réponse libre (QRL) ont un temps fixé à 60 secondes.</p>
         <button class="questions-button" mat-raised-button color="primary" routerLink="/questions">Modifier la liste de questions</button>

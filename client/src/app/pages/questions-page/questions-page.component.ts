@@ -2,7 +2,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { QuestionCreationPopupComponent } from '@app/components/question-creation-popup/question-creation-popup.component';
-import { Question } from '@app/interfaces/question';
+import { Question } from '@common/game';
 
 @Component({
     selector: 'app-questions-page',
@@ -13,17 +13,17 @@ export class QuestionsPageComponent {
     pageTitle: string = 'Liste des questions';
 
     questions: Question[] = [
-        { text: 'Orange?', type: 'QCM' },
-        { text: 'Pomme?', type: 'QCM' },
-        { text: 'Banane?', type: 'QCL' },
-        { text: 'Citron?', type: 'QCM' },
+        // { text: 'Orange?', type: 'QCM' },
+        // { text: 'Pomme?', type: 'QCM' },
+        // { text: 'Banane?', type: 'QCL' },
+        // { text: 'Citron?', type: 'QCM' },
     ];
 
     constructor(private dialog: MatDialog) {}
 
-    setQuestionStyle(question: Question): object {
-        if (question.type === 'QCM') return { background: '#78B9DE' };
-        return { background: '#F2BB7B' };
+    setQuestionStyle(question: Question) {
+        // if (question.type === 'QCM') return { background: '#78B9DE' };
+        // return { background: '#F2BB7B' };
     }
 
     drop(event: CdkDragDrop<Question[]>): void {
