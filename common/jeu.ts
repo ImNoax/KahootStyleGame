@@ -1,19 +1,23 @@
-export type Jeu = {
-    name: string,
+export enum QuestionType {
+    QCM = "QCM",
+    QRL = "QRL"
+}
+
+export interface Question {
+    text: string,
+    points: number,
+    type: QuestionType,
+    choices: {
+        answer: string,
+        isCorrect: boolean
+    }[]
+}
+
+export interface Jeu {
+    title: string,
     description: string,
     duration: number,
-    questions: {
-        id: number,
-        text: string,
-        type: string,
-        points: number,
-        responses?: {
-            answer: string,
-            isCorrect: boolean
-        }[],
-        choices?: {
-            answer: string,
-            isCorrect: boolean
-        }[]
-    }[]
+    lastModification: string,
+    isVisible?: boolean,
+    questions: Question[],
 }

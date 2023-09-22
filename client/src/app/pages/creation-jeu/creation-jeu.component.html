@@ -1,18 +1,46 @@
 <div class="container">
-    <app-header [title]="'Création d\'un jeu'"></app-header>
-    <div class="fields">
-        <form>
-            <label for="title">Nom du jeu</label><br />
-            <input class="field" type="text" placeholder="Titre du Questionnaire" name="title" /><br />
-            <label for="description">Description</label><br />
-            <textarea class="field" id="description" type="text" placeholder="Description du Questionnaire" name="description"></textarea><br /><br />
-            <label for="time">Temps alloué pour les questions à choix multiples (QCM)</label><br />
-            <input class="field" id="time_field" type="number" name="time" value="30" />
-            <p id="units">secondes</p>
-            <p id="note">Note: Les questions à réponse libre (QRL) ont un temps fixé à 60 secondes.</p>
-        </form>
-        <button class="questions-button" mat-raised-button color="primary" routerLink="/questions">Modifier la liste de questions</button>
-    </div>
-    <button mat-raised-button color="primary" class="navigation" routerLink="/admin">Retourner</button>
-    <button mat-raised-button color="primary" class="navigation" routerLink="/admin">Enregistrer</button>
+    <app-header [title]="pageTitle"></app-header>
+    <form class="fields" [formGroup]="detailsForm" (ngSubmit)="onSubmit()">
+        <label for="title">Nom du jeu</label><br />
+        <input
+            [ngClass]="{ incorrect: isNameDuplicate }"
+            id="nameField"
+            class="field"
+            type="text"
+            placeholder="Titre du Questionnaire"
+            name="title"
+            (keyup)="verifyName($event)"
+            [attr.maxlength]="maxCharName"
+            formControlName="title"
+        />
+        <br />
+        <span class="note" id="incorrectName" *ngIf="isNameDuplicate">Nom déjà utilisé</span>
+        <span class="note" id="charCounterName">{{ detailsForm.value.title.length }}/{{ maxCharName }}</span>
+        <br />
+        <br />
+        <label for="description">Description</label><br />
+        <textarea
+            class="field"
+            id="description"
+            type="text"
+            placeholder="Description du Questionnaire"
+            name="description"
+            [maxLength]="maxCharDesc"
+            formControlName="description"
+        ></textarea>
+        <br />
+        <span class="note" id="charCounterDesc">{{ detailsForm.value.description.length }}/{{ maxCharDesc }}</span
+        ><br />
+        <label for="time">Temps alloué pour les questions à choix multiples (QCM) (10 à 60 secondes)</label><br />
+        <input class="field" id="time_field" type="number" name="time" value="qcmTime" formControlName="duration" min="10" max="60" />
+        <p id="units">secondes</p>
+        <p class="note">Note: Les questions à réponse libre (QRL) ont un temps fixé à 60 secondes.</p>
+        <button (click)="saveGameDetails()" class="questions-button" mat-raised-button color="primary" routerLink="/questions">
+            Modifier la liste de questions
+        </button>
+        <button (click)="resetForm()" mat-raised-button color="primary" class="navigation" routerLink="/admin">Retourner</button>
+        <button type="submit" mat-raised-button color="primary" class="navigation" [disabled]="!(detailsForm.valid && !isNameDuplicate)">
+            Soumettre
+        </button>
+    </form>
 </div>
