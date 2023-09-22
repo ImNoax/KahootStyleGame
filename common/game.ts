@@ -13,7 +13,7 @@ export interface Question {
     }[];
 }
 
-export interface Game {
+export interface Jeu {
     title: string;
     description: string;
     duration: number;

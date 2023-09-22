@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GameHandlingService } from '@app/services/game-handling.service';
-import { Game } from '@common/game';
+import { Jeu } from '@common/game';
 
 const BASE_TIMER = 30;
 
@@ -17,7 +17,7 @@ export class CreationJeuComponent implements OnInit {
     maxCharDesc: number;
     isNameDuplicate: boolean;
     myForm: FormGroup;
-    games: Game[] = new Array();
+    games: Jeu[] = new Array();
 
     constructor(
         private gameHandler: GameHandlingService,
