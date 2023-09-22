@@ -1,4 +1,5 @@
 import { ExampleService } from '@app/services/example.service';
+import { Jeu } from '@common/jeu';
 import { Message } from '@common/message';
 import { Request, Response, Router } from 'express';
 import { Service } from 'typedi';
@@ -55,8 +56,8 @@ export class ExampleController {
          */
         this.router.get('/', async (req: Request, res: Response) => {
             // Send the request to the service and send the response
-            const time: Message = await this.exampleService.helloWorld();
-            res.json(time);
+            const games: Jeu[] = await this.exampleService.getGames();
+            res.json(games);
         });
 
         /**
