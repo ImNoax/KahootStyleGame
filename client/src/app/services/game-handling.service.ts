@@ -18,8 +18,6 @@ export class GameHandlingService {
 
     getGames(): Observable<Jeu[]> {
         return this.http.get<Jeu[]>(`${this.baseUrl}/jeux`).pipe(catchError(this.handleError<Jeu[]>('getGames')));
-    getGames(): Observable<Jeu[]> {
-        return this.http.get<Jeu[]>(`${this.baseUrl}/jeux`).pipe(catchError(this.handleError<Jeu[]>('getGames')));
     }
 
     addGame(newGame: Jeu): Observable<Jeu[]> {
@@ -28,8 +26,6 @@ export class GameHandlingService {
 
     changeVisibility(game: Jeu) {
         return this.http
-            .patch<Jeu[]>(`${this.baseUrl}/jeux`, { isVisible: !game.isVisible })
-            .pipe(catchError(this.handleError<Jeu[]>('changeVisibility')));
             .patch<Jeu[]>(`${this.baseUrl}/jeux`, { isVisible: !game.isVisible })
             .pipe(catchError(this.handleError<Jeu[]>('changeVisibility')));
     }

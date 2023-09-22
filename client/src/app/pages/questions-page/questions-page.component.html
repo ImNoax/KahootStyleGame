@@ -18,8 +18,10 @@
                     <div class="left-section">
                         <i class="handle fa-solid fa-bars fa-lg" cdkDragHandle></i>
                         <div class="question-text">{{ i + 1 }}. {{ question.value.text }}</div>
+                        <div class="question-text">{{ i + 1 }}. {{ question.value.text }}</div>
                     </div>
 
+                    <div class="question-type">{{ question.value.type }}</div>
                     <div class="question-type">{{ question.value.type }}</div>
 
                     <div class="right-section">
@@ -28,18 +30,22 @@
                         </div>
 
                         <div (click)="deleteQuestion(i)" class="delete-icon">
-                            <i class="fa-solid fa-xmark fa-xl"></i>
+                            <div (click)="deleteQuestion(i)" class="delete-icon">
+                                <i class="fa-solid fa-xmark fa-xl"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <button class="question-insertion" mat-raised-button color="primary" (click)="openQuestionCreator()">Ajouter une question</button>
+                <button class="question-insertion" mat-raised-button color="primary" (click)="openQuestionCreator()">Ajouter une question</button>
             </div>
-
-            <button class="question-insertion" mat-raised-button color="primary" (click)="openQuestionCreator()">Ajouter une question</button>
         </div>
-    </div>
 
-    <div id="nav">
-        <button class="navigation" mat-raised-button color="primary" routerLink="/creation">Retourner</button>
-        <button (click)="saveQuestionsForm()" class="navigation" mat-raised-button color="primary" routerLink="/creation">Enregistrer</button>
+        <div id="nav">
+            <button class="navigation" mat-raised-button color="primary" routerLink="/creation">Retourner</button>
+            <button (click)="saveQuestionsForm()" class="navigation" mat-raised-button color="primary" routerLink="/creation">Enregistrer</button>
+            <button (click)="saveQuestionsForm()" class="navigation" mat-raised-button color="primary" routerLink="/creation">Enregistrer</button>
+        </div>
     </div>
 </div>
