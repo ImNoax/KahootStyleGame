@@ -1,23 +1,23 @@
 export enum QuestionType {
-    QCM = "QCM",
-    QRL = "QRL"
+    QCM = 'QCM',
+    QRL = 'QRL',
 }
 
 export interface Question {
-    text: string,
-    points: number,
-    type: QuestionType,
+    text: string;
+    points: number;
+    type: QuestionType;
     choices: {
-        answer: string,
-        isCorrect: boolean
-    }[]
+        answer: string;
+        isCorrect: boolean;
+    }[];
 }
 
 export interface Jeu {
-    title: string,
-    description: string,
-    duration: number,
-    lastModification: string,
-    isVisible?: boolean,
-    questions: Question[],
+    title: string;
+    description: string;
+    duration: number;
+    lastModification: string;
+    isVisible?: boolean;
+    questions: Question[];
 }
