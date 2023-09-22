@@ -1,6 +1,5 @@
 .center {
-    background-image: url('../../../assets/blue_curtain.jpg');
-    background-color:rgba(0, 0, 0, 1);
+    background-image: url('../../../assets/dark-theater.jpg');
     background-size: 100% 100%;
     width: 100%;
     height: 100%;
@@ -32,7 +31,7 @@ h2 {
 }
 
 #answer-list {
-    width: 70%;
+    width: 100%;
     margin-top: 2%;   
     margin-bottom: 2%;   
     display: flex;
@@ -124,6 +123,10 @@ button.answer-creation:active {
 
 span {
     padding-left: 2%;
+}
+
+.text-color {
+    color: white;
 }
 
 #nav {

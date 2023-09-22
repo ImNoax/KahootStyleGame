@@ -1,6 +1,6 @@
 <div class="container">
-    <app-header title="Création d'un jeu"></app-header>
-    <form class="fields" [formGroup]="myForm" (ngSubmit)="onSubmit()">
+    <app-header [title]="pageTitle"></app-header>
+    <form class="fields" [formGroup]="detailsForm" (ngSubmit)="onSubmit()">
         <label for="title">Nom du jeu</label><br />
         <input
             [ngClass]="{ incorrect: isNameDuplicate }"
@@ -15,7 +15,7 @@
         />
         <br />
         <span class="note" id="incorrectName" *ngIf="isNameDuplicate">Nom déjà utilisé</span>
-        <span class="note" id="charCounterName">{{ myForm.value.title.length }}/{{ maxCharName }}</span>
+        <span class="note" id="charCounterName">{{ detailsForm.value.title.length }}/{{ maxCharName }}</span>
         <br />
         <br />
         <label for="description">Description</label><br />
@@ -29,16 +29,16 @@
             formControlName="description"
         ></textarea>
         <br />
-        <span class="note" id="charCounterDesc">{{ myForm.value.description.length }}/{{ maxCharDesc }}</span
+        <span class="note" id="charCounterDesc">{{ detailsForm.value.description.length }}/{{ maxCharDesc }}</span
         ><br />
         <label for="time">Temps alloué pour les questions à choix multiples (QCM) (10 à 60 secondes)</label><br />
         <input class="field" id="time_field" type="number" name="time" value="qcmTime" formControlName="duration" min="10" max="60" />
         <p id="units">secondes</p>
         <p class="note">Note: Les questions à réponse libre (QRL) ont un temps fixé à 60 secondes.</p>
-        <button class="questions-button" mat-raised-button color="primary" routerLink="/questions">Modifier la liste de questions</button>
-        <button mat-raised-button color="primary" class="navigation" routerLink="/admin">Retourner</button>
-        <button type="submit" mat-raised-button color="primary" class="navigation" [disabled]="!(myForm.valid && !isNameDuplicate)">
-            Enregistrer
+        <button (click)="saveGameDetails()" class="questions-button" mat-raised-button color="primary" routerLink="/questions">Modifier la liste de questions</button>
+        <button (click)="resetForm()" mat-raised-button color="primary" class="navigation" routerLink="/admin">Retourner</button>
+        <button type="submit" mat-raised-button color="primary" class="navigation" [disabled]="!(detailsForm.valid && !isNameDuplicate)">
+            Soumettre
         </button>
     </form>
 </div>

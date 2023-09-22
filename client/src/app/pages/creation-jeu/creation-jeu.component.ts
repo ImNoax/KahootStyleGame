@@ -1,11 +1,10 @@
-import { formatDate } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
+import { FormManagerService } from '@app/services/form-manager.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
-import { Jeu } from '@common/game';
+import { Jeu } from '@common/jeu';
 
-const BASE_TIMER = 30;
 
 @Component({
     selector: 'app-creation-jeu',
@@ -13,36 +12,32 @@ const BASE_TIMER = 30;
     styleUrls: ['./creation-jeu.component.scss'],
 })
 export class CreationJeuComponent implements OnInit {
+    pageTitle: string = "Création d'un jeu";
     maxCharName: number;
     maxCharDesc: number;
     isNameDuplicate: boolean;
-    myForm: FormGroup;
-    games: Jeu[] = new Array();
+    games: Jeu[];
+    detailsForm: FormGroup;
 
     constructor(
-        private gameHandler: GameHandlingService,
-        private fb: FormBuilder,
+        private gameHandler: GameHandlingService, 
+        private formManager: FormManagerService,
+        // private fb: FormBuilder,
         private router: Router,
     ) {
         this.isNameDuplicate = false;
         this.maxCharName = 255;
         this.maxCharDesc = 2000;
     }
+    
     ngOnInit() {
-        this.myForm = this.fb.group({
-            title: ['', Validators.required],
-            description: ['', Validators.required],
-            duration: BASE_TIMER,
-            lastModification: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
-            isVisible: false,
-            questions: [],
-        });
-        
         this.gameHandler.getGames().subscribe((game) => {
             this.games = game;
         });
-    }
 
+        this.detailsForm = this.formManager.gameForm;
+    }
+    
     verifyName(event: Event) {
         for (const game of this.games) {
             if (game.title === (event.target as HTMLInputElement).value) {
@@ -53,10 +48,20 @@ export class CreationJeuComponent implements OnInit {
             }
         }
     }
-
+    
+    saveGameDetails(): void {    
+        this.formManager.saveGameForm(this.detailsForm);
+    }
+    
     onSubmit() {
-        this.gameHandler.addGame(this.myForm.value);
-
+        // console.log(this.formManager.getGameForm());
+        this.saveGameDetails();
+        this.formManager.sendGameForm();
+        
         this.router.navigate(['/admin']);
+    }
+
+    resetForm(): void {
+        this.formManager.resetGameForm();
     }
 }
