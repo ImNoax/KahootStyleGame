@@ -66,4 +66,9 @@ export class QuestionsPageComponent implements OnInit {
         // ajouter disableClose: true après définition des routes
         this.dialog.open(QuestionCreationPopupComponent, { width: '75%', height: '80%', backdropClass: 'backdropBackground' });
     }
+
+    openDialog(): void {
+        // ajouter disableClose: true après définition des routes
+        this.dialog.open(QuestionCreationPopupComponent, { width: '75%', height: '80%', backdropClass: 'backdropBackground' });
+    }
 }
