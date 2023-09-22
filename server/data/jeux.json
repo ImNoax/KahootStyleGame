@@ -4,6 +4,7 @@
         "description": "This is the description for Game 1",
         "duration": 30,
         "lastModification": "2018-11-13",
+        "isVisible": true,
         "questions": [
             {
                 "text": "What is the capital of France?",
@@ -58,6 +59,7 @@
         "description": "This is the description for Game 2",
         "duration": 25,
         "lastModification": "2018-11-13",
+        "isVisible": true,
         "questions": [
             {
                 "text": "What is 2 + 2?",
