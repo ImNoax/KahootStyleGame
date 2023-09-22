@@ -15,23 +15,22 @@ export class FormManagerService {
         duration: BASE_TIMER,
         lastModification: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
         isVisible: false,
-        questions: this.fb.array([])
+        questions: this.fb.array([]),
     });
 
     constructor(
         private fb: FormBuilder,
-        private gameHandler: GameHandlingService
-        ) {}
-    
+        private gameHandler: GameHandlingService,
+    ) {}
+
     get questions(): FormArray {
-        return this.gameForm.get("questions") as FormArray;
+        return this.gameForm.get('questions') as FormArray;
     }
 
     saveGameForm(gameForm: FormGroup): void {
         this.gameForm.patchValue(gameForm.value);
-        
     }
-    
+
     resetGameForm(): void {
         this.gameForm.reset(this.gameForm.value);
     }

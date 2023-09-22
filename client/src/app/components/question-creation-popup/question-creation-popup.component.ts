@@ -13,7 +13,6 @@ const BASE_POINTS = 10;
     templateUrl: './question-creation-popup.component.html',
     styleUrls: ['./question-creation-popup.component.scss'],
 })
-
 export class QuestionCreationPopupComponent implements OnInit {
     pageTitle: string = 'Liste des questions';
 
@@ -26,8 +25,12 @@ export class QuestionCreationPopupComponent implements OnInit {
     constructor(
         public dialogRef: MatDialogRef<QuestionCreationPopupComponent>,
         private fb: FormBuilder,
-        private formManager: FormManagerService
+        private formManager: FormManagerService,
     ) {}
+
+    get choices(): FormArray {
+        return this.questionForm.get('choices') as FormArray;
+    }
 
     ngOnInit() {
         this.questionForm = this.fb.group({
@@ -37,10 +40,10 @@ export class QuestionCreationPopupComponent implements OnInit {
             choices: this.fb.array([
                 this.fb.group({
                     answer: ['', Validators.required],
-                    isCorrect: this.isChecked
-                })
-            ])
-        });        
+                    isCorrect: this.isChecked,
+                }),
+            ]),
+        });
     }
 
     setAnswerStyle(isCorrect: boolean) {
@@ -54,24 +57,20 @@ export class QuestionCreationPopupComponent implements OnInit {
 
     drop(event: CdkDragDrop<Question[]>): void {
         moveItemInArray(this.choices.controls, event.previousIndex, event.currentIndex);
-        
-        const choices: {answer: string, isCorrect: boolean}[] = this.choices.value;
+
+        const choices: { answer: string; isCorrect: boolean }[] = this.choices.value;
         // Sources: https://stackoverflow.com/questions/49273499/angular-formarray-contents-order
-                    https://www.freecodecamp.org/news/swap-two-array-elements-in-javascript/
+        // www.freecodecamp.org/news/swap-two-array-elements-in-javascript/
         [choices[event.previousIndex], choices[event.currentIndex]] = [choices[event.currentIndex], choices[event.previousIndex]];
         this.choices.setValue(choices);
     }
 
-    get choices(): FormArray {
-        return this.questionForm.get("choices") as FormArray;
-    }
-    
     addChoice() {
         this.choices.push(
             this.fb.group({
                 answer: ['', Validators.required],
-                isCorrect: true
-            })
+                isCorrect: true,
+            }),
         );
         this.canAddAnswer = this.choices.length !== MAX_CHOICES_NUMBER;
     }
@@ -80,7 +79,7 @@ export class QuestionCreationPopupComponent implements OnInit {
         this.choices.removeAt(index);
         this.canAddAnswer = this.choices.length !== MAX_CHOICES_NUMBER;
     }
-    
+
     closeQuestionCreator() {
         this.dialogRef.close();
     }

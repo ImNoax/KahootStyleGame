@@ -5,7 +5,6 @@ import { FormManagerService } from '@app/services/form-manager.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { Jeu } from '@common/jeu';
 
-
 @Component({
     selector: 'app-creation-jeu',
     templateUrl: './creation-jeu.component.html',
@@ -20,16 +19,15 @@ export class CreationJeuComponent implements OnInit {
     detailsForm: FormGroup;
 
     constructor(
-        private gameHandler: GameHandlingService, 
+        private gameHandler: GameHandlingService,
         private formManager: FormManagerService,
-        // private fb: FormBuilder,
         private router: Router,
     ) {
         this.isNameDuplicate = false;
         this.maxCharName = 255;
         this.maxCharDesc = 2000;
     }
-    
+
     ngOnInit() {
         this.gameHandler.getGames().subscribe((game) => {
             this.games = game;
@@ -37,7 +35,7 @@ export class CreationJeuComponent implements OnInit {
 
         this.detailsForm = this.formManager.gameForm;
     }
-    
+
     verifyName(event: Event) {
         for (const game of this.games) {
             if (game.title === (event.target as HTMLInputElement).value) {
@@ -48,16 +46,15 @@ export class CreationJeuComponent implements OnInit {
             }
         }
     }
-    
-    saveGameDetails(): void {    
+
+    saveGameDetails(): void {
         this.formManager.saveGameForm(this.detailsForm);
     }
-    
+
     onSubmit() {
-        // console.log(this.formManager.getGameForm());
         this.saveGameDetails();
         this.formManager.sendGameForm();
-        
+
         this.router.navigate(['/admin']);
     }
 

@@ -2,6 +2,8 @@ import { FileManagerService } from '@app/services/file-manager.service';
 import { Jeu } from '@common/jeu';
 import { Service } from 'typedi';
 
+const JSON_SPACE = 4;
+
 @Service()
 export class GameManagerService {
     constructor(private fileManager: FileManagerService) {}
@@ -17,7 +19,7 @@ export class GameManagerService {
         const file = `./data/jeu${id}.json`;
 
         delete gameToExport.isVisible;
-        await this.fileManager.writeJsonFile(file, JSON.stringify(gameToExport, null, 4));
+        await this.fileManager.writeJsonFile(file, JSON.stringify(gameToExport, null, JSON_SPACE));
 
         return file;
     }
@@ -26,7 +28,7 @@ export class GameManagerService {
         const games: Jeu[] = await this.getGames();
         games[id] = modifiedGame;
 
-        this.fileManager.writeJsonFile('./data/jeux.json', JSON.stringify(games, null, 4));
+        this.fileManager.writeJsonFile('./data/jeux.json', JSON.stringify(games, null, JSON_SPACE));
 
         return games;
     }
@@ -35,7 +37,7 @@ export class GameManagerService {
         const games: Jeu[] = await this.getGames();
         games[id].isVisible = newVisibility.isVisible;
 
-        this.fileManager.writeJsonFile('./data/jeux.json', JSON.stringify(games, null, 4));
+        this.fileManager.writeJsonFile('./data/jeux.json', JSON.stringify(games, null, JSON_SPACE));
 
         return games;
     }
@@ -44,7 +46,7 @@ export class GameManagerService {
         const games: Jeu[] = await this.getGames();
         games.push(newGame);
 
-        this.fileManager.writeJsonFile('./data/jeux.json', JSON.stringify(games, null, 4));
+        this.fileManager.writeJsonFile('./data/jeux.json', JSON.stringify(games, null, JSON_SPACE));
 
         return games;
     }
@@ -53,6 +55,6 @@ export class GameManagerService {
         const games: Jeu[] = await this.getGames();
         delete games[id];
 
-        this.fileManager.writeJsonFile('./data/jeux.json', JSON.stringify(games, null, 4));
+        this.fileManager.writeJsonFile('./data/jeux.json', JSON.stringify(games, null, JSON_SPACE));
     }
 }
