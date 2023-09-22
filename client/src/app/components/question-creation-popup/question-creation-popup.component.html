@@ -1,49 +1,50 @@
 <div class="center">
     <h2>Ajout d'une question</h2>
 
-    <form>
+    <form [formGroup] = "questionForm" (ngSubmit)="onSubmit()">
         <mat-form-field class="field question-field">
             <mat-label>Texte de la question</mat-label>
-            <textarea matInput placeholder="Question..." required autofocus rows="5"></textarea>
+            <textarea matInput formControlName="text" placeholder="Question..." required autofocus rows="5"></textarea>
         </mat-form-field>
 
         <mat-form-field class="field value-field">
             <mat-label>Valeur de la question</mat-label>
-            <input matInput id="score" type="number" min="10" max="100" step="10" value="50">
+            <input formControlName="points" matInput id="score" type="number" min="10" max="100" step="10" value="50">
         </mat-form-field>
 
-        <mat-slide-toggle hideIcon></mat-slide-toggle>
+        <mat-slide-toggle disabled><span class="text-color">{{questionType}}</span></mat-slide-toggle>
+        
+        <div formArrayName="choices" cdkDropList id="answer-list" (cdkDropListDropped)="drop($event)">
+            <div [formGroupName]="i" class="answer-box" [ngStyle]="setAnswerStyle(choice.value.isCorrect)" *ngFor="let choice of choices.controls; index as i" cdkDrag>
+
+                <div class="left-section">
+                    <i class="handle fa-solid fa-bars fa-lg" cdkDragHandle></i>
+                    <div class="answer-text">
+                        {{i + 1}}.
+                        <input type="text" size="35" formControlName="answer">
+                    </div>
+                </div>
+                
+                <div class="right-section">
+                    <div class="toggle-icon">
+                        <mat-slide-toggle color="primary" [checked]="isChecked">{{choice.value.type}}</mat-slide-toggle>
+                    </div>
+
+                    <div (click)="deleteChoice(i)" class="delete-icon">
+                        <i class="fa-solid fa-xmark fa-xl"></i>
+                    </div>
+                </div>
+            </div>
+        
+            <button type="button" (click)="addChoice()" *ngIf="canAddAnswer" class="answer-creation">
+                <i class="fa-solid fa-plus fa-lg"></i>
+                <span>Ajouter un choix de réponse</span>
+            </button>
+         </div>
+         
+         <div id="nav">
+             <button (click)="closeQuestionCreator()" mat-raised-button color="primary">Annuler</button>
+             <button type="submit" mat-raised-button color="primary">Enregistrer</button>
+         </div>
     </form>
-
-    <div cdkDropList id="answer-list" (cdkDropListDropped)="drop($event)">
-        <!-- [ngStyle]="setAnswerStyle(answer)" -->
-        <div class="answer-box" *ngFor="let answer of answers; index as i" cdkDrag>
-            <div class="left-section">
-                <i class="handle fa-solid fa-bars fa-lg" cdkDragHandle></i>
-                <div class="answer-text">
-                    {{i + 1}}. {{answer.text}}
-                </div>
-            </div>
-
-            <div class="right-section">
-                <div class="toggle-icon">
-                    <mat-slide-toggle color="primary" [(ngModel)]="isChecked">{{answer.type}}</mat-slide-toggle>
-                </div>
-
-                <div class="delete-icon">
-                    <i class="fa-solid fa-xmark fa-xl"></i>
-                </div>
-            </div>
-        </div>
-
-        <button *ngIf="canAddAnswer" class="answer-creation">
-            <i class="fa-solid fa-plus fa-lg"></i>
-            <span>Ajouter un choix de réponse</span>
-        </button>
-    </div>
-
-    <div id="nav">
-        <button mat-raised-button color="primary">Annuler</button>
-        <button mat-raised-button color="primary">Enregistrer</button>
-    </div>
 </div>
