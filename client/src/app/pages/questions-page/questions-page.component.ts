@@ -69,6 +69,21 @@ export class QuestionsPageComponent implements OnInit {
 
     openDialog(): void {
         // ajouter disableClose: true après définition des routes
-        this.dialog.open(QuestionCreationPopupComponent, { width: '75%', height: '80%', backdropClass: 'backdropBackground' });
+        this.dialog.open(QuestionCreationPopupComponent, {
+            width: '75%',
+            height: '80%',
+            backdropClass: 'backdropBackground',
+        });
+    }
+
+    deleteQuestion(index: number) {
+        this.questionsFormArray.removeAt(index);
+    }
+
+    saveQuestionsForm() {
+        const questionsForm: FormGroup = this.fb.group({
+            questions: this.questionsFormArray,
+        });
+        this.formManager.saveGameForm(questionsForm);
     }
 }

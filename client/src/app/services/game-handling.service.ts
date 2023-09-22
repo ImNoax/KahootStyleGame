@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Jeu } from '@common/game';
+import { Jeu } from '@common/jeu';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -22,8 +22,8 @@ export class GameHandlingService {
         return this.http.get<Jeu[]>(`${this.baseUrl}/jeux`).pipe(catchError(this.handleError<Jeu[]>('getGames')));
     }
 
-    addGame(game: Jeu) {
-        this.http.post(`${this.baseUrl}/jeux`, game).subscribe();
+    addGame(newGame: Jeu): Observable<Jeu[]> {
+        return this.http.post<Jeu[]>(`${this.baseUrl}/jeux`, newGame).pipe(catchError(this.handleError<Jeu[]>('addGame')));
     }
 
     changeVisibility(game: Jeu) {

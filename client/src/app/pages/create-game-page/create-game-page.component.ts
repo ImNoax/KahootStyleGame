@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GameHandlingService } from '@app/services/game-handling.service';
-import { Jeu } from '@common/game';
+import { Jeu } from '@common/jeu';
 // import { saveAs } from 'file-saver';
 
 @Component({
