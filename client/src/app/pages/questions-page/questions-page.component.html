@@ -7,9 +7,14 @@
                 <h4>Nom du jeu</h4>
                 <p>Questionnaire sur les dindes</p>
             </div>
-            
+
             <div cdkDropList id="questions-list" (cdkDropListDropped)="drop($event)">
-                <div class="question-box" [ngStyle]="setQuestionStyle(question.value)" *ngFor="let question of questionsFormArray.controls; index as i" cdkDrag>
+                <div
+                    class="question-box"
+                    [ngStyle]="setQuestionStyle(question.value)"
+                    *ngFor="let question of questionsFormArray.controls; index as i"
+                    cdkDrag
+                >
                     <div class="left-section">
                         <i class="handle fa-solid fa-bars fa-lg" cdkDragHandle></i>
                         <div class="question-text">{{ i + 1 }}. {{ question.value.text }}</div>

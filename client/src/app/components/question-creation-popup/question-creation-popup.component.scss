@@ -27,17 +27,17 @@ h2 {
 }
 
 .value-field {
-    width: 150px; 
+    width: 150px;
 }
 
 #answer-list {
     width: 100%;
-    margin-top: 2%;   
-    margin-bottom: 2%;   
+    margin-top: 2%;
+    margin-bottom: 2%;
     display: flex;
     flex-direction: column;
 }
-  
+
 .answer-box {
     display: flex;
     flex-direction: row;
@@ -65,21 +65,22 @@ h2 {
 .answer-text {
     padding-left: 2%;
     font-size: medium;
-}  
+}
 
 // Source: https://material.angular.io/cdk/drag-drop/overview
 .cdk-drag-preview {
     box-sizing: border-box;
     border-radius: 4px;
-    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
-                0 8px 10px 1px rgba(0, 0, 0, 0.14),
-                0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    box-shadow:
+        0 5px 5px -3px rgba(0, 0, 0, 0.2),
+        0 8px 10px 1px rgba(0, 0, 0, 0.14),
+        0 3px 14px 2px rgba(0, 0, 0, 0.12);
 }
 
 .cdk-drag-placeholder {
     opacity: 40%;
 }
-  
+
 .cdk-drag-animating {
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
@@ -104,7 +105,7 @@ h2 {
 }
 
 .right-section div:active {
-    background: rgb(#3F51B5, 0.5);
+    background: rgb(#3f51b5, 0.5);
     border-radius: 100%;
 }
 
@@ -114,11 +115,11 @@ button.answer-creation {
 }
 
 button.answer-creation:hover {
-    background:lightgrey;
+    background: lightgrey;
 }
 
 button.answer-creation:active {
-    background:grey;
+    background: grey;
 }
 
 span {
@@ -133,12 +134,12 @@ span {
     width: 100%;
     display: flex;
     flex-direction: row;
-    justify-content: space-around;   
+    justify-content: space-around;
 }
 
 #nav button:nth-child(1) {
-    color: #3F51B5;
-    background-color: #EEEEEE;
+    color: #3f51b5;
+    background-color: #eeeeee;
     font-weight: bold;
 }
 
