@@ -34,15 +34,15 @@ export class GameHandlingService {
         return this.http.get<Jeu>(`${this.baseUrl}/jeux/${id}`, { responseType: 'json' });
     }
 
-    private handleError<T>(request: string, result?: T): (error: Error) => Observable<T> {
-        return () => of(result as T);
-    }
-
     setCurrentGameId(id: number) {
         this.currentGameId = id;
     }
 
     setCurrentQuestionId(id: number) {
         this.currentQuestionId = id;
+    }
+
+    private handleError<T>(request: string, result?: T): (error: Error) => Observable<T> {
+        return () => of(result as T);
     }
 }
