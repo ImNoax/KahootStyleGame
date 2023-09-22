@@ -9,7 +9,8 @@
             </div>
 
             <div cdkDropList id="questions-list" (cdkDropListDropped)="drop($event)">
-                <div class="question-box" [ngStyle]="setQuestionStyle(question)" *ngFor="let question of questions; index as i" cdkDrag>
+                <!-- [ngStyle]="setQuestionStyle(question)" ajouter après-->
+                <div class="question-box"  *ngFor="let question of questions; index as i" cdkDrag>
                     <div class="left-section">
                         <i class="handle fa-solid fa-bars fa-lg" cdkDragHandle></i>
                         <div class="question-text">{{ i + 1 }}. {{ question.text }}</div>

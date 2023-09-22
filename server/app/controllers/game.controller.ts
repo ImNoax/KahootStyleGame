@@ -1,6 +1,6 @@
 import { FileManagerService } from '@app/services/file-manager.service';
 import { GameManagerService } from '@app/services/game-manager.service';
-import { Game } from '@common/jeu';
+import { Game } from '@common/game';
 import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
