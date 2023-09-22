@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GameHandlingService } from '@app/services/game-handling.service';
-import { Game } from '@common/game';
+import { Jeu } from '@common/game';
 // import { saveAs } from 'file-saver';
 
 @Component({
@@ -9,12 +9,12 @@ import { Game } from '@common/game';
     styleUrls: ['./create-game-page.component.scss'],
 })
 export class CreateGamePageComponent implements OnInit {
-    games: Game[];
+    games: Jeu[];
 
     constructor(private gameHandler: GameHandlingService) {}
 
     ngOnInit(): void {
-        this.gameHandler.getGames().subscribe((games: Game[]) => {
+        this.gameHandler.getGames().subscribe((games: Jeu[]) => {
             this.games = games;
         });
     }
