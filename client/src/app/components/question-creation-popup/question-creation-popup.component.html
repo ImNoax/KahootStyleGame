@@ -16,7 +16,8 @@
     </form>
 
     <div cdkDropList id="answer-list" (cdkDropListDropped)="drop($event)">
-        <div class="answer-box" [ngStyle]="setAnswerStyle(answer)" *ngFor="let answer of answers; index as i" cdkDrag>
+        <!-- [ngStyle]="setAnswerStyle(answer)" -->
+        <div class="answer-box" *ngFor="let answer of answers; index as i" cdkDrag>
             <div class="left-section">
                 <i class="handle fa-solid fa-bars fa-lg" cdkDragHandle></i>
                 <div class="answer-text">

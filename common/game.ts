@@ -1,15 +1,4 @@
-/* import { Question } from './question';
-
-export interface Game {
-    name: string;
-    description: string;
-    timePerQuestion: number;
-    questions: Question[];
-    lastModification: string;
-    isVisible?: boolean;
-}*/
-
-enum QuestionType {
+export enum QuestionType {
     QCM,
     QRL,
 }

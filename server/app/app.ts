@@ -14,7 +14,7 @@ export class Application {
     private readonly internalError: number = StatusCodes.INTERNAL_SERVER_ERROR;
     private readonly swaggerOptions: swaggerJSDoc.Options;
 
-    constructor(private readonly exampleController: GameController) {
+    constructor(private readonly gameController: GameController) {
         this.app = express();
 
         this.swaggerOptions = {
@@ -35,7 +35,7 @@ export class Application {
 
     bindRoutes(): void {
         this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(this.swaggerOptions)));
-        this.app.use('/api/', this.exampleController.router);
+        this.app.use('/api/games', this.gameController.router);
         this.errorHandling();
     }
 
