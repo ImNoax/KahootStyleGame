@@ -11,22 +11,10 @@
                 "points": 10,
                 "type": "QCM",
                 "choices": [
-                    {
-                        "answer": "Paris",
-                        "isCorrect": true
-                    },
-                    {
-                        "answer": "London",
-                        "isCorrect": false
-                    },
-                    {
-                        "answer": "Berlin",
-                        "isCorrect": false
-                    },
-                    {
-                        "answer": "Madrid",
-                        "isCorrect": false
-                    }
+                    { "answer": "Paris", "isCorrect": true },
+                    { "answer": "London", "isCorrect": false },
+                    { "answer": "Berlin", "isCorrect": false },
+                    { "answer": "Madrid", "isCorrect": false }
                 ]
             },
             {
@@ -34,22 +22,10 @@
                 "points": 10,
                 "type": "QCM",
                 "choices": [
-                    {
-                        "answer": "Blue",
-                        "isCorrect": false
-                    },
-                    {
-                        "answer": "Apple",
-                        "isCorrect": true
-                    },
-                    {
-                        "answer": "Green",
-                        "isCorrect": false
-                    },
-                    {
-                        "answer": "Yellow",
-                        "isCorrect": false
-                    }
+                    { "answer": "Blue", "isCorrect": false },
+                    { "answer": "Apple", "isCorrect": true },
+                    { "answer": "Green", "isCorrect": false },
+                    { "answer": "Yellow", "isCorrect": false }
                 ]
             }
         ]
@@ -66,18 +42,9 @@
                 "points": 20,
                 "type": "QCM",
                 "choices": [
-                    {
-                        "answer": "3",
-                        "isCorrect": false
-                    },
-                    {
-                        "answer": "4",
-                        "isCorrect": true
-                    },
-                    {
-                        "answer": "5",
-                        "isCorrect": false
-                    }
+                    { "answer": "3", "isCorrect": false },
+                    { "answer": "4", "isCorrect": true },
+                    { "answer": "5", "isCorrect": false }
                 ]
             },
             {
@@ -85,22 +52,10 @@
                 "points": 30,
                 "type": "QCM",
                 "choices": [
-                    {
-                        "answer": "Earth",
-                        "isCorrect": false
-                    },
-                    {
-                        "answer": "Mars",
-                        "isCorrect": false
-                    },
-                    {
-                        "answer": "Jupiter",
-                        "isCorrect": true
-                    },
-                    {
-                        "answer": "Venus",
-                        "isCorrect": false
-                    }
+                    { "answer": "Earth", "isCorrect": false },
+                    { "answer": "Mars", "isCorrect": false },
+                    { "answer": "Jupiter", "isCorrect": true },
+                    { "answer": "Venus", "isCorrect": false }
                 ]
             }
         ]
