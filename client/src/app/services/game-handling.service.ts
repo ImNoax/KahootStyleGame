@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Game } from '@app/interfaces/game';
+import { Game } from '@common/game';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -31,7 +31,7 @@ export class GameHandlingService {
     }
 
     export(id: number) {
-        return this.http.get<Game>(`${this.baseUrl}/Gamex/${id}`, { responseType: 'json' });
+        return this.http.get<Game>(`${this.baseUrl}/games/${id}`, { responseType: 'json' });
     }
 
     private handleError<T>(request: string, result?: T): (error: Error) => Observable<T> {

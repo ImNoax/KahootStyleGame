@@ -35,7 +35,7 @@ export class Application {
 
     bindRoutes(): void {
         this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(this.swaggerOptions)));
-        this.app.use('/api/', this.exampleController.router);
+        this.app.use('/api/games', this.gameController.router);
         this.errorHandling();
     }
 
