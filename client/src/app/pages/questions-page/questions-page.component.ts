@@ -1,37 +1,65 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { QuestionCreationPopupComponent } from '@app/components/question-creation-popup/question-creation-popup.component';
-import { Question } from '@common/game';
+import { FormManagerService } from '@app/services/form-manager.service';
+import { Question, QuestionType } from '@common/jeu';
 
 @Component({
     selector: 'app-questions-page',
     templateUrl: './questions-page.component.html',
     styleUrls: ['./questions-page.component.scss'],
 })
-export class QuestionsPageComponent {
+
+export class QuestionsPageComponent implements OnInit {
     pageTitle: string = 'Liste des questions';
+    questionsFormArray: FormArray;
 
-    questions: Question[] = [
-        // { text: 'Orange?', type: 'QCM' },
-        // { text: 'Pomme?', type: 'QCM' },
-        // { text: 'Banane?', type: 'QCL' },
-        // { text: 'Citron?', type: 'QCM' },
-    ];
+    constructor(
+        private dialog: MatDialog,
+        private fb: FormBuilder,
+        private formManager: FormManagerService,
+        ) {}
 
-    constructor(private dialog: MatDialog) {}
+    ngOnInit(): void {
+        this.questionsFormArray = this.formManager.questions;
+    }
 
     setQuestionStyle(question: Question) {
-        // if (question.type === 'QCM') return { background: '#78B9DE' };
-        // return { background: '#F2BB7B' };
+        if (question.type === QuestionType.QCM) return { background: '#78B9DE' };
+        return { background: '#F2BB7B' };
     }
 
     drop(event: CdkDragDrop<Question[]>): void {
-        moveItemInArray(this.questions, event.previousIndex, event.currentIndex);
+        moveItemInArray(this.questionsFormArray.controls, event.previousIndex, event.currentIndex);
+        const questions: {answer: string, isCorrect: boolean}[] = this.formManager.questions.value;
+        
+        // Sources: https://stackoverflow.com/questions/49273499/angular-formarray-contents-order
+                    https://www.freecodecamp.org/news/swap-two-array-elements-in-javascript/
+        [questions[event.previousIndex], questions[event.currentIndex]] = [questions[event.currentIndex], questions[event.previousIndex]];
+        this.formManager.questions.setValue(questions);
     }
 
-    openDialog(): void {
+    openQuestionCreator(): void {
+        this.saveQuestionsForm();
+        
         // ajouter disableClose: true après définition des routes
-        this.dialog.open(QuestionCreationPopupComponent, { width: '75%', height: '80%', backdropClass: 'backdropBackground' });
+        this.dialog.open(QuestionCreationPopupComponent, {
+            width: '75%', 
+            height: '80%', 
+            backdropClass: 'backdropBackground' 
+        });
+    }
+
+    deleteQuestion(index: number) {
+        this.questionsFormArray.removeAt(index);
+    }
+
+    saveQuestionsForm() {
+        const questionsForm: FormGroup = this.fb.group({
+            questions: this.questionsFormArray
+        });
+        this.formManager.saveGameForm(questionsForm);
     }
 }

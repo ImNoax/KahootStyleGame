@@ -1,5 +1,5 @@
 import { FileManagerService } from '@app/services/file-manager.service';
-import { Jeu } from '@common/game';
+import { Jeu } from '@common/jeu';
 import { Service } from 'typedi';
 
 @Service()
