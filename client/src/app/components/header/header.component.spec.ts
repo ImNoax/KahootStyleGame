@@ -1,5 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatIconModule } from '@angular/material/icon';
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { FormManagerService } from '@app/services/form-manager.service';
 import { HeaderComponent } from './header.component';
 
 describe('HeaderComponent', () => {
@@ -9,6 +12,8 @@ describe('HeaderComponent', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             declarations: [HeaderComponent],
+            imports: [MatIconModule, HttpClientTestingModule],
+            providers: [FormManagerService],
         });
         fixture = TestBed.createComponent(HeaderComponent);
         component = fixture.componentInstance;
@@ -17,5 +22,11 @@ describe('HeaderComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('resetForm should call resetGameForm from the formManager', () => {
+        const mockReset = spyOn(TestBed.inject(FormManagerService), 'resetGameForm');
+        component.resetForm();
+        expect(mockReset).toHaveBeenCalled();
     });
 });
