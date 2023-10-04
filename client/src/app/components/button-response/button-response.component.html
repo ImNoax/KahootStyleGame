@@ -1,10 +1,14 @@
-<div class="buttons-parent">
+<div class="buttons-parent" (keydown)="playerEntries($event)" #buttonFocus tabindex="0" autofocus>
     <div class="buttons-container">
-        <button class="btn">hello test test test test test test test test test tests test test test test test
-            test test test test test test test test test test
-            test....</button>
-        <button class="btn">test</button>
-        <button class="btn">test3</button>
-        <button class="btn">test4</button>
+        <button *ngFor="let button of buttons" [ngClass]="{
+   'btn-default': !button.selected,
+   'btn-selected': button.selected,
+   'highlight-correct': button.showCorrectButtons,
+   'highlight-wrong': button.showWrongButtons
+}" (click)="onButtonClick(button)" class="btn"
+            [ngClass]="{'highlight-correct': button.showCorrectButtons, 'highlight-wrong': button.showWrongButtons}">
+            {{ button.id }} ){{ button.text }}
+        </button>
     </div>
 </div>
+<button class="validate-btn" (click)="verifyResponsesAndCallUpdate()">Soumettre</button>

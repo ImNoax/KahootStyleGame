@@ -1,20 +1,53 @@
 <div class="container">
     <app-header title="Création d'une partie"></app-header>
     <div class="fields">
-        <table>
-            <thead>
-                <tr>
-                    <th>Liste de jeux</th>
-                    <th>Détails</th>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Liste de jeux</th>
+                    </tr>
+                </thead>
+                <tr *ngFor="let game of games; index as i" (click)="selectRow(i)">
+                    <td *ngIf="game.isVisible === true" [class.selected-game]="game.id === selectedGame?.id">{{ game.title }}</td>
                 </tr>
-            </thead>
-            <tr *ngFor="let jeu of jeux">
-                <td>{{ jeu.name }}</td>
-                <td><!-- Deuxième colonne (vide pour le moment) --></td>
-            </tr>
-            <tbody></tbody>
-        </table>
-    </div>
+            </table>
+        </div>
+        <div class="game-block">
+            <div *ngIf="selectedRowIndex !== null">
+                <span>
+                    <button class="petit-button" (click)="selectRow(null)">X</button>
+                    <span id="underlined">Détails</span>
+                </span>
+                <div>
+                    <div class="description">
+                        <div id="underlined">Descriptions du jeu :</div>
+                        <br />
+                        <div>{{ selectedGame!.description }}</div>
+                        <br />
+                        <div id="underlined">Temps alloué pour répondre :</div>
+                        <br />
+                        <div>{{ selectedGame!.duration }} secondes</div>
+                    </div>
+                    <div class="questions">
+                        <table>
+                            <th>Questions</th>
+                            <tr class="table-question" *ngFor="let question of selectedGame!.questions">
+                                {{
+                                    question.text
+                                }}
+                            </tr>
+                        </table>
+                    </div>
 
-    <button class="navigation" mat-raised-button color="primary" routerLink="/home">Retourner</button>
+                    <div>
+                        <button class="bott" (click)="testerJeu()">Tester le jeu</button>
+                        <button class="bott" routerLink="/waiting">Créer une partie</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="navigation" mat-raised-button color="primary" routerLink="/home">Retourner</button>
+    </div>
 </div>

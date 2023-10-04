@@ -4,25 +4,25 @@
 .fields {
     background-color: rgb(white, 0.6);
     padding: 2%;
-    margin-top: 0%;
-    text-align: center;
+    margin: 0%;
+    text-align: left;
 }
 
-form {
+form *:not(button) {
     margin-left: 35%;
-    text-align: start;
 }
 
 #units {
     display: inline;
+    margin-left: 0.5%;
 }
 
 .field {
-    width: 30%;
+    width: 19%;
     border-color: lightgray;
     border-style: solid;
     border-width: 1.5px;
-    margin-bottom: 1%;
+    margin-bottom: 0.5%;
 }
 
 .field::placeholder {
@@ -31,7 +31,7 @@ form {
 }
 
 #description {
-    width: 50%;
+    width: 31.5%;
     height: 100px;
 }
 
@@ -39,17 +39,41 @@ form {
     width: 35px;
 }
 
-#note {
+.note {
     font-size: 12px;
     padding-bottom: 2%;
+    margin: 0%;
 }
 
-.questions-button {
+button.questions-button {
     padding: 1.5%;
     margin: 0%;
     font-size: 24px;
+    left: 42%;
+    background-color: #f75c1e;
 }
 
 .navigation + .navigation {
     left: 85%;
+}
+
+.incorrect {
+    border-color: red;
+    border-width: 2px;
+}
+
+.incorrectField {
+    color: red;
+}
+
+#charCounterName {
+    position: absolute;
+    left: 52.5%;
+    margin-left: 0%;
+}
+
+#charCounterDesc {
+    position: absolute;
+    left: 64%;
+    margin-left: 0%;
 }
