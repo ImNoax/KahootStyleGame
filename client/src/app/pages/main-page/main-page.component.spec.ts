@@ -1,29 +1,32 @@
-import { HttpClientModule, HttpResponse } from '@angular/common/http';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { Router } from '@angular/router';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
-import { CommunicationService } from '@app/services/communication.service';
-import { of } from 'rxjs';
-import SpyObj = jasmine.SpyObj;
-
+import { GameHandlingService } from '@app/services/game-handling.service';
+import { of, throwError } from 'rxjs';
 describe('MainPageComponent', () => {
     let component: MainPageComponent;
     let fixture: ComponentFixture<MainPageComponent>;
-    let communicationServiceSpy: SpyObj<CommunicationService>;
-
+    let mockGameHandlingService: jasmine.SpyObj<GameHandlingService>;
+    let mockRouter: jasmine.SpyObj<Router>;
     beforeEach(async () => {
-        communicationServiceSpy = jasmine.createSpyObj('ExampleService', ['basicGet', 'basicPost']);
-        communicationServiceSpy.basicGet.and.returnValue(of({ title: '', body: '' }));
-        communicationServiceSpy.basicPost.and.returnValue(of(new HttpResponse<string>({ status: 201, statusText: 'Created' })));
+        mockGameHandlingService = jasmine.createSpyObj('GameHandlingService', ['verifyAdminPassword']);
+        mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
-        await TestBed.configureTestingModule({
-            imports: [RouterTestingModule, HttpClientModule],
+        TestBed.configureTestingModule({
             declarations: [MainPageComponent],
-            providers: [{ provide: CommunicationService, useValue: communicationServiceSpy }],
+            providers: [
+                { provide: GameHandlingService, useValue: mockGameHandlingService },
+                { provide: Router, useValue: mockRouter },
+            ],
         }).compileComponents();
+
+        fixture = TestBed.createComponent(MainPageComponent);
+        component = fixture.componentInstance;
     });
 
     beforeEach(() => {
+        spyOn(window, 'prompt').and.returnValue('testPassword');
+        spyOn(window, 'alert').and.stub();
         fixture = TestBed.createComponent(MainPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
@@ -32,4 +35,24 @@ describe('MainPageComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
+    it('should navigate to admin route when password is correct', fakeAsync(() => {
+        mockGameHandlingService.verifyAdminPassword.and.returnValue(of(true));
+        component.adminLogin();
+        tick();
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/admin']);
+    }));
+
+    it('should alert when password is incorrect', fakeAsync(() => {
+        mockGameHandlingService.verifyAdminPassword.and.returnValue(throwError(() => ({ status: 401 })));
+        component.adminLogin();
+        tick();
+        expect(window.alert).toHaveBeenCalledWith('Mot de passe incorrect !');
+    }));
+
+    it('should alert on other errors', fakeAsync(() => {
+        mockGameHandlingService.verifyAdminPassword.and.returnValue(throwError(() => ({ status: 500 })));
+        component.adminLogin();
+        tick();
+        expect(window.alert).toHaveBeenCalledWith('Une erreur est survenue');
+    }));
 });

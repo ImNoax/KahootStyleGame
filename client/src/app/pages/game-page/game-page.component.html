@@ -1,24 +1,18 @@
 <div class="container">
-    <button id="quit-button" routerLink="/home">
+    <button id="quit-button" class="navigation" mat-raised-button color="primary" routerLink="/create-game">
         <mat-icon id="leave-icon">exit_to_app</mat-icon> Quitter
     </button>
     <div id="top-page">
         <app-timer></app-timer>
         <div class="question-container">
-            <div id="question">
-                {{ currentQuestion }} (+{{currentQuestionScore}})
-            </div>
-            <div id="pointage">
-                Score: {{ score}}
-            </div>
+            <div id="question">{{ currentQuestion }} (+{{ currentQuestionScore }})</div>
+            <div id="pointage">Score: {{ score }}</div>
         </div>
         <div id="buttons">
-            <app-button-response>
-            </app-button-response>
+            <app-button-response> </app-button-response>
         </div>
         <div>
             <app-sidebar></app-sidebar>
         </div>
-
     </div>
 </div>

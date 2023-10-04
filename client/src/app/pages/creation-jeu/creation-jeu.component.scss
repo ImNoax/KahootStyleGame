@@ -8,13 +8,13 @@
     text-align: left;
 }
 
+form *:not(button) {
+    margin-left: 35%;
+}
+
 #units {
     display: inline;
     margin-left: 0.5%;
-}
-
-form *:not(button) {
-    margin-left: 35%;
 }
 
 .field {
@@ -45,11 +45,12 @@ form *:not(button) {
     margin: 0%;
 }
 
-.questions-button {
+button.questions-button {
     padding: 1.5%;
     margin: 0%;
     font-size: 24px;
     left: 42%;
+    background-color: #f75c1e;
 }
 
 .navigation + .navigation {
@@ -61,7 +62,7 @@ form *:not(button) {
     border-width: 2px;
 }
 
-#incorrectName {
+.incorrectField {
     color: red;
 }
 

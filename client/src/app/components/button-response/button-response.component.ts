@@ -1,36 +1,26 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { GameHandlingService } from '@angular/../../client/src/app/services/game-handling.service';
-import { Jeu } from '@common/jeu';
-import { GamePageComponent } from '@angular/../../client/src/app/pages/game-page/game-page.component';
-import { TimeService } from '@app/services/time.service';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-const ALERT_DELAY = 100;
-interface Button {
-    color: string;
-    selected: boolean;
-    text: string;
-    isCorrect: boolean;
-    id: number;
-}
+import { Button, Choice } from '@app/interfaces/button-model';
+import { TimeService } from '@app/services/time.service';
+import { Jeu } from '@common/jeu';
+import { Subscription } from 'rxjs/internal/Subscription';
+const TIME_OUT = 3000;
 
-interface Choice {
-    answer: string;
-    isCorrect: boolean;
-}
 @Component({
     selector: 'app-button-response',
     templateUrl: './button-response.component.html',
     styleUrls: ['./button-response.component.scss'],
 })
-export class ButtonResponseComponent implements OnInit, AfterViewInit {
+export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('buttonFocus', { static: false }) buttonFocus: ElementRef;
     buttons: Button[] = [];
     games: Jeu[] = [];
+    timerSubscription: Subscription;
+    isProcessing: boolean = false;
 
-    // eslint-disable-next-line max-params
     constructor(
         private gameService: GameHandlingService,
-        private gamePage: GamePageComponent,
         private timeService: TimeService,
         private router: Router,
     ) {}
@@ -40,7 +30,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit {
             this.games = data;
             this.updateButtons();
         });
-        this.timeService.timerEnded.subscribe(() => {
+        this.timerSubscription = this.timeService.timerEnded.subscribe(() => {
             this.onTimerEnded();
         });
     }
@@ -72,11 +62,12 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit {
     }
 
     onButtonClick(button: Button) {
+        if (this.isProcessing) return;
         button.selected = !button.selected;
-        button.color = button.selected ? 'lightblue' : 'white';
     }
 
     verifyResponsesAndCallUpdate() {
+        if (this.isProcessing) return;
         let clickedChoicesCount = 0;
         let correctChoicesCount = 0;
         let isAnswerCorrect = true;
@@ -96,22 +87,19 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit {
         if (clickedChoicesCount !== correctChoicesCount) {
             isAnswerCorrect = false;
         }
+        this.isProcessing = true;
         if (isAnswerCorrect) {
-            this.gamePage.incrementScore(this.games[this.gameService.currentGameId].questions[this.gameService.currentQuestionId].points);
-
-            setTimeout(() => {
-                // a enlever plustard car les alerts bloque la update du view de angular
-                alert('bonne reponse');
-                this.updateGameQuestions();
-            }, ALERT_DELAY);
+            this.gameService.incrementScore(this.games[this.gameService.currentGameId].questions[this.gameService.currentQuestionId].points);
+            this.processAnswer();
         } else {
-            alert('mauvaise reponse');
-            this.updateGameQuestions();
+            this.processAnswer();
         }
     }
 
     playerEntries(event: KeyboardEvent) {
+        if (this.isProcessing) return;
         if (event.key === 'Enter') {
+            event.preventDefault();
             this.verifyResponsesAndCallUpdate();
         } else {
             if (parseInt(event.key, 10) >= 1 && parseInt(event.key, 10) <= this.buttons.length) {
@@ -123,15 +111,39 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit {
 
     updateGameQuestions() {
         if (this.gameService.currentQuestionId === this.games[this.gameService.currentGameId].questions.length - 1) {
-            // on verifie si c'est la derniere question de la game
-            alert('Fin de la partie !');
-            this.router.navigate(['/home']);
+            this.timeService.stopTimer();
+            this.router.navigate(['/create-game']);
         } else {
             this.gameService.setCurrentQuestionId(++this.gameService.currentQuestionId);
             this.updateButtons();
-            this.gamePage.updateQuestion();
+            this.gameService.setCurrentQuestion(this.games[this.gameService.currentGameId].questions[this.gameService.currentQuestionId].text);
             this.timeService.stopTimer();
             this.timeService.startTimer(this.games[this.gameService.currentGameId].duration);
+            this.buttonFocus.nativeElement.focus();
         }
+    }
+
+    ngOnDestroy(): void {
+        if (this.timerSubscription) {
+            this.timerSubscription.unsubscribe();
+        }
+    }
+
+    processAnswer() {
+        this.buttons.forEach((button) => {
+            if (button.isCorrect) button.showCorrectButtons = true;
+            if (!button.isCorrect) {
+                button.showWrongButtons = true;
+            }
+        });
+
+        setTimeout(() => {
+            this.buttons.forEach((button) => {
+                button.showCorrectButtons = false;
+                button.showWrongButtons = false;
+            });
+            this.updateGameQuestions();
+            this.isProcessing = false;
+        }, TIME_OUT);
     }
 }

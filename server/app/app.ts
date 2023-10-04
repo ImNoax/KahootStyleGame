@@ -1,4 +1,5 @@
 import { HttpException } from '@app/classes/http.exception';
+import { AdminController } from '@app/controllers/admin.controller';
 import { GameController } from '@app/controllers/game.controller';
 import * as cookieParser from 'cookie-parser';
 import * as cors from 'cors';
@@ -14,7 +15,10 @@ export class Application {
     private readonly internalError: number = StatusCodes.INTERNAL_SERVER_ERROR;
     private readonly swaggerOptions: swaggerJSDoc.Options;
 
-    constructor(private readonly gameController: GameController) {
+    constructor(
+        private readonly gameController: GameController,
+        private readonly adminController: AdminController,
+    ) {
         this.app = express();
 
         this.swaggerOptions = {
@@ -36,6 +40,7 @@ export class Application {
     bindRoutes(): void {
         this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(this.swaggerOptions)));
         this.app.use('/api/jeux', this.gameController.router);
+        this.app.use('/api/admin', this.adminController.getRouter());
         this.errorHandling();
     }
 

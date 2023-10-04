@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { Jeu } from '@common/jeu';
-// import { saveAs } from 'file-saver';
 
 @Component({
     selector: 'app-create-game-page',
@@ -10,20 +10,36 @@ import { Jeu } from '@common/jeu';
 })
 export class CreateGamePageComponent implements OnInit {
     games: Jeu[];
-
-    constructor(private gameHandler: GameHandlingService) {}
+    selectedRowIndex: number | null = null;
+    selectedGame: Jeu | null = null;
+    constructor(
+        private gameHandler: GameHandlingService,
+        public router: Router,
+    ) {}
 
     ngOnInit(): void {
         this.gameHandler.getGames().subscribe((games: Jeu[]) => {
             this.games = games;
         });
     }
+    selectRow(index: number | null) {
+        this.selectedRowIndex = index;
+        this.selectedGame = index !== null ? this.games[index] : null;
+    }
 
-    /* fonction() {
-        return this.gameHandler.export(1).subscribe((data) => {
-            const file = new Blob([JSON.stringify(data)], { type: 'application/json' });
-            const downloadURL = window.URL.createObjectURL(file);
-            saveAs(downloadURL, "Testststs.json");
+    testerJeu() {
+        this.gameHandler.getGames().subscribe((games: Jeu[]) => {
+            this.games = games;
+
+            for (const game of this.games) {
+                if (game.id === this.selectedGame?.id && game.isVisible) {
+                    this.gameHandler.setCurrentGameId(this.selectedGame.id);
+                    this.router.navigate(['/game']);
+                    return;
+                }
+            }
+            window.alert('Erreur: Jeu Indisponible... Rafraichissement de page.');
+            this.selectRow(null);
         });
-    }*/
+    }
 }

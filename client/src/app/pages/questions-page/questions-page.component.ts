@@ -1,53 +1,62 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { Component } from '@angular/core';
+import { FormArray, FormGroup } from '@angular/forms';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { QuestionCreationPopupComponent } from '@app/components/question-creation-popup/question-creation-popup.component';
+import { Limits } from '@app/enums';
 import { FormManagerService } from '@app/services/form-manager.service';
-import { Question, QuestionType } from '@common/jeu';
+import { Question } from '@common/jeu';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-questions-page',
     templateUrl: './questions-page.component.html',
     styleUrls: ['./questions-page.component.scss'],
 })
-export class QuestionsPageComponent implements OnInit {
+export class QuestionsPageComponent {
     pageTitle: string = 'Liste des questions';
-    questionsFormArray: FormArray;
+    gameName: string = this.formManager.gameForm.value.title;
+    gameNameUnavailable: string = 'À déterminer';
+    questionsFormArray: FormArray = _.cloneDeep(this.formManager.questions) as FormArray;
 
     constructor(
         private dialog: MatDialog,
-        private fb: FormBuilder,
         private formManager: FormManagerService,
     ) {}
 
-    ngOnInit(): void {
-        this.questionsFormArray = this.formManager.questions;
-    }
-
     setQuestionStyle(question: Question) {
-        if (question.type === QuestionType.QCM) return { background: '#78B9DE' };
+        if (question.type === 'QCM') return { background: '#78B9DE' };
         return { background: '#F2BB7B' };
     }
 
     drop(event: CdkDragDrop<Question[]>): void {
         moveItemInArray(this.questionsFormArray.controls, event.previousIndex, event.currentIndex);
-        const questions: { answer: string; isCorrect: boolean }[] = this.formManager.questions.value;
+        const questions: Question[] = this.questionsFormArray.value;
 
         // Sources: https://stackoverflow.com/questions/49273499/angular-formarray-contents-order
         // www.freecodecamp.org/news/swap-two-array-elements-in-javascript/
         [questions[event.previousIndex], questions[event.currentIndex]] = [questions[event.currentIndex], questions[event.previousIndex]];
-        this.formManager.questions.setValue(questions);
+        this.questionsFormArray.setValue(questions);
     }
 
-    openQuestionCreator(): void {
-        this.saveQuestionsForm();
-
-        // ajouter disableClose: true après définition des routes
-        this.dialog.open(QuestionCreationPopupComponent, {
-            width: '75%',
-            height: '80%',
+    openQuestionCreator(index?: number): void {
+        const questionsFormArray = this.questionsFormArray;
+        const questionPopup: MatDialogRef<QuestionCreationPopupComponent, FormGroup> = this.dialog.open(QuestionCreationPopupComponent, {
+            data: { questionsFormArray, index },
+            width: '70%',
+            height: '85%',
             backdropClass: 'backdropBackground',
+            disableClose: true,
+        });
+
+        questionPopup.afterClosed().subscribe((questionForm: FormGroup | undefined) => {
+            if (questionForm) {
+                if (index === undefined) {
+                    this.questionsFormArray.push(questionForm);
+                } else {
+                    this.questionsFormArray.controls[index] = questionForm;
+                }
+            }
         });
     }
 
@@ -55,10 +64,11 @@ export class QuestionsPageComponent implements OnInit {
         this.questionsFormArray.removeAt(index);
     }
 
-    saveQuestionsForm() {
-        const questionsForm: FormGroup = this.fb.group({
-            questions: this.questionsFormArray,
-        });
-        this.formManager.saveGameForm(questionsForm);
+    saveQuestions() {
+        this.formManager.saveQuestions(this.questionsFormArray);
+    }
+
+    isEmpty() {
+        return this.questionsFormArray.length < Limits.MinQuestionsNumber;
     }
 }

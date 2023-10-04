@@ -1,7 +1,12 @@
 <div class="buttons-parent" (keydown)="playerEntries($event)" #buttonFocus tabindex="0" autofocus>
     <div class="buttons-container">
-        <button *ngFor="let button of buttons" [style.backgroundColor]="button.color" (click)="onButtonClick(button)"
-            class="btn">
+        <button *ngFor="let button of buttons" [ngClass]="{
+   'btn-default': !button.selected,
+   'btn-selected': button.selected,
+   'highlight-correct': button.showCorrectButtons,
+   'highlight-wrong': button.showWrongButtons
+}" (click)="onButtonClick(button)" class="btn"
+            [ngClass]="{'highlight-correct': button.showCorrectButtons, 'highlight-wrong': button.showWrongButtons}">
             {{ button.id }} ){{ button.text }}
         </button>
     </div>
