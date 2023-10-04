@@ -1,6 +1,6 @@
 <div class="container">
     <app-header [title]="'Administration des jeux'"></app-header>
-    <div class="fields">
+    <div class="fields" id="game-table">
         <table>
             <thead>
                 <tr>
@@ -12,65 +12,46 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
+                <tr *ngFor="let game of games; let i = index">
                     <td class="logo-container">
-                        <a><img src="https://cdn-icons-png.flaticon.com/512/814/814236.png" /></a>
+                        <a (click)="modifyGame(game)" routerLink="/creation"><img src="https://cdn-icons-png.flaticon.com/512/814/814236.png" /></a>
                     </td>
                     <td class="logo-container">
-                        <a><img src="https://www.freeiconspng.com/thumbs/export-icon/data-export-icon-0.png" /></a>
+                        <a (click)="exportGame(i)">
+                            <img src="https://www.freeiconspng.com/thumbs/export-icon/data-export-icon-0.png" />
+                        </a>
                     </td>
-                    <td class="nom-jeu">Nom du jeu 1, Le nom du jeu jeu plus récent</td>
-                    <td>2023-09-11</td>
+                    <td class="nom-jeu">
+                        <div (click)="deleteGame(game)">
+                            <img src="https://www.pngkit.com/png/full/367-3670169_delete-comments-clip-art.png" />
+                        </div>
+                        <div>{{ game.title }}</div>
+                        <div class="description-jeu">{{ game.description }}</div>
+                    </td>
+                    <td>{{ game.lastModification }}</td>
                     <td class="logo-container">
-                        <a
-                            ><img
+                        <a (click)="toggleVisibility(game)">
+                            <img
                                 class="toggle-image"
-                                src="https://www.freeiconspng.com/thumbs/eye-icon/eyeball-icon-png-eye-icon-1.png"
-                                data-alt-src="https://icons.veryicon.com/png/o/photographic/ant-design-official-icon-library/eye-close-1.png"
-                        /></a>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="logo-container">
-                        <a><img src="https://cdn-icons-png.flaticon.com/512/814/814236.png" /></a>
-                    </td>
-                    <td class="logo-container">
-                        <a><img src="https://www.freeiconspng.com/thumbs/export-icon/data-export-icon-0.png" /></a>
-                    </td>
-                    <td class="nom-jeu">Nom du jeu 2</td>
-                    <td>2023-09-10</td>
-                    <td class="logo-container">
-                        <a
-                            ><img
-                                class="toggle-image"
-                                src="https://www.freeiconspng.com/thumbs/eye-icon/eyeball-icon-png-eye-icon-1.png"
-                                data-alt-src="https://icons.veryicon.com/png/o/photographic/ant-design-official-icon-library/eye-close-1.png"
-                        /></a>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="logo-container">
-                        <a><img src="https://cdn-icons-png.flaticon.com/512/814/814236.png" /></a>
-                    </td>
-                    <td class="logo-container">
-                        <a><img src="https://www.freeiconspng.com/thumbs/export-icon/data-export-icon-0.png" /></a>
-                    </td>
-                    <td class="nom-jeu">Nom du jeu 3, le plus ancien</td>
-                    <td>2023-09-09</td>
-                    <td class="logo-container">
-                        <a
-                            ><img
-                                class="toggle-image"
-                                src="https://www.freeiconspng.com/thumbs/eye-icon/eyeball-icon-png-eye-icon-1.png"
-                                data-alt-src="https://icons.veryicon.com/png/o/photographic/ant-design-official-icon-library/eye-close-1.png"
-                        /></a>
+                                [src]="
+                                    game.isVisible
+                                        ? 'https://www.freeiconspng.com/thumbs/eye-icon/eyeball-icon-png-eye-icon-1.png'
+                                        : 'https://icons.veryicon.com/png/o/photographic/ant-design-official-icon-library/eye-close-1.png'
+                                "
+                            />
+                        </a>
                     </td>
                 </tr>
             </tbody>
         </table>
     </div>
     <button mat-raised-button color="primary" class="adminbutton" routerLink="/creation">Ajouter un nouveau jeu</button>
-    <button mat-raised-button color="primary" class="adminbutton">Importer un nouveau jeu</button>
+ 
+    <button mat-raised-button (click)="gameImport.click()" color="primary" class="adminbutton">Importer un nouveau jeu</button>
+    <p class="error-empty" *ngIf="isFileEmpty">Fichier vide!</p>
+    <p class="error-format" *ngIf="isFormInvalid">Le fichier JSON n'est pas bien formaté!</p>
+    <input #gameImport type="file" accept="application/JSON" (change)="importGame($event)" hidden>
+
     <br />
-    <button mat-raised-button color="primary" class="navigation" routerLink="/home">Retourner</button>
+    <button (click)="resetForm()" mat-raised-button color="primary" class="navigation" routerLink="/home">Retourner</button>
 </div>

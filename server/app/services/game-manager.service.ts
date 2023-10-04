@@ -3,6 +3,7 @@ import { Jeu } from '@common/jeu';
 import { Service } from 'typedi';
 
 const JSON_SPACE = 4;
+const NOT_FOUND_INDEX = -1;
 
 @Service()
 export class GameManagerService {
@@ -24,8 +25,11 @@ export class GameManagerService {
         return file;
     }
 
-    async modifyGame(id: number, modifiedGame: Jeu): Promise<Jeu[]> {
+    async modifyGame(id: number, modifiedGame: Jeu, gameName: string): Promise<Jeu[]> {
         const games: Jeu[] = await this.getGames();
+        if (id >= games.length || gameName !== games[id].title) {
+            return this.addGame(modifiedGame);
+        }
         games[id] = modifiedGame;
 
         this.fileManager.writeJsonFile('./data/jeux.json', JSON.stringify(games, null, JSON_SPACE));
@@ -35,26 +39,35 @@ export class GameManagerService {
 
     async modifyGameVisibility(id: number, newVisibility: { isVisible: boolean }): Promise<Jeu[]> {
         const games: Jeu[] = await this.getGames();
-        games[id].isVisible = newVisibility.isVisible;
+        const gameToUpdate = games.find((game) => game.id === id);
 
-        this.fileManager.writeJsonFile('./data/jeux.json', JSON.stringify(games, null, JSON_SPACE));
+        if (gameToUpdate) {
+            gameToUpdate.isVisible = newVisibility.isVisible;
+            await this.fileManager.writeJsonFile('./data/jeux.json', JSON.stringify(games, null, JSON_SPACE));
+        }
 
         return games;
     }
 
     async addGame(newGame: Jeu): Promise<Jeu[]> {
         const games: Jeu[] = await this.getGames();
+        newGame.id = games.length;
         games.push(newGame);
 
         this.fileManager.writeJsonFile('./data/jeux.json', JSON.stringify(games, null, JSON_SPACE));
 
         return games;
     }
-
-    async removeGame(id: number): Promise<void> {
+    async deleteGameById(id: number): Promise<void> {
         const games: Jeu[] = await this.getGames();
-        delete games[id];
-
-        this.fileManager.writeJsonFile('./data/jeux.json', JSON.stringify(games, null, JSON_SPACE));
+        if (id >= games.length) return;
+        const index = games.findIndex((game) => game.id === id);
+        if (index !== NOT_FOUND_INDEX) {
+            games.splice(index, 1);
+            for (let i = index; i < games.length; i++) {
+                games[i].id = i;
+            }
+            await this.fileManager.writeJsonFile('./data/jeux.json', JSON.stringify(games, null, JSON_SPACE));
+        }
     }
 }

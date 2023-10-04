@@ -1,9 +1,10 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { CommunicationService } from '@app/services/communication.service';
-import { Message } from '@common/message';
+import { Router } from '@angular/router';
+import { GameHandlingService } from '@app/services/game-handling.service';
 import { BehaviorSubject } from 'rxjs';
-import { map } from 'rxjs/operators';
+
+const ERROR401 = 401;
 
 @Component({
     selector: 'app-main-page',
@@ -14,35 +15,28 @@ export class MainPageComponent {
     readonly title: string = 'Survey Genius';
     message: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
-    constructor(private readonly communicationService: CommunicationService) {}
+    constructor(
+        private readonly gameHandler: GameHandlingService,
+        private readonly router: Router,
+    ) {}
 
-    sendTimeToServer(): void {
-        const newTimeMessage: Message = {
-            title: 'Hello from the client',
-            body: 'Time is : ' + new Date().toString(),
-        };
-        // Important de ne pas oublier "subscribe" ou l'appel ne sera jamais lancé puisque personne l'observe
-        this.communicationService.basicPost(newTimeMessage).subscribe({
-            next: (response) => {
-                const responseString = `Le serveur a reçu la requête a retourné un code ${response.status} : ${response.statusText}`;
-                this.message.next(responseString);
-            },
-            error: (err: HttpErrorResponse) => {
-                const responseString = `Le serveur ne répond pas et a retourné : ${err.message}`;
-                this.message.next(responseString);
-            },
-        });
-    }
-
-    getMessagesFromServer(): void {
-        this.communicationService
-            .basicGet()
-            // Cette étape transforme l'objet Message en un seul string
-            .pipe(
-                map((message: Message) => {
-                    return `${message.title} ${message.body}`;
-                }),
-            )
-            .subscribe(this.message);
+    adminLogin(): void {
+        const password = prompt('Veuillez entrer le mot de passe:');
+        if (password) {
+            this.gameHandler.verifyAdminPassword(password).subscribe({
+                next: (response) => {
+                    if (response) {
+                        this.router.navigate(['/admin']);
+                    }
+                },
+                error: (error: HttpErrorResponse) => {
+                    if (error.status === ERROR401) {
+                        alert('Mot de passe incorrect !');
+                    } else {
+                        alert('Une erreur est survenue');
+                    }
+                },
+            });
+        }
     }
 }

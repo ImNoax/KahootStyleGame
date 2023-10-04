@@ -49,3 +49,16 @@
 .buttons-parent:focus {
     outline: none;
 }
+
+.btn-selected {
+    background-color: lightblue;
+}
+
+.highlight-correct {
+    background-color: #aaffaa;
+    
+}
+
+.highlight-wrong {
+    background-color: #ffaaaa;
+}
