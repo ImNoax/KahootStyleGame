@@ -1,6 +1,7 @@
 import { formatDate } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Jeu } from '@common/jeu';
 import { Observable } from 'rxjs';
 import { GameHandlingService } from './game-handling.service';
@@ -17,6 +18,7 @@ export class FormManagerService {
     constructor(
         private fb: FormBuilder,
         private gameHandler: GameHandlingService,
+        private router: Router,
     ) {}
 
     get questions(): FormArray {
@@ -40,18 +42,25 @@ export class FormManagerService {
         this.nameModif = '';
     }
 
+    modifyGame(): void {
+        this.gameForm.value.lastModification = formatDate(new Date(), 'yyyy-MM-dd   h:mm:ss a', 'en');
+        this.gameHandler.modifyGame(this.gameForm.value, this.nameModif).subscribe(() => {
+            this.resetGameForm();
+            this.router.navigate(['/admin']);
+        });
+    }
+
+    addGame(): void {
+        this.gameHandler.addGame(this.gameForm.value).subscribe(() => {
+            this.resetGameForm();
+            this.router.navigate(['/admin']);
+        });
+    }
+
     sendGameForm(importedGameForm?: FormGroup): void | Observable<Jeu[]> {
-        if (this.nameModif !== '') {
-            this.gameHandler.modifyGame(this.gameForm.value, this.nameModif).subscribe(() => {
-                this.resetGameForm();
-                // location.reload();
-            });
-        } else if (importedGameForm === undefined) {
-            this.gameHandler.addGame(this.gameForm.value).subscribe(() => {
-                this.resetGameForm();
-                // location.reload();
-            });
-        } else return this.gameHandler.addGame(importedGameForm.value);
+        if (this.nameModif !== '') this.modifyGame();
+        else if (importedGameForm === undefined) this.addGame();
+        else return this.gameHandler.addGame(importedGameForm.value);
     }
 
     hasQuestions(): boolean {
@@ -75,7 +84,7 @@ export class FormManagerService {
             title: ['', Validators.required],
             description: ['', Validators.required],
             duration: [BASE_TIMER, Validators.required],
-            lastModification: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+            lastModification: formatDate(new Date(), 'yyyy-MM-dd   h:mm:ss a', 'en'),
             isVisible: false,
             questions: this.fb.array([]),
         });

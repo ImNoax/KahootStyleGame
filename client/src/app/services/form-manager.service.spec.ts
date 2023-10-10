@@ -2,6 +2,7 @@ import { formatDate } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Jeu, QuestionType } from '@common/jeu';
 import { of } from 'rxjs';
 import { FormManagerService } from './form-manager.service';
@@ -14,7 +15,7 @@ describe('FormManagerService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [HttpClientTestingModule],
-            providers: [GameHandlingService],
+            providers: [GameHandlingService, Router],
         });
         service = TestBed.inject(FormManagerService);
         fb = TestBed.inject(FormBuilder);
@@ -30,7 +31,7 @@ describe('FormManagerService', () => {
             title: ['', Validators.required],
             description: ['', Validators.required],
             duration: 30,
-            lastModification: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+            lastModification: formatDate(new Date(), 'yyyy-MM-dd   h:mm:ss a', 'en'),
             isVisible: false,
             questions: fb.array([]),
         });
@@ -39,32 +40,46 @@ describe('FormManagerService', () => {
         expect(service.gameForm.value).toEqual(form.value);
     });
 
-    it('sendGameForm should reset the values of the game Form and send them to the game Handler', () => {
+    it('modifyGame should modify the date, call the method from the gameHandler, reset the form and navigate', () => {
         const games: Jeu[] = [];
-        const form = fb.group({
-            id: 0,
-            title: ['', Validators.required],
-            description: ['', Validators.required],
-            duration: 30,
-            lastModification: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
-            isVisible: false,
-            questions: fb.array([]),
-        });
+        const mockModif = spyOn(TestBed.inject(GameHandlingService), 'modifyGame').and.returnValue(of(games));
+        const mockReset = spyOn(service, 'resetGameForm');
+        const mockNavigate = spyOn(TestBed.inject(Router), 'navigate');
 
-        const mockGameAdder = spyOn(TestBed.inject(GameHandlingService), 'addGame').and.returnValues(of(games));
-        const mockModify = spyOn(TestBed.inject(GameHandlingService), 'modifyGame').and.returnValues(of(games));
-        const mockReset = spyOn(TestBed.inject(FormManagerService), 'resetGameForm');
+        service.modifyGame();
+
+        expect(service.gameForm.value.lastModification).toEqual(formatDate(new Date(), 'yyyy-MM-dd   h:mm:ss a', 'en'));
+        expect(mockModif).toHaveBeenCalled();
+        expect(mockReset).toHaveBeenCalled();
+        expect(mockNavigate).toHaveBeenCalled();
+    });
+
+    it('addGame should modify the date, call the method from the gameHandler, reset the form and navigate', () => {
+        const games: Jeu[] = [];
+        const mockAdd = spyOn(TestBed.inject(GameHandlingService), 'addGame').and.returnValue(of(games));
+        const mockReset = spyOn(service, 'resetGameForm');
+        const mockNavigate = spyOn(TestBed.inject(Router), 'navigate');
+
+        service.addGame();
+
+        expect(mockAdd).toHaveBeenCalled();
+        expect(mockReset).toHaveBeenCalled();
+        expect(mockNavigate).toHaveBeenCalled();
+    });
+
+    it('sendGameForm should call the correct method', () => {
+        const mockGameAdder = spyOn(service, 'addGame');
+        const mockModify = spyOn(service, 'modifyGame');
 
         service.sendGameForm();
         expect(mockGameAdder).toHaveBeenCalled();
-        expect(mockReset).toHaveBeenCalled();
-        expect(service.gameForm.value).toEqual(form.value);
+        expect(mockModify).not.toHaveBeenCalled();
 
+        mockGameAdder.calls.reset();
         service.nameModif = 'test';
         service.sendGameForm();
         expect(mockModify).toHaveBeenCalled();
-        expect(mockReset).toHaveBeenCalled();
-        expect(service.gameForm.value).toEqual(form.value);
+        expect(mockGameAdder).not.toHaveBeenCalled();
     });
 
     it('sendGameForm with importedGameForm parameter should return an Observable', () => {

@@ -35,7 +35,9 @@ describe('QuestionCreationPopupComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('ngOnInit should correctly set the question form when index is defined', () => {
+    it('ngOnInit should call the correct method', () => {
+        const mockCreate = spyOn(component, 'createNewForm');
+        const mockLoad = spyOn(component, 'loadForm').and.returnValue(new FormGroup(0));
         const fb = new FormBuilder();
         const questionFormGroup: FormGroup = fb.group({
             text: 'Test',
@@ -49,6 +51,27 @@ describe('QuestionCreationPopupComponent', () => {
         };
 
         component.ngOnInit();
+        expect(mockLoad).toHaveBeenCalled();
+
+        component.data.index = undefined;
+        component.ngOnInit();
+        expect(mockCreate).toHaveBeenCalled();
+    });
+
+    it('loadForm should correctly set the question form', () => {
+        const fb = new FormBuilder();
+        const questionFormGroup: FormGroup = fb.group({
+            text: 'Test',
+            points: 10,
+            type: QuestionType.QCM,
+            choices: fb.array([{ answer: '123', isCorrect: true }]),
+        });
+        component.data = {
+            index: 0,
+            questionsFormArray: fb.array([questionFormGroup]),
+        };
+
+        component.questionForm = component.loadForm(fb, 0);
 
         expect(component.questionForm.get('text')?.value).toBe('Test');
         expect(component.questionForm.get('points')?.value).toBe(DEFAULT_POINTS);
@@ -56,12 +79,12 @@ describe('QuestionCreationPopupComponent', () => {
         expect(component.questionForm.get('choices')?.value).toEqual([{ answer: '123', isCorrect: true }]);
     });
 
-    it('ngOnInit should correctly set the question form when index is undefined', () => {
+    it('createNewForm should correctly set the question form', () => {
         const fb = new FormBuilder();
         component.data = {
             questionsFormArray: fb.array([]) as FormArray,
         };
-        component.ngOnInit();
+        component.createNewForm(fb);
         expect(component.questionForm.get('text')?.value).toBe('');
         expect(component.questionForm.get('points')?.value).toBe(DEFAULT_POINTS);
         expect(component.questionForm.get('type')?.value).toBe(QuestionType.QCM);
@@ -89,6 +112,23 @@ describe('QuestionCreationPopupComponent', () => {
         component.addChoice(false);
         expect(component.choices.length).toEqual(++nbChoices);
         expect(component.choices.at(nbChoices - 1).value.isCorrect).toBeFalse();
+    });
+
+    it('verifyChoice should change choiceDuplicate if the choice already exist', () => {
+        const choiceInput = fixture.debugElement.nativeElement.querySelector('#choiceInput');
+        const event = new KeyboardEvent('keyup');
+
+        choiceInput.value = 'test';
+        choiceInput.dispatchEvent(event);
+
+        component.verifyChoice(event);
+        expect(component.choiceDuplicate).toBeFalse();
+
+        component.choices.value[0].answer = 'test';
+        component.choices.value[1].answer = 'test';
+
+        component.verifyChoice(event);
+        expect(component.choiceDuplicate).toBeTrue();
     });
 
     it('deleteChoice should remove a choice from the list', () => {

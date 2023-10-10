@@ -31,7 +31,6 @@ form {
     position: relative;
 }
 
-
 .field {
     display: block;
 }
@@ -50,7 +49,6 @@ form {
     margin-bottom: 2%;
     display: flex;
     flex-direction: column;
-
 }
 
 .answer-box {
@@ -88,10 +86,10 @@ form {
         0 5px 5px -3px rgba(0, 0, 0, 0.2),
         0 8px 10px 1px rgba(0, 0, 0, 0.14),
         0 3px 14px 2px rgba(0, 0, 0, 0.12);
-    }
-    
-    .cdk-drag-placeholder {
-        opacity: 40%;
+}
+
+.cdk-drag-placeholder {
+    opacity: 40%;
 }
 
 .cdk-drag-animating {
@@ -124,7 +122,7 @@ form {
 
 #choices input:invalid:not(:focus) {
     border: 1px solid red;
-    background-color: #F8BABA;
+    background-color: #f8baba;
 }
 
 button.answer-creation {
@@ -198,7 +196,7 @@ span {
 }
 
 #save-button:disabled {
-    color: #C0C0C0;
+    color: #c0c0c0;
     background-color: #808080;
 }
 
@@ -216,3 +214,6 @@ p#question-length {
     text-align: right;
 }
 
+#incorrectChoice {
+    margin: 0%;
+}
