@@ -64,10 +64,32 @@ describe('CreationJeuComponent', () => {
         expect(component.isNameEmpty).toBeTrue();
     });
 
-    it('verifyName should change isNameDuplicate if the name already exist', () => {
+    it('verifyName should call if the name is different from nameModif', () => {
         const nameInput = fixture.debugElement.nativeElement.querySelector('#nameField');
         const event = new InputEvent('keyup');
+        component.games = new Array();
 
+        nameInput.value = 'Game 1';
+        nameInput.dispatchEvent(event);
+        const mockVerifyDup = spyOn(component, 'verifyNameDuplicate');
+
+        component.verifyName(event);
+        expect(component.isNameEmpty).toBeFalse();
+        expect(mockVerifyDup).toHaveBeenCalled();
+
+        mockVerifyDup.calls.reset();
+        component.nameModif = 'Game 1';
+        component.verifyName(event);
+        expect(component.isNameEmpty).toBeFalse();
+        expect(mockVerifyDup).not.toHaveBeenCalled();
+
+        nameInput.value = 'Game 2';
+        component.verifyName(event);
+        expect(component.isNameEmpty).toBeFalse();
+        expect(mockVerifyDup).toHaveBeenCalled();
+    });
+
+    it('verifyNameDuplicate should change isNameDuplicate if the name is already existing', () => {
         component.games = new Array();
         component.games.push({
             id: 0,
@@ -78,27 +100,12 @@ describe('CreationJeuComponent', () => {
             isVisible: false,
             questions: [],
         });
-        nameInput.value = 'Game 1';
-        nameInput.dispatchEvent(event);
 
-        component.verifyName(event);
+        component.verifyNameDuplicate('  Game 1');
         expect(component.isNameDuplicate).toBeTrue();
-        expect(component.isNameEmpty).toBeFalse();
 
-        nameInput.value = 'Game 1   ';
-        component.verifyName(event);
-        expect(component.isNameDuplicate).toBeTrue();
-        expect(component.isNameEmpty).toBeFalse();
-
-        component.nameModif = 'Game 1';
-        component.verifyName(event);
+        component.verifyNameDuplicate('Test');
         expect(component.isNameDuplicate).toBeFalse();
-        expect(component.isNameEmpty).toBeFalse();
-
-        nameInput.value = 'Game 2';
-        component.verifyName(event);
-        expect(component.isNameDuplicate).toBeFalse();
-        expect(component.isNameEmpty).toBeFalse();
     });
 
     it('verifyDesc should change isDescEmpty if the description is empty', () => {

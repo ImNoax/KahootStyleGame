@@ -4,7 +4,7 @@
         "title": "Game 1",
         "description": "This is the description for Game 1",
         "duration": 30,
-        "lastModification": "2018-11-13",
+        "lastModification": "2018-11-13   2:28:44 PM",
         "isVisible": true,
         "questions": [
             {
@@ -60,7 +60,7 @@
         "title": "Game 2",
         "description": "This is the description for Game 2",
         "duration": 25,
-        "lastModification": "2018-11-13",
+        "lastModification": "2023-10-09   2:28:44 PM",
         "isVisible": false,
         "questions": [
             {
@@ -112,7 +112,7 @@
         "title": "Game 3",
         "description": "This is the description for Game 3",
         "duration": 25,
-        "lastModification": "2018-11-12",
+        "lastModification": "2018-11-12   2:28:44 PM",
         "isVisible": false,
         "questions": [
             {

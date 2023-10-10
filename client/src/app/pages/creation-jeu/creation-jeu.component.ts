@@ -44,12 +44,13 @@ export class CreationJeuComponent implements OnInit {
             this.isNameDuplicate = false;
             return;
         }
+        this.verifyNameDuplicate((event.target as HTMLInputElement).value);
+    }
 
+    verifyNameDuplicate(name: string): void {
         for (const game of this.games) {
-            this.isNameDuplicate = game.title.toLowerCase() === (event.target as HTMLInputElement).value.trim().toLowerCase();
-            if (this.isNameDuplicate) {
-                return;
-            }
+            this.isNameDuplicate = game.title.toLowerCase() === name.trim().toLowerCase();
+            if (this.isNameDuplicate) return;
         }
     }
 

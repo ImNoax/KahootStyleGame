@@ -20,6 +20,7 @@ export class QuestionCreationPopupComponent implements OnInit {
     maxQuestionLength: number = Limits.MaxQuestionLength;
     maxAnswerLength: number = Limits.MaxAnswerLength;
     questionForm: FormGroup;
+    choiceDuplicate = false;
 
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: { questionsFormArray: FormArray; index?: number },
@@ -33,28 +34,31 @@ export class QuestionCreationPopupComponent implements OnInit {
 
     ngOnInit() {
         const fb: FormBuilder = new FormBuilder();
-        if (this.data.index === undefined) {
-            this.questionForm = fb.group({
-                // Source: https://stackoverflow.com/questions/18476318/regex-for-multiples-of-10
-                text: ['', [Validators.required, this.formManager.preventEmptyInput]],
-                points: [Limits.MinPoints, [Validators.required, Validators.pattern('^[1-9][0-9]*0$'), Validators.max(Limits.MaxPoints)]],
-                type: QuestionType.QCM,
-                choices: fb.array([]),
-            });
-            this.addChoice(true);
-            this.addChoice(false);
-        } else {
-            const question: AbstractControl = this.data.questionsFormArray.controls[this.data.index];
-            const choices: FormArray = question.get('choices') as FormArray;
-            const questionForm: FormGroup = fb.group({
-                text: [question.value.text, [Validators.required, this.formManager.preventEmptyInput]],
-                points: [question.value.points, [Validators.required, Validators.pattern('^[1-9][0-9]*0$'), Validators.max(Limits.MaxPoints)]],
-                type: question.value.type,
-                choices: fb.array(choices.controls),
-            });
+        if (this.data.index === undefined) this.createNewForm(fb);
+        else this.questionForm = _.cloneDeep(this.loadForm(fb, this.data.index)) as FormGroup;
+    }
 
-            this.questionForm = _.cloneDeep(questionForm) as FormGroup;
-        }
+    loadForm(fb: FormBuilder, index: number): FormGroup {
+        const question: AbstractControl = this.data.questionsFormArray.controls[index];
+        const choices: FormArray = question.get('choices') as FormArray;
+        return fb.group({
+            text: [question.value.text, [Validators.required, this.formManager.preventEmptyInput]],
+            points: [question.value.points, [Validators.required, Validators.pattern('^[1-9][0-9]*0$'), Validators.max(Limits.MaxPoints)]],
+            type: question.value.type,
+            choices: fb.array(choices.controls),
+        });
+    }
+
+    createNewForm(fb: FormBuilder): void {
+        this.questionForm = fb.group({
+            // Source: https://stackoverflow.com/questions/18476318/regex-for-multiples-of-10
+            text: ['', [Validators.required, this.formManager.preventEmptyInput]],
+            points: [Limits.MinPoints, [Validators.required, Validators.pattern('^[1-9][0-9]*0$'), Validators.max(Limits.MaxPoints)]],
+            type: QuestionType.QCM,
+            choices: fb.array([]),
+        });
+        this.addChoice(true);
+        this.addChoice(false);
     }
 
     setAnswerStyle(isCorrect: boolean): { background: string } {
@@ -79,6 +83,16 @@ export class QuestionCreationPopupComponent implements OnInit {
                 isCorrect: isChoiceCorrect,
             }),
         );
+    }
+
+    verifyChoice(event: KeyboardEvent) {
+        let choiceCount = 0;
+        for (const choice of this.choices.value) {
+            if (choice.answer.trim().toLowerCase() === (event.target as HTMLInputElement).value.trim().toLowerCase()) {
+                choiceCount++;
+            }
+        }
+        this.choiceDuplicate = choiceCount > 1;
     }
 
     deleteChoice(index: number) {
