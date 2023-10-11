@@ -56,12 +56,11 @@
                                 type="text"
                                 size="50"
                                 formControlName="answer"
-                                (keyup)="verifyChoice($event)"
+                                (keyup)="verifyChoice()"
                                 (keydown.enter)="choiceInput.blur()"
                                 required
                                 [maxlength]="maxAnswerLength"
                             />
-                            <p class="error" id="incorrectChoice" *ngIf="choiceDuplicate">Choix déjà existant</p>
                         </div>
                     </div>
 
@@ -83,7 +82,10 @@
                     <span>Ajouter un choix de réponse</span>
                 </button>
             </div>
-            <span class="error good-choice" *ngIf="!hasMinimumGoodChoices()">{{ showCorrectnessError() }}</span>
+            <div class="error choice-error">
+                <p *ngIf="!hasMinimumGoodChoices()">{{ showCorrectnessError() }}</p>
+                <p *ngIf="choiceDuplicate">Choix doivent être uniques</p>
+            </div>
         </div>
 
         <div id="nav">
