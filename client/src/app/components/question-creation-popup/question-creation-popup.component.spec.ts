@@ -115,20 +115,14 @@ describe('QuestionCreationPopupComponent', () => {
     });
 
     it('verifyChoice should change choiceDuplicate if the choice already exist', () => {
-        const choiceInput = fixture.debugElement.nativeElement.querySelector('#choiceInput');
-        const event = new KeyboardEvent('keyup');
-
-        choiceInput.value = 'test';
-        choiceInput.dispatchEvent(event);
-
-        component.verifyChoice(event);
-        expect(component.choiceDuplicate).toBeFalse();
-
-        component.choices.value[0].answer = 'test';
-        component.choices.value[1].answer = 'test';
-
-        component.verifyChoice(event);
+        component.verifyChoice();
         expect(component.choiceDuplicate).toBeTrue();
+
+        component.choices.value[0].answer = 'test1';
+        component.choices.value[1].answer = 'test2';
+
+        component.verifyChoice();
+        expect(component.choiceDuplicate).toBeFalse();
     });
 
     it('deleteChoice should remove a choice from the list', () => {

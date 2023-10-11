@@ -85,14 +85,16 @@ export class QuestionCreationPopupComponent implements OnInit {
         );
     }
 
-    verifyChoice(event: KeyboardEvent) {
-        let choiceCount = 0;
-        for (const choice of this.choices.value) {
-            if (choice.answer.trim().toLowerCase() === (event.target as HTMLInputElement).value.trim().toLowerCase()) {
-                choiceCount++;
+    verifyChoice(): void {
+        for (let i = 0; i < this.choices.length; i++) {
+            for (let j = i + 1; j < this.choices.length; j++) {
+                if (this.choices.value[i].answer.trim().toLowerCase() === this.choices.value[j].answer.trim().toLowerCase()) {
+                    this.choiceDuplicate = true;
+                    return;
+                }
             }
         }
-        this.choiceDuplicate = choiceCount > 1;
+        this.choiceDuplicate = false;
     }
 
     deleteChoice(index: number) {
