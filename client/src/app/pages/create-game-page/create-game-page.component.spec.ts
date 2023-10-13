@@ -99,4 +99,30 @@ describe('CreateGamePageComponent', () => {
         expect(window.alert).toHaveBeenCalledWith('Erreur: Jeu Indisponible... Rafraichissement de page.');
         expect(component.selectRow).toHaveBeenCalledWith(null);
     });
+
+    it('should return true when the list is empty', () => {
+        const mockGames: Jeu[] = [];
+        component.games = mockGames;
+        expect(component.allGamesAreHiddenOrListIsEmpty()).toBeTrue();
+    });
+
+    it('should return true when all games are hidden', () => {
+        const mockGames = [
+            { id: 0, title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
+            { id: 1, title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
+        ];
+        component.games = mockGames;
+
+        expect(component.allGamesAreHiddenOrListIsEmpty()).toBeTrue();
+    });
+
+    it('should return false when at least one game is visible', () => {
+        const mockGames = [
+            { id: 0, title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
+            { id: 1, title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: true, questions: [] },
+        ];
+        component.games = mockGames;
+
+        expect(component.allGamesAreHiddenOrListIsEmpty()).toBeFalse();
+    });
 });

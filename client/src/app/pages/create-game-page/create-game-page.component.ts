@@ -9,7 +9,7 @@ import { Jeu } from '@common/jeu';
     styleUrls: ['./create-game-page.component.scss'],
 })
 export class CreateGamePageComponent implements OnInit {
-    games: Jeu[];
+    games: Jeu[] = [];
     selectedRowIndex: number | null = null;
     selectedGame: Jeu | null = null;
     constructor(
@@ -25,6 +25,13 @@ export class CreateGamePageComponent implements OnInit {
     selectRow(index: number | null) {
         this.selectedRowIndex = index;
         this.selectedGame = index !== null ? this.games[index] : null;
+    }
+
+    allGamesAreHiddenOrListIsEmpty() {
+        if (this.games.length === 0) {
+            return true;
+        }
+        return this.games.every((game) => !game.isVisible);
     }
 
     testerJeu() {
