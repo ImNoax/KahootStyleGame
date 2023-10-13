@@ -22,6 +22,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         this.questionSubscription = this.gameService.currentQuestion$.subscribe(() => {
             if (this.games[this.gameService.currentGameId]) {
                 this.currentQuestion = this.games[this.gameService.currentGameId].questions[this.gameService.currentQuestionId].text;
+                this.currentQuestionScore = this.games[this.gameService.currentGameId].questions[this.gameService.currentQuestionId].points;
             }
         });
         this.subscriptionScore = this.gameService.score$.subscribe((updatedScore) => {
