@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { GameMode } from '@app/enums';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { Jeu } from '@common/jeu';
 
@@ -12,9 +13,11 @@ export class CreateGamePageComponent implements OnInit {
     games: Jeu[] = [];
     selectedRowIndex: number | null = null;
     selectedGame: Jeu | null = null;
+    testing: GameMode = GameMode.Testing;
+
     constructor(
-        private gameHandler: GameHandlingService,
         public router: Router,
+        private gameHandler: GameHandlingService,
     ) {}
 
     ngOnInit(): void {
@@ -22,6 +25,7 @@ export class CreateGamePageComponent implements OnInit {
             this.games = games;
         });
     }
+
     selectRow(index: number | null) {
         this.selectedRowIndex = index;
         this.selectedGame = index !== null ? this.games[index] : null;
@@ -34,14 +38,14 @@ export class CreateGamePageComponent implements OnInit {
         return this.games.every((game) => !game.isVisible);
     }
 
-    testerJeu() {
+    initializeGame(mode: GameMode = GameMode.RealGame) {
         this.gameHandler.getGames().subscribe((games: Jeu[]) => {
             this.games = games;
 
             for (const game of this.games) {
                 if (game.id === this.selectedGame?.id && game.isVisible) {
                     this.gameHandler.setCurrentGameId(this.selectedGame.id);
-                    this.router.navigate(['/game']);
+                    this.router.navigate([mode]);
                     return;
                 }
             }

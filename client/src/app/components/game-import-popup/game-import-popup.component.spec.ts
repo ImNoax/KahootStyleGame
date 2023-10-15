@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ImportStates, Limits } from '@app/enums';
+import { ImportState, Limit } from '@app/enums';
 import { FormManagerService } from '@app/services/form-manager.service';
 import { Jeu, Question, QuestionType } from '@common/jeu';
 import { Observable } from 'rxjs';
@@ -51,7 +51,7 @@ describe('GameImportPopupComponent', () => {
     const createValidQuestion = (): Question => {
         return {
             text: ' text ',
-            points: Limits.MinPoints,
+            points: Limit.MinPoints,
             type: QuestionType.QCM,
             choices: [
                 { answer: ' answer', isCorrect: true },
@@ -89,17 +89,17 @@ describe('GameImportPopupComponent', () => {
         const titleExistenceSpy = spyOn(component, 'titleAlreadyExists').and.returnValue(true);
 
         component.getImportState();
-        expect(component.importState).toEqual(ImportStates.NameExists);
+        expect(component.importState).toEqual(ImportState.NameExists);
         expect(formValiditySpy).toHaveBeenCalled();
         expect(titleExistenceSpy).toHaveBeenCalled();
 
         titleExistenceSpy.and.returnValue(false);
         component.getImportState();
-        expect(component.importState).toEqual(ImportStates.ValidForm);
+        expect(component.importState).toEqual(ImportState.ValidForm);
 
         formValiditySpy.and.returnValue(false);
         component.getImportState();
-        expect(component.importState).toEqual(ImportStates.InvalidForm);
+        expect(component.importState).toEqual(ImportState.InvalidForm);
     });
 
     it('closeDialog should reset the form and close the dialog', () => {
@@ -170,7 +170,7 @@ describe('GameImportPopupComponent', () => {
     it('isDurationValid should return true if the duration is valid', () => {
         component.errors = [];
         let errorsCount = 0;
-        component.importedGame.duration = Limits.MinDuration;
+        component.importedGame.duration = Limit.MinDuration;
 
         expect(component.errors.length).toEqual(errorsCount);
 

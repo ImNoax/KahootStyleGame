@@ -2,7 +2,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, Inject, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Limits } from '@app/enums';
+import { Limit } from '@app/enums';
 import { FormManagerService } from '@app/services/form-manager.service';
 import { Choice, Question, QuestionType } from '@common/jeu';
 import * as _ from 'lodash';
@@ -17,8 +17,8 @@ export class QuestionCreationPopupComponent implements OnInit {
     questionType: QuestionType = QuestionType.QCM;
     isChoiceEmpty: boolean = false;
     nGoodChoices: number = 0;
-    maxQuestionLength: number = Limits.MaxQuestionLength;
-    maxAnswerLength: number = Limits.MaxAnswerLength;
+    maxQuestionLength: number = Limit.MaxQuestionLength;
+    maxAnswerLength: number = Limit.MaxAnswerLength;
     questionForm: FormGroup;
     choiceDuplicate = false;
 
@@ -43,7 +43,7 @@ export class QuestionCreationPopupComponent implements OnInit {
         const choices: FormArray = question.get('choices') as FormArray;
         return fb.group({
             text: [question.value.text, [Validators.required, this.formManager.preventEmptyInput]],
-            points: [question.value.points, [Validators.required, Validators.pattern('^[1-9][0-9]*0$'), Validators.max(Limits.MaxPoints)]],
+            points: [question.value.points, [Validators.required, Validators.pattern('^[1-9][0-9]*0$'), Validators.max(Limit.MaxPoints)]],
             type: question.value.type,
             choices: fb.array(choices.controls),
         });
@@ -53,7 +53,7 @@ export class QuestionCreationPopupComponent implements OnInit {
         this.questionForm = fb.group({
             // Source: https://stackoverflow.com/questions/18476318/regex-for-multiples-of-10
             text: ['', [Validators.required, this.formManager.preventEmptyInput]],
-            points: [Limits.MinPoints, [Validators.required, Validators.pattern('^[1-9][0-9]*0$'), Validators.max(Limits.MaxPoints)]],
+            points: [Limit.MinPoints, [Validators.required, Validators.pattern('^[1-9][0-9]*0$'), Validators.max(Limit.MaxPoints)]],
             type: QuestionType.QCM,
             choices: fb.array([]),
         });
@@ -110,28 +110,28 @@ export class QuestionCreationPopupComponent implements OnInit {
     }
 
     canAddAnswer(): boolean {
-        return this.choices.length !== Limits.MaxChoicesNumber;
+        return this.choices.length !== Limit.MaxChoicesNumber;
     }
 
     canDeleteAnswer(): boolean {
-        return this.choices.length !== Limits.MinChoicesNumber;
+        return this.choices.length !== Limit.MinChoicesNumber;
     }
 
     isQuestionEmpty(): boolean {
-        return this.questionForm.controls['text'].touched && this.questionForm.controls['text'].errors?.isEmpty;
+        return this.questionForm.controls['text'].dirty && this.questionForm.controls['text'].hasError('isEmpty');
     }
 
     showPointsError(): string {
         const points: number = this.questionForm.controls['points'].value;
-        return points < Limits.MinPoints || points > Limits.MaxPoints ? 'Doit être entre 10 et 100.' : 'Doit être un multiple de 10.';
+        return points < Limit.MinPoints || points > Limit.MaxPoints ? 'Doit être entre 10 et 100.' : 'Doit être un multiple de 10.';
     }
 
     hasMinimumGoodChoices(): boolean {
         this.nGoodChoices = this.choices.value.reduce((counter: number, choice: Choice) => (choice.isCorrect ? counter + 1 : counter), 0);
-        return Limits.MinGoodChoices <= this.nGoodChoices && this.nGoodChoices < this.choices.length;
+        return Limit.MinGoodChoices <= this.nGoodChoices && this.nGoodChoices < this.choices.length;
     }
 
     showCorrectnessError(): string {
-        return this.nGoodChoices < Limits.MinGoodChoices ? 'Il manque un bon choix.' : 'Il manque un mauvais choix.';
+        return this.nGoodChoices < Limit.MinGoodChoices ? 'Il manque un bon choix.' : 'Il manque un mauvais choix.';
     }
 }

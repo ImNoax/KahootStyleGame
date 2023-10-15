@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { FormArray, FormGroup } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { QuestionCreationPopupComponent } from '@app/components/question-creation-popup/question-creation-popup.component';
-import { Limits } from '@app/enums';
+import { Limit } from '@app/enums';
 import { FormManagerService } from '@app/services/form-manager.service';
 import { Question } from '@common/jeu';
 import * as _ from 'lodash';
@@ -69,6 +69,6 @@ export class QuestionsPageComponent {
     }
 
     isEmpty() {
-        return this.questionsFormArray.length < Limits.MinQuestionsNumber;
+        return this.questionsFormArray.length < Limit.MinQuestionsNumber;
     }
 }

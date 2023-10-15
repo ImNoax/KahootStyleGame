@@ -1,11 +1,12 @@
 <div class="container">
-    <app-header title="Dans la vue d'attente "></app-header>
+    <app-header title="Salle d'attente"></app-header> 
+    <!-- faudra mentionner le PIN -->
     <br />
     <br />
     <br />
     <br />
     <br />
-    <br />
-    <br />
-    <div class="header-item"><h3>Merci de patentier...</h3></div>
+    <ul>
+        <li *ngFor="let player of players">{{player.name}}</li>
+    </ul>
 </div>

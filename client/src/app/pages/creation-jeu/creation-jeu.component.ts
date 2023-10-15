@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { Limits } from '@app/enums';
+import { Limit } from '@app/enums';
 import { FormManagerService } from '@app/services/form-manager.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { Jeu } from '@common/jeu';
@@ -26,8 +26,8 @@ export class CreationJeuComponent implements OnInit {
         private gameHandler: GameHandlingService,
         private formManager: FormManagerService,
     ) {
-        this.maxTitleLength = Limits.MaxTitleLength;
-        this.maxDescriptionLength = Limits.MaxDescriptionLength;
+        this.maxTitleLength = Limit.MaxTitleLength;
+        this.maxDescriptionLength = Limit.MaxDescriptionLength;
     }
 
     ngOnInit(): void {
@@ -61,8 +61,8 @@ export class CreationJeuComponent implements OnInit {
     verifyTimer(event: Event) {
         this.isTimerInvalid =
             (event.target as HTMLInputElement).value.trim() === '' ||
-            Number((event.target as HTMLInputElement).value) < Limits.MinDuration ||
-            Number((event.target as HTMLInputElement).value) > Limits.MaxDuration;
+            Number((event.target as HTMLInputElement).value) < Limit.MinDuration ||
+            Number((event.target as HTMLInputElement).value) > Limit.MaxDuration;
     }
 
     hasQuestions(): boolean {

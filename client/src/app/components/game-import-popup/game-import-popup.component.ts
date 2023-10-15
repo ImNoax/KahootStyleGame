@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ImportStates, Limits } from '@app/enums';
+import { ImportState, Limit } from '@app/enums';
 import { FormManagerService } from '@app/services/form-manager.service';
 import { Jeu, Question } from '@common/jeu';
 import { Observable } from 'rxjs';
@@ -19,7 +19,7 @@ export class GameImportPopupComponent implements OnInit {
     newName: string = '';
     gameForm: FormGroup = this.formManager.gameForm;
     importState: string = '';
-    maxTitleLength = Limits.MaxTitleLength;
+    maxTitleLength = Limit.MaxTitleLength;
     importedGame: Jeu;
 
     questionsDetailsAreValid: boolean = true;
@@ -49,12 +49,12 @@ export class GameImportPopupComponent implements OnInit {
         if (this.isFormValid()) {
             this.gameForm = this.formManager.initializeImportForm(this.importedGame);
             if (this.titleAlreadyExists()) {
-                this.importState = ImportStates.NameExists;
+                this.importState = ImportState.NameExists;
             } else {
-                this.importState = ImportStates.ValidForm;
+                this.importState = ImportState.ValidForm;
             }
         } else {
-            this.importState = ImportStates.InvalidForm;
+            this.importState = ImportState.InvalidForm;
         }
     }
 
@@ -65,8 +65,8 @@ export class GameImportPopupComponent implements OnInit {
 
     isFormValid(): boolean {
         return [
-            this.isGameDetailValid(this.importedGame.title, Limits.MaxTitleLength),
-            this.isGameDetailValid(this.importedGame.description, Limits.MaxDescriptionLength, true),
+            this.isGameDetailValid(this.importedGame.title, Limit.MaxTitleLength),
+            this.isGameDetailValid(this.importedGame.description, Limit.MaxDescriptionLength, true),
             this.isDurationValid(),
             this.areQuestionsValid(),
         ].every((value: boolean) => value === true);
@@ -100,8 +100,8 @@ export class GameImportPopupComponent implements OnInit {
 
     isDurationValid(): boolean {
         const gameDuration: number = this.importedGame.duration;
-        if (gameDuration === undefined || gameDuration < Limits.MinDuration || Limits.MaxDuration < gameDuration) {
-            this.errors.push(`La propriété 'duration' doit être entre ${Limits.MinDuration} et ${Limits.MaxDuration}`);
+        if (gameDuration === undefined || gameDuration < Limit.MinDuration || Limit.MaxDuration < gameDuration) {
+            this.errors.push(`La propriété 'duration' doit être entre ${Limit.MinDuration} et ${Limit.MaxDuration}`);
             return false;
         }
         return true;
@@ -131,14 +131,14 @@ export class GameImportPopupComponent implements OnInit {
             this.emptyQuestionVerified = true;
         }
 
-        if (!this.exceededQuestionTextVerified && text.length > Limits.MaxQuestionLength) {
-            this.errors.push(`Une propriété 'text' dépasse le nombre de caractères permis (${Limits.MaxQuestionLength})`);
+        if (!this.exceededQuestionTextVerified && text.length > Limit.MaxQuestionLength) {
+            this.errors.push(`Une propriété 'text' dépasse le nombre de caractères permis (${Limit.MaxQuestionLength})`);
             this.questionsDetailsAreValid = false;
             this.exceededQuestionTextVerified = true;
         }
 
-        if (!this.pointsLimitsVerified && (question.points < Limits.MinPoints || Limits.MaxPoints < question.points)) {
-            this.errors.push(`La propriété 'points' doit être entre ${Limits.MinPoints} et ${Limits.MaxPoints}`);
+        if (!this.pointsLimitsVerified && (question.points < Limit.MinPoints || Limit.MaxPoints < question.points)) {
+            this.errors.push(`La propriété 'points' doit être entre ${Limit.MinPoints} et ${Limit.MaxPoints}`);
             this.questionsDetailsAreValid = false;
             this.pointsLimitsVerified = true;
         }
@@ -169,8 +169,8 @@ export class GameImportPopupComponent implements OnInit {
                     this.emptyAnswerVerified = true;
                 }
 
-                if (!this.exceededAnswerVerified && answer.length > Limits.MaxAnswerLength) {
-                    this.errors.push(`Une propriété 'answer' dépasse le nombre de caractères permis ${Limits.MaxAnswerLength}`);
+                if (!this.exceededAnswerVerified && answer.length > Limit.MaxAnswerLength) {
+                    this.errors.push(`Une propriété 'answer' dépasse le nombre de caractères permis ${Limit.MaxAnswerLength}`);
                     this.choicesAreValid = false;
                     this.exceededAnswerVerified = true;
                 }
@@ -179,7 +179,7 @@ export class GameImportPopupComponent implements OnInit {
                 else ++nBadChoices;
             }
 
-            if (!this.minimumChoicesVerified && (nGoodChoices < Limits.MinGoodChoices || nBadChoices < Limits.MinGoodChoices)) {
+            if (!this.minimumChoicesVerified && (nGoodChoices < Limit.MinGoodChoices || nBadChoices < Limit.MinGoodChoices)) {
                 this.errors.push('Il doit y avoir au moins un bon et un mauvais choix pour chaque question');
                 this.choicesAreValid = false;
                 this.minimumChoicesVerified = true;

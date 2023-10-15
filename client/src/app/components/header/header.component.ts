@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { ClientSocketService } from '@app/services/client-socket.service';
 import { FormManagerService } from '@app/services/form-manager.service';
 
 @Component({
@@ -9,9 +10,13 @@ import { FormManagerService } from '@app/services/form-manager.service';
 export class HeaderComponent {
     @Input() title: string = '';
 
-    constructor(private formManager: FormManagerService) {}
+    constructor(
+        private formManager: FormManagerService,
+        private clientSocket: ClientSocketService,
+    ) {}
 
-    resetForm() {
+    reset() {
         this.formManager.resetGameForm();
+        this.clientSocket.send('leaveLobby');
     }
 }

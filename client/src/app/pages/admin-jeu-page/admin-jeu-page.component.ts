@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { GameImportPopupComponent } from '@app/components/game-import-popup/game-import-popup.component';
-import { Limits } from '@app/enums';
+import { Limit } from '@app/enums';
 import { FormManagerService } from '@app/services/form-manager.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { Jeu } from '@common/jeu';
@@ -46,7 +46,7 @@ export class AdminJeuPageComponent implements OnInit {
                 game.questions.map((question) => {
                     return fb.group({
                         text: [question.text, [Validators.required, this.formManager.preventEmptyInput]],
-                        points: [question.points, [Validators.required, Validators.pattern('^[1-9][0-9]*0$'), Validators.max(Limits.MaxPoints)]],
+                        points: [question.points, [Validators.required, Validators.pattern('^[1-9][0-9]*0$'), Validators.max(Limit.MaxPoints)]],
                         type: question.type,
                         choices: fb.array(
                             question.choices.map((choice) => {

@@ -16,30 +16,30 @@ export class GameHandlingService {
     score$ = this.scoreSource.asObservable();
     currentQuestionSource = new BehaviorSubject<string>('');
     currentQuestion$ = this.currentQuestionSource.asObservable();
-    private readonly baseUrl: string = environment.serverUrl;
+    private readonly baseUrl: string = environment.serverGamesUrl;
 
     constructor(private http: HttpClient) {}
 
     getGames(): Observable<Jeu[]> {
-        return this.http.get<Jeu[]>(`${this.baseUrl}/jeux`).pipe(catchError(this.handleError<Jeu[]>('getGames')));
+        return this.http.get<Jeu[]>(this.baseUrl).pipe(catchError(this.handleError<Jeu[]>('getGames')));
     }
 
     modifyGame(game: Jeu, gameName: string): Observable<Jeu[]> {
-        return this.http.patch<Jeu[]>(`${this.baseUrl}/jeux/${game.id}`, [game, gameName]).pipe(catchError(this.handleError<Jeu[]>('modifyGame')));
+        return this.http.patch<Jeu[]>(`${this.baseUrl}/${game.id}`, [game, gameName]).pipe(catchError(this.handleError<Jeu[]>('modifyGame')));
     }
 
     addGame(newGame: Jeu): Observable<Jeu[]> {
-        return this.http.post<Jeu[]>(`${this.baseUrl}/jeux`, newGame).pipe(catchError(this.handleError<Jeu[]>('addGame')));
+        return this.http.post<Jeu[]>(this.baseUrl, newGame).pipe(catchError(this.handleError<Jeu[]>('addGame')));
     }
 
     changeVisibility(game: Jeu): Observable<Jeu[]> {
         return this.http
-            .patch<Jeu[]>(`${this.baseUrl}/jeux/visibility/${game.id}`, { isVisible: game.isVisible })
+            .patch<Jeu[]>(`${this.baseUrl}/visibility/${game.id}`, { isVisible: game.isVisible })
             .pipe(catchError(this.handleError<Jeu[]>('changeVisibility')));
     }
 
     export(id: number) {
-        return this.http.get<Jeu>(`${this.baseUrl}/jeux/${id}`, { responseType: 'json' });
+        return this.http.get<Jeu>(`${this.baseUrl}/${id}`, { responseType: 'json' });
     }
 
     setCurrentGameId(id: number) {
@@ -64,12 +64,12 @@ export class GameHandlingService {
     }
 
     deleteGame(id: number): Observable<void> {
-        return this.http.delete<void>(`${this.baseUrl}/jeux/${id}`).pipe(catchError(this.handleError<void>('deleteGame')));
+        return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(catchError(this.handleError<void>('deleteGame')));
     }
 
     verifyAdminPassword(password: string): Observable<boolean> {
         return this.http
-            .post<{ valid: boolean }>(`${this.baseUrl}/admin/verify-admin-password`, { password })
+            .post<{ valid: boolean }>(`${environment.serverAdminUrl}/verify-admin-password`, { password })
             .pipe(map((response) => response.valid));
     }
 
