@@ -158,7 +158,7 @@ describe('QuestionCreationPopupComponent', () => {
         component.questionForm.controls['text'].setValue('   ');
         expect(component.isQuestionEmpty()).toBeFalse();
 
-        component.questionForm.controls['text'].markAsTouched();
+        component.questionForm.controls['text'].markAsDirty();
         expect(component.isQuestionEmpty()).toBeTrue();
 
         component.questionForm.controls['text'].setValue('a');

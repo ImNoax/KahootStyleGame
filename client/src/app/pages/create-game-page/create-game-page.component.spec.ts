@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
+import { GameMode } from '@app/enums';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { Jeu } from '@common/jeu';
 import { of } from 'rxjs';
@@ -60,7 +61,7 @@ describe('CreateGamePageComponent', () => {
         expect(component.selectedGame).toBeNull();
     });
 
-    it('testerJeu should navigate to /game when game is visible and existing', () => {
+    it('initializeGame with argument GameMode.Testing should navigate to /game when game is visible and existing', () => {
         const games = [
             { id: 0, title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
             { id: 1, title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: true, questions: [] },
@@ -71,7 +72,7 @@ describe('CreateGamePageComponent', () => {
         spyOn(gameHandler, 'setCurrentGameId');
         const navigateSpy = spyOn(component.router, 'navigate');
 
-        component.testerJeu();
+        component.initializeGame(GameMode.Testing);
 
         expect(mockGetGames).toHaveBeenCalled();
         expect(component.games).toBeDefined();
@@ -80,7 +81,7 @@ describe('CreateGamePageComponent', () => {
         expect(navigateSpy).toHaveBeenCalledWith(['/game']);
     });
 
-    it('testerJeu should show an alert if game is no longer visible', () => {
+    it('initializeGame should show an alert if game is no longer visible', () => {
         const games = [
             { id: 0, title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
             { id: 1, title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
@@ -92,7 +93,7 @@ describe('CreateGamePageComponent', () => {
         spyOn(component, 'selectRow');
         spyOn(window, 'alert');
 
-        component.testerJeu();
+        component.initializeGame(GameMode.Testing);
         expect(mockGetGames).toHaveBeenCalled();
         expect(component.games).toBeDefined();
 

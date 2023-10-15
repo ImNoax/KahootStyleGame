@@ -1,4 +1,4 @@
-export enum Limits {
+export enum Limit {
     MinQuestionsNumber = 1,
     MinChoicesNumber = 2,
     MaxChoicesNumber = 4,
@@ -11,10 +11,16 @@ export enum Limits {
     MaxDuration = 60,
     MinDuration = 10,
     MaxAnswerLength = 150,
+    MaxNameLength = 50,
 }
 
-export enum ImportStates {
+export enum ImportState {
     ValidForm = 'ValidForm',
     NameExists = 'NameExists',
     InvalidForm = 'InvalidForm',
+}
+
+export enum GameMode {
+    Testing = '/game',
+    RealGame = '/waiting',
 }
