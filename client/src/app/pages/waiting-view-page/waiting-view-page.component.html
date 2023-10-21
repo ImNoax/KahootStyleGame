@@ -1,12 +1,19 @@
 <div class="container">
-    <app-header title="Salle d'attente"></app-header> 
-    <!-- faudra mentionner le PIN -->
+    <app-header title="Salle d'attente"></app-header>
+    <div class="room-pin">{{ pin }}</div>
+    <div class="room-pin" *ngIf="this.isOrganizer">
+        <div>Vous êtes l'organisateur de la partie!</div>
+        <div>Partagez le code pour inviter vos amis!</div>
+    </div>
     <br />
     <br />
     <br />
     <br />
     <br />
     <ul>
-        <li *ngFor="let player of players">{{player.name}}</li>
+        <li *ngFor="let player of players">
+            {{ player.name }}
+            <span *ngIf="player.name === 'Organisateur' && this.isOrganizer">(vous)</span>
+        </li>
     </ul>
 </div>
