@@ -40,23 +40,28 @@ export class SocketManager {
 
                 if (pin) {
                     const currentLobby = this.lobbies.get(pin);
-                    if (isOrganizer(pin)) {
-                        // est ce que ca fait leave les autres socket de la room avec pin sachant que ca fait
-                        // renvoie au /home mais ca ne fait pas socket.leave(pin) aux autres donc peuvent-ils tjrs recevoir les emit?
-                        this.sio.to(pin).emit('lobbyClosed');
-                        this.lobbies.delete(pin);
-                    } else {
-                        currentLobby.players = currentLobby.players.filter((player) => player.socketId !== socket.id);
-                        socket.leave(pin);
-                        sendLatestPlayersList(pin);
-                        this.activeSockets.delete(socket.id);
+                    if (currentLobby) {
+                        if (isOrganizer(pin)) {
+                            // est ce que ca fait leave les autres socket de la room avec pin sachant que ca fait
+                            // renvoie au /home mais ca ne fait pas socket.leave(pin) aux autres donc peuvent-ils tjrs recevoir les emit?
+                            this.sio.to(pin).emit('lobbyClosed');
+                            this.lobbies.delete(pin);
+                        } else {
+                            currentLobby.players = currentLobby.players.filter((player) => player.socketId !== socket.id);
+                            socket.leave(pin);
+                            sendLatestPlayersList(pin);
+                            this.activeSockets.delete(socket.id);
+                        }
                     }
                 }
             };
 
             const isOrganizer = (pin: string) => {
                 const currentLobby = this.lobbies.get(pin);
-                return currentLobby.players.some((player) => player.socketId === socket.id && player.name.toLowerCase() === 'organisateur');
+                if (currentLobby) {
+                    return currentLobby.players.some((player) => player.socketId === socket.id && player.name.toLowerCase() === 'organisateur');
+                }
+                return null;
             };
 
             const generateRandomPin = () => {
@@ -138,6 +143,21 @@ export class SocketManager {
                 }
             });
 
+            socket.on('banPlayer', (player: { socketId: string; name: string }) => {
+                const socketToBan = this.sio.sockets.sockets.get(player.socketId);
+                const pin = this.activeSockets.get(socket.id);
+                const currentLobby = this.lobbies.get(pin);
+                if (currentLobby) {
+                    currentLobby.players = currentLobby.players.filter((playerr) => playerr.name !== player.name);
+                    currentLobby.bannedNames.push(player.name);
+                    if (socketToBan) {
+                        socketToBan.leave(pin);
+                        socketToBan.emit('lobbyClosed');
+                    }
+                }
+                socket.emit('successfulBan', 'Le nom ${player.name} a été banni');
+            });
+
             socket.on('leaveLobby', () => {
                 leaveLobby();
             });
@@ -148,3 +168,4 @@ export class SocketManager {
         });
     }
 }
+// fonction getlobby pour eviter repetition de constpin et const currentlobby?

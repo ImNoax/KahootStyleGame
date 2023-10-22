@@ -14,6 +14,7 @@
         <li *ngFor="let player of players">
             {{ player.name }}
             <span *ngIf="player.name === 'Organisateur' && this.isOrganizer">(vous)</span>
+            <button *ngIf="player.name !== 'Organisateur' && this.isOrganizer" (click)="banPlayer(player)">Exclure</button>
         </li>
     </ul>
 </div>

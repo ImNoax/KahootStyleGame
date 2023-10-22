@@ -12,6 +12,7 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
     pin: string;
     isLocked: boolean;
     isOrganizer: boolean;
+    latestLobbyMessage: string;
 
     constructor(
         public router: Router,
@@ -26,6 +27,7 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.clientSocket.canAccessLobby = false;
+        this.clientSocket.send('leaveLobby');
     }
 
     configureBaseSocketFeatures() {
@@ -49,5 +51,13 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
         this.clientSocket.socket.on('statusNotOrganizer', () => {
             this.isOrganizer = false;
         });
+
+        this.clientSocket.socket.on('successfulBan', (message: string) => {
+            this.latestLobbyMessage = message;
+        });
+    }
+
+    banPlayer(player: { socketId: string; name: string }) {
+        this.clientSocket.send('banPlayer', player);
     }
 }
