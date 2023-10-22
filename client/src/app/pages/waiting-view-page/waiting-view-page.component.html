@@ -17,7 +17,8 @@
             <button *ngIf="player.name !== 'Organisateur' && isOrganizer" (click)="banPlayer(player)">Exclure</button>
         </li>
     </ul>
-    <button *ngIf="isOrganizer" (click)="isLocked ? unlockRoom() : lockRoom()">
+    <button [disabled]="!isOrganizer" (click)="isLocked ? unlockRoom() : lockRoom()">
         {{ isLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}
     </button>
+    <button *ngIf="isOrganizer">Start Game</button>
 </div>
