@@ -143,19 +143,22 @@ export class SocketManager {
                 }
             });
 
-            socket.on('banPlayer', (player: { socketId: string; name: string }) => {
-                const socketToBan = this.sio.sockets.sockets.get(player.socketId);
+            socket.on('lockRoom', () => {
                 const pin = this.activeSockets.get(socket.id);
                 const currentLobby = this.lobbies.get(pin);
                 if (currentLobby) {
-                    currentLobby.players = currentLobby.players.filter((playerr) => playerr.name !== player.name);
-                    currentLobby.bannedNames.push(player.name);
-                    if (socketToBan) {
-                        socketToBan.leave(pin);
-                        socketToBan.emit('lobbyClosed');
-                    }
+                    currentLobby.locked = true;
+                    socket.emit('roomLocked');
                 }
-                socket.emit('successfulBan', 'Le nom ${player.name} a été banni');
+            });
+
+            socket.on('unlockRoom', () => {
+                const pin = this.activeSockets.get(socket.id);
+                const currentLobby = this.lobbies.get(pin);
+                if (currentLobby) {
+                    currentLobby.locked = false;
+                    socket.emit('roomUnlocked');
+                }
             });
 
             socket.on('leaveLobby', () => {

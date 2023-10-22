@@ -12,7 +12,6 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
     pin: string;
     isLocked: boolean;
     isOrganizer: boolean;
-    latestLobbyMessage: string;
 
     constructor(
         public router: Router,
@@ -52,12 +51,24 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
             this.isOrganizer = false;
         });
 
-        this.clientSocket.socket.on('successfulBan', (message: string) => {
-            this.latestLobbyMessage = message;
+        this.clientSocket.socket.on('roomLocked', () => {
+            this.isLocked = true;
+        });
+
+        this.clientSocket.socket.on('roomUnlocked', () => {
+            this.isLocked = false;
         });
     }
 
     banPlayer(player: { socketId: string; name: string }) {
         this.clientSocket.send('banPlayer', player);
+    }
+
+    lockRoom() {
+        this.clientSocket.send('lockRoom', true);
+    }
+
+    unlockRoom() {
+        this.clientSocket.send('unlockRoom', true);
     }
 }
