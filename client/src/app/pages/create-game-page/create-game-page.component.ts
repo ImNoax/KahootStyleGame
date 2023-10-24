@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { GameMode } from '@app/enums';
+import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { Jeu } from '@common/jeu';
 
@@ -18,11 +19,20 @@ export class CreateGamePageComponent implements OnInit {
     constructor(
         public router: Router,
         private gameHandler: GameHandlingService,
+        private clientSocket: ClientSocketService,
     ) {}
 
     ngOnInit(): void {
         this.gameHandler.getGames().subscribe((games: Jeu[]) => {
             this.games = games;
+        });
+        this.configureBaseSocketFeatures();
+    }
+
+    configureBaseSocketFeatures() {
+        this.clientSocket.socket.on('successfulLobbyCreation', () => {
+            this.clientSocket.canAccessLobby = true;
+            this.router.navigate(['/waiting']);
         });
     }
 
@@ -45,7 +55,11 @@ export class CreateGamePageComponent implements OnInit {
             for (const game of this.games) {
                 if (game.id === this.selectedGame?.id && game.isVisible) {
                     this.gameHandler.setCurrentGameId(this.selectedGame.id);
-                    this.router.navigate([mode]);
+                    if (mode !== this.testing) {
+                        this.clientSocket.send('createLobby');
+                    } else {
+                        this.router.navigate([mode]);
+                    }
                     return;
                 }
             }

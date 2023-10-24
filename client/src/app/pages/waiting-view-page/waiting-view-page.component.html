@@ -1,12 +1,24 @@
 <div class="container">
-    <app-header title="Salle d'attente"></app-header> 
-    <!-- faudra mentionner le PIN -->
+    <app-header title="Salle d'attente"></app-header>
+    <div class="room-pin">{{ pin }}</div>
+    <div class="room-pin" *ngIf="isOrganizer">
+        <div>Vous êtes l'organisateur de la partie!</div>
+        <div>Partagez le code pour inviter vos amis!</div>
+    </div>
     <br />
     <br />
     <br />
     <br />
     <br />
     <ul>
-        <li *ngFor="let player of players">{{player.name}}</li>
+        <li *ngFor="let player of players">
+            {{ player.name }}
+            <span *ngIf="player.name === 'Organisateur' && isOrganizer">(vous)</span>
+            <button *ngIf="player.name !== 'Organisateur' && isOrganizer" (click)="banPlayer(player)">Exclure</button>
+        </li>
     </ul>
+    <button [disabled]="!isOrganizer" (click)="isLocked ? unlockRoom() : lockRoom()">
+        {{ isLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}
+    </button>
+    <button *ngIf="isOrganizer">Start Game</button>
 </div>
