@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { MessageData } from '@common/message';
+import { Observable } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 
@@ -26,5 +28,21 @@ export class ClientSocketService {
 
     send(event: string, ...data: (string | number | object | boolean)[]): void {
         this.socket.emit(event, ...data);
+    }
+
+    listenForStartGame(): Observable<void> {
+        return new Observable((observer) => {
+            this.socket.on('gameStarted', () => {
+                observer.next();
+            });
+        });
+    }
+
+    listenToMessageReceived(): Observable<MessageData> {
+        return new Observable((observer) => {
+            this.socket.on('messageReceived', (messageData: MessageData) => {
+                observer.next(messageData);
+            });
+        });
     }
 }

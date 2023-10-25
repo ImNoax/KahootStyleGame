@@ -1,6 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ClientSocketService } from '@app/services/client-socket.service';
+import { GameHandlingService } from '@app/services/game-handling.service';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-waiting-view-page',
@@ -12,21 +14,34 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
     pin: string;
     isLocked: boolean;
     isOrganizer: boolean;
+    gameStarted: boolean = false;
+    private startGameSubscription: Subscription;
 
     constructor(
         public router: Router,
         private clientSocket: ClientSocketService,
+        private gameHand: GameHandlingService,
     ) {}
 
     ngOnInit(): void {
         this.configureBaseSocketFeatures();
         this.clientSocket.send('getPlayers');
         this.clientSocket.send('getStatus');
+        this.startGameSubscription = this.clientSocket.listenForStartGame().subscribe(() => {
+            this.startGame();
+        });
     }
 
     ngOnDestroy(): void {
         this.clientSocket.canAccessLobby = false;
         this.clientSocket.send('leaveLobby');
+        if (this.startGameSubscription) {
+            this.startGameSubscription.unsubscribe();
+        }
+    }
+
+    getPlayers(): { socketId: string; name: string }[] {
+        return this.players;
     }
 
     configureBaseSocketFeatures() {
@@ -34,13 +49,17 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
             'latestPlayerList',
             (roomData: { pin: string; players: { socketId: string; name: string }[]; isLocked: boolean }) => {
                 this.players = roomData.players;
+                this.gameHand.setPlayers(this.players);
                 this.pin = roomData.pin;
                 this.isLocked = roomData.isLocked;
             },
         );
 
         this.clientSocket.socket.on('lobbyClosed', () => {
-            this.router.navigate(['/home']);
+            if (!this.gameStarted) {
+                // console.log('Lobby closed triggered');
+                this.router.navigate(['/home']);
+            }
         });
 
         this.clientSocket.socket.on('statusOrganizer', () => {
@@ -70,5 +89,14 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
 
     unlockRoom() {
         this.clientSocket.send('unlockRoom', true);
+    }
+
+    startGameEmit() {
+        this.clientSocket.socket.emit('startGame', { pin: this.pin });
+    }
+
+    startGame() {
+        this.gameStarted = true;
+        this.router.navigate(['/game']);
     }
 }

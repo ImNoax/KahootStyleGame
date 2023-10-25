@@ -8,7 +8,6 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { QuestionCreationPopupComponent } from '@app/components/question-creation-popup/question-creation-popup.component';
-import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
 import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AdminJeuPageComponent } from '@app/pages/admin-jeu-page/admin-jeu-page.component';
@@ -19,6 +18,7 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { WaitingViewPageComponent } from '@app/pages/waiting-view-page/waiting-view-page.component';
 import { ButtonResponseComponent } from './components/button-response/button-response.component';
+import { ChatBoxComponent } from './components/chat-box/chat-box.component';
 import { GameImportPopupComponent } from './components/game-import-popup/game-import-popup.component';
 import { HeaderComponent } from './components/header/header.component';
 import { TimerComponent } from './components/timer/timer.component';
@@ -39,7 +39,6 @@ import { QuestionsPageComponent } from './pages/questions-page/questions-page.co
         GamePageComponent,
         MainPageComponent,
         MaterialPageComponent,
-        SidebarComponent,
         TimerComponent,
         ButtonResponseComponent,
         CreationJeuComponent,
@@ -50,6 +49,7 @@ import { QuestionsPageComponent } from './pages/questions-page/questions-page.co
         GameImportPopupComponent,
         WaitingViewPageComponent,
         NameDefinitionPageComponent,
+        ChatBoxComponent,
     ],
     imports: [
         AppMaterialModule,

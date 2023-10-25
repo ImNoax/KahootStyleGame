@@ -20,5 +20,5 @@
     <button [disabled]="!isOrganizer" (click)="isLocked ? unlockRoom() : lockRoom()">
         {{ isLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}
     </button>
-    <button *ngIf="isOrganizer">Start Game</button>
+    <button *ngIf="isOrganizer" (click)="startGameEmit()">Start Game</button>
 </div>
