@@ -30,7 +30,7 @@ export class GameHandlingService {
     }
 
     getPlayerNameBySocketId(socketId: string): string {
-        const player = this.players.find((player) => player.socketId === socketId);
+        const player = this.players.find((plyer) => plyer.socketId === socketId);
         return player ? player.name : 'Unknown';
     }
 

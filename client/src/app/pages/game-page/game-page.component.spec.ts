@@ -1,11 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatIcon } from '@angular/material/icon';
 import { ButtonResponseComponent } from '@app/components/button-response/button-response.component';
-import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { Jeu, QuestionType } from '@common/jeu';
-import { Subject, of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { GamePageComponent } from './game-page.component';
 
 const MOCK_QUESTIONS = [
@@ -50,7 +49,7 @@ describe('GamePageComponent', () => {
         gameServiceSpy.currentQuestionId = 0;
 
         TestBed.configureTestingModule({
-            declarations: [GamePageComponent, SidebarComponent, ButtonResponseComponent, TimerComponent, MatIcon],
+            declarations: [GamePageComponent, ButtonResponseComponent, TimerComponent, MatIcon],
             providers: [{ provide: GameHandlingService, useValue: gameServiceSpy }],
         });
 
