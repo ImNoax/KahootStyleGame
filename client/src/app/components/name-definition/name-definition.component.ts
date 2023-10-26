@@ -1,24 +1,20 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { Limit } from '@app/enums';
 import { ClientSocketService } from '@app/services/client-socket.service';
 
 @Component({
-    selector: 'app-name-definition-page',
-    templateUrl: './name-definition-page.component.html',
-    styleUrls: ['./name-definition-page.component.scss'],
+    selector: 'app-name-definition',
+    templateUrl: './name-definition.component.html',
+    styleUrls: ['./name-definition.component.scss'],
 })
-export class NameDefinitionPageComponent implements OnDestroy {
+export class NameDefinitionComponent {
     nameForm: FormGroup;
     maxNameLength: number = Limit.MaxNameLength;
     nameIsInvalid: boolean = false;
     serverMessage: string = '';
 
-    constructor(
-        private clientSocket: ClientSocketService,
-        private router: Router,
-    ) {
+    constructor(private clientSocket: ClientSocketService) {
         const fb: FormBuilder = new FormBuilder();
         this.nameForm = fb.group({
             name: ['', [Validators.required, this.preventEmptyInput]],
@@ -32,14 +28,10 @@ export class NameDefinitionPageComponent implements OnDestroy {
         return whiteSpaceRemoved.length === 0 ? { isEmpty: true } : null;
     }
 
-    ngOnDestroy(): void {
-        this.clientSocket.canAccessNameDefinition = false;
-    }
-
     configureBaseSocketFeatures() {
-        this.clientSocket.socket.on('validName', () => {
-            this.clientSocket.canAccessLobby = true;
-            this.router.navigate(['/waiting']);
+        this.clientSocket.socket.on('validName', (name) => {
+            this.clientSocket.isNameDefined = true;
+            this.clientSocket.playerName = name;
         });
 
         this.clientSocket.socket.on('invalidName', (message: string) => {

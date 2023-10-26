@@ -31,8 +31,12 @@ export class CreateGamePageComponent implements OnInit {
 
     configureBaseSocketFeatures() {
         this.clientSocket.socket.on('successfulLobbyCreation', () => {
-            this.clientSocket.canAccessLobby = true;
+            this.clientSocket.configureOrganisatorLobby(true);
             this.router.navigate(['/waiting']);
+        });
+
+        this.clientSocket.socket.on('failedLobbyCreation', (reason) => {
+            window.alert(reason);
         });
     }
 
@@ -56,6 +60,7 @@ export class CreateGamePageComponent implements OnInit {
                 if (game.id === this.selectedGame?.id && game.isVisible) {
                     this.gameHandler.setCurrentGameId(this.selectedGame.id);
                     if (mode !== this.testing) {
+                        this.clientSocket.isOrganizer = true;
                         this.clientSocket.send('createLobby');
                     } else {
                         this.router.navigate([mode]);

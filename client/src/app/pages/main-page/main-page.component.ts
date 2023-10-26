@@ -4,10 +4,10 @@ import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/fo
 import { Router } from '@angular/router';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
+import { REQUIRED_PIN_LENGTH } from '@common/lobby';
 import { BehaviorSubject } from 'rxjs';
 
 const ERROR401 = 401;
-const REQUIRED_PIN_LENGTH = 4;
 
 @Component({
     selector: 'app-main-page',
@@ -55,8 +55,8 @@ export class MainPageComponent {
 
     configureBaseSocketFeatures() {
         this.clientSocket.socket.on('successfulLobbyConnection', () => {
-            this.clientSocket.canAccessNameDefinition = true;
-            this.router.navigate(['/name-definition']);
+            this.clientSocket.canAccessLobby = true;
+            this.router.navigate(['/waiting']);
         });
 
         this.clientSocket.socket.on('failedLobbyConnection', (message: string) => {
