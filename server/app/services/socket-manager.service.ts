@@ -168,6 +168,20 @@ export class SocketManager {
             socket.on('disconnect', () => {
                 leaveLobby();
             });
+
+            socket.on('startGame', () => {
+                const pin = this.activeSockets.get(socket.id);
+                this.sio.to(pin).emit('gameStarted');
+            });
+
+            socket.on('chatMessage', (messageData) => {
+                const pin = this.activeSockets.get(socket.id);
+                this.sio.to(pin).emit('messageReceived', {
+                    sender: socket.id,
+                    content: messageData.content,
+                    time: new Date(),
+                });
+            });
         });
     }
 }
