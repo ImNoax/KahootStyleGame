@@ -176,7 +176,7 @@ export class SocketManager {
 
             socket.on('chatMessage', (messageData) => {
                 const pin = this.activeSockets.get(socket.id);
-                    this.sio.to(pin).emit('messageReceived', {
+                this.sio.to(pin).emit('messageReceived', {
                     sender: socket.id,
                     content: messageData.content,
                     time: new Date(),
