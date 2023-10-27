@@ -11,8 +11,8 @@
                 </mat-form-field>
                 <p id="server-error-message" class="error">{{serverErrorMessage}}</p>
             </div>
-            <button type="button" mat-raised-button color="primary" class="button" routerLink="/create-game">Créer une partie</button>
-            <button type="button" mat-raised-button color="primary" class="button" (click)="adminLogin()">Administrer les jeux</button> 
+            <button type="button" mat-raised-button color="primary" routerLink="/create-game">Créer une partie</button>
+            <button type="button" mat-raised-button color="primary" (click)="adminLogin()">Administrer les jeux</button> 
         </form>
     </section>
 

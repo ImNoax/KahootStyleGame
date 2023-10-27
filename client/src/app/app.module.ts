@@ -21,9 +21,9 @@ import { ButtonResponseComponent } from './components/button-response/button-res
 import { ChatBoxComponent } from './components/chat-box/chat-box.component';
 import { GameImportPopupComponent } from './components/game-import-popup/game-import-popup.component';
 import { HeaderComponent } from './components/header/header.component';
+import { NameDefinitionComponent } from './components/name-definition/name-definition.component';
 import { TimerComponent } from './components/timer/timer.component';
 import { CreationJeuComponent } from './pages/creation-jeu/creation-jeu.component';
-import { NameDefinitionPageComponent } from './pages/name-definition-page/name-definition-page.component';
 import { QuestionsPageComponent } from './pages/questions-page/questions-page.component';
 
 /**
@@ -48,7 +48,7 @@ import { QuestionsPageComponent } from './pages/questions-page/questions-page.co
         QuestionCreationPopupComponent,
         GameImportPopupComponent,
         WaitingViewPageComponent,
-        NameDefinitionPageComponent,
+        NameDefinitionComponent,
         ChatBoxComponent,
     ],
     imports: [

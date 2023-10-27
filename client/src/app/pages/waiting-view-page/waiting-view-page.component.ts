@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
+import { LobbyDetails, Pin, SocketId } from '@common/lobby';
 import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
@@ -10,85 +11,72 @@ import { Subscription } from 'rxjs/internal/Subscription';
     styleUrls: ['./waiting-view-page.component.scss'],
 })
 export class WaitingViewPageComponent implements OnInit, OnDestroy {
-    players: { socketId: string; name: string }[] = [];
-    pin: string;
-    isLocked: boolean;
-    isOrganizer: boolean;
+    players: { socketId: SocketId; name: string }[] = [];
+    pin: Pin = '';
+    isLocked: boolean = false;
     gameStarted: boolean = false;
     private startGameSubscription: Subscription;
 
     constructor(
         public router: Router,
         private clientSocket: ClientSocketService,
-        private gameHand: GameHandlingService,
+        private gameHandler: GameHandlingService,
     ) {}
+
+    get isNameDefined(): boolean {
+        return this.clientSocket.isNameDefined;
+    }
+
+    get isOrganizer(): boolean {
+        return this.clientSocket.isOrganizer;
+    }
+
+    get playerName(): string {
+        return this.clientSocket.playerName;
+    }
 
     ngOnInit(): void {
         this.configureBaseSocketFeatures();
         this.clientSocket.send('getPlayers');
-        this.clientSocket.send('getStatus');
         this.startGameSubscription = this.clientSocket.listenForStartGame().subscribe(() => {
             this.startGame();
         });
     }
 
     ngOnDestroy(): void {
-        this.clientSocket.canAccessLobby = false;
-        this.clientSocket.send('leaveLobby');
+        this.clientSocket.configureOrganisatorLobby(false);
         if (this.startGameSubscription) {
             this.startGameSubscription.unsubscribe();
         }
     }
 
-    getPlayers(): { socketId: string; name: string }[] {
-        return this.players;
-    }
-
     configureBaseSocketFeatures() {
-        this.clientSocket.socket.on(
-            'latestPlayerList',
-            (roomData: { pin: string; players: { socketId: string; name: string }[]; isLocked: boolean }) => {
-                this.players = roomData.players;
-                this.gameHand.setPlayers(this.players);
-                this.pin = roomData.pin;
-                this.isLocked = roomData.isLocked;
-            },
-        );
-
-        this.clientSocket.socket.on('lobbyClosed', () => {
-            if (!this.gameStarted) {
-                // console.log('Lobby closed triggered');
-                this.router.navigate(['/home']);
-            }
+        this.clientSocket.socket.on('latestPlayerList', (pin: Pin, lobbyDetails: LobbyDetails) => {
+            this.pin = pin;
+            this.isLocked = lobbyDetails.isLocked;
+            this.players = lobbyDetails.players;
+            this.gameHandler.setPlayers(this.players);
         });
 
-        this.clientSocket.socket.on('statusOrganizer', () => {
-            this.isOrganizer = true;
+        this.clientSocket.socket.on('lobbyClosed', (/* reason*/) => {
+            this.clientSocket.send('leaveLobby');
+            this.router.navigate(['/home']).then(() => {
+                // BUG: Parfois, on reçoit plusieurs alertes. Je sais pas le problème est où
+                // window.alert(reason);
+            });
         });
 
-        this.clientSocket.socket.on('statusNotOrganizer', () => {
-            this.isOrganizer = false;
-        });
-
-        this.clientSocket.socket.on('roomLocked', () => {
-            this.isLocked = true;
-        });
-
-        this.clientSocket.socket.on('roomUnlocked', () => {
-            this.isLocked = false;
+        this.clientSocket.socket.on('lockToggled', (isLocked: boolean) => {
+            this.isLocked = isLocked;
         });
     }
 
-    banPlayer(player: { socketId: string; name: string }) {
+    banPlayer(player: { socketId: SocketId; name: string }) {
         this.clientSocket.send('banPlayer', player);
     }
 
-    lockRoom() {
-        this.clientSocket.send('lockRoom', true);
-    }
-
-    unlockRoom() {
-        this.clientSocket.send('unlockRoom', true);
+    toggleLobbyLock() {
+        this.clientSocket.send('toggleLock');
     }
 
     startGameEmit() {

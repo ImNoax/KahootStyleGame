@@ -163,8 +163,4 @@ export class AdminJeuPageComponent implements OnInit {
             }
         });
     }
-
-    resetForm(): void {
-        this.formManager.resetGameForm();
-    }
 }
