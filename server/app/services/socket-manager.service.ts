@@ -119,33 +119,6 @@ export class SocketManager {
                 socket.emit('lockToggled', currentLobby.isLocked);
             });
 
-            socket.on('getStatus', () => {
-                const pin = this.activeSockets.get(socket.id);
-                if (isOrganizer(pin)) {
-                    socket.emit('statusOrganizer');
-                } else {
-                    socket.emit('statusNotOrganizer');
-                }
-            });
-
-            socket.on('lockRoom', () => {
-                const pin = this.activeSockets.get(socket.id);
-                const currentLobby = this.lobbies.get(pin);
-                if (currentLobby) {
-                    currentLobby.locked = true;
-                    socket.emit('roomLocked');
-                }
-            });
-
-            socket.on('unlockRoom', () => {
-                const pin = this.activeSockets.get(socket.id);
-                const currentLobby = this.lobbies.get(pin);
-                if (currentLobby) {
-                    currentLobby.locked = false;
-                    socket.emit('roomUnlocked');
-                }
-            });
-
             socket.on('leaveLobby', () => {
                 leaveLobby();
             });
@@ -168,4 +141,3 @@ export class SocketManager {
         });
     }
 }
-// fonction getlobby pour eviter repetition de constpin et const currentlobby?
