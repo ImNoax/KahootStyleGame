@@ -28,7 +28,7 @@
             <button mat-raised-button color="primary" (click)="toggleLobbyLock()">
                 {{ isLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}
             </button>
-            <button mat-raised-button color="primary" *ngIf="isOrganizer" [disabled]="isLocked">Start Game</button>
+            <button mat-raised-button color="primary" *ngIf="isOrganizer" [disabled]="!isLocked" (click)="startGameEmit()">Start Game</button>
         </div>
     </div>
 </div>

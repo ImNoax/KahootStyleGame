@@ -1,7 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ClientSocketService } from '@app/services/client-socket.service';
+import { GameHandlingService } from '@app/services/game-handling.service';
 import { LobbyDetails, Pin, SocketId } from '@common/lobby';
+import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
     selector: 'app-waiting-view-page',
@@ -12,10 +14,13 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
     players: { socketId: SocketId; name: string }[] = [];
     pin: Pin = '';
     isLocked: boolean = false;
+    gameStarted: boolean = false;
+    private startGameSubscription: Subscription;
 
     constructor(
         public router: Router,
         private clientSocket: ClientSocketService,
+        private gameHandler: GameHandlingService,
     ) {}
 
     get isNameDefined(): boolean {
@@ -33,13 +38,16 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.configureBaseSocketFeatures();
         this.clientSocket.send('getPlayers');
+        this.startGameSubscription = this.clientSocket.listenForStartGame().subscribe(() => {
+            this.startGame();
+        });
     }
 
     ngOnDestroy(): void {
         this.clientSocket.configureOrganisatorLobby(false);
-        // Dangereux. Lorsque la partie aura commencé, ce code va trigger et tout le monde quittera le room
-        // Je l'ai mis dans le bouton menu principal et dans lobbyClose. Commentaire à supprimer
-        // this.clientSocket.send('leaveLobby');
+        if (this.startGameSubscription) {
+            this.startGameSubscription.unsubscribe();
+        }
     }
 
     configureBaseSocketFeatures() {
@@ -47,9 +55,10 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
             this.pin = pin;
             this.isLocked = lobbyDetails.isLocked;
             this.players = lobbyDetails.players;
+            this.gameHandler.setPlayers(this.players);
         });
 
-        this.clientSocket.socket.on('lobbyClosed', (/*reason*/) => {
+        this.clientSocket.socket.on('lobbyClosed', (/* reason*/) => {
             this.clientSocket.send('leaveLobby');
             this.router.navigate(['/home']).then(() => {
                 // BUG: Parfois, on reçoit plusieurs alertes. Je sais pas le problème est où
@@ -68,5 +77,14 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
 
     toggleLobbyLock() {
         this.clientSocket.send('toggleLock');
+    }
+
+    startGameEmit() {
+        this.clientSocket.socket.emit('startGame', { pin: this.pin });
+    }
+
+    startGame() {
+        this.gameStarted = true;
+        this.router.navigate(['/game']);
     }
 }

@@ -17,11 +17,21 @@ export class GameHandlingService {
     currentQuestionSource = new BehaviorSubject<string>('');
     currentQuestion$ = this.currentQuestionSource.asObservable();
     private readonly baseUrl: string = environment.serverGamesUrl;
+    private players: { socketId: string; name: string }[] = [];
 
     constructor(private http: HttpClient) {}
 
     getGames(): Observable<Jeu[]> {
         return this.http.get<Jeu[]>(this.baseUrl).pipe(catchError(this.handleError<Jeu[]>('getGames')));
+    }
+
+    setPlayers(players: { socketId: string; name: string }[]): void {
+        this.players = players;
+    }
+
+    getPlayerNameBySocketId(socketId: string): string {
+        const player = this.players.find((plyer) => plyer.socketId === socketId);
+        return player ? player.name : 'Unknown';
     }
 
     modifyGame(game: Jeu, gameName: string): Observable<Jeu[]> {

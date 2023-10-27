@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { MessageData } from '@common/message';
+import { Observable } from 'rxjs';
 import { io, Socket } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 
@@ -43,5 +45,21 @@ export class ClientSocketService {
             return;
         }
         this.playerName = '';
+    }
+
+    listenForStartGame(): Observable<void> {
+        return new Observable((observer) => {
+            this.socket.on('gameStarted', () => {
+                observer.next();
+            });
+        });
+    }
+
+    listenToMessageReceived(): Observable<MessageData> {
+        return new Observable((observer) => {
+            this.socket.on('messageReceived', (messageData: MessageData) => {
+                observer.next(messageData);
+            });
+        });
     }
 }
