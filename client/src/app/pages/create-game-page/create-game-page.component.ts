@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { GameMode } from '@app/enums';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
-import { Jeu } from '@common/jeu';
+import { Game } from '@common/game';
 
 @Component({
     selector: 'app-create-game-page',
@@ -11,9 +11,9 @@ import { Jeu } from '@common/jeu';
     styleUrls: ['./create-game-page.component.scss'],
 })
 export class CreateGamePageComponent implements OnInit {
-    games: Jeu[] = [];
+    games: Game[];
     selectedRowIndex: number | null = null;
-    selectedGame: Jeu | null = null;
+    selectedGame: Game | null = null;
     testing: GameMode = GameMode.Testing;
 
     constructor(
@@ -23,7 +23,7 @@ export class CreateGamePageComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.gameHandler.getGames().subscribe((games: Jeu[]) => {
+        this.gameHandler.getGames().subscribe((games: Game[]) => {
             this.games = games;
         });
         this.configureBaseSocketFeatures();
@@ -53,7 +53,7 @@ export class CreateGamePageComponent implements OnInit {
     }
 
     initializeGame(mode: GameMode = GameMode.RealGame) {
-        this.gameHandler.getGames().subscribe((games: Jeu[]) => {
+        this.gameHandler.getGames().subscribe((games: Game[]) => {
             this.games = games;
 
             for (const game of this.games) {

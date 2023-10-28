@@ -8,7 +8,7 @@ import { GameImportPopupComponent } from '@app/components/game-import-popup/game
 import { HeaderComponent } from '@app/components/header/header.component';
 import { FormManagerService } from '@app/services/form-manager.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
-import { Jeu, QuestionType } from '@common/jeu';
+import { Game, QuestionType } from '@common/game';
 import { Observable, of } from 'rxjs';
 import { AdminJeuPageComponent } from './admin-jeu-page.component';
 interface MockEvent {
@@ -22,9 +22,9 @@ describe('AdminJeuPageComponent', () => {
     let fixture: ComponentFixture<AdminJeuPageComponent>;
     let gameHandler: GameHandlingService;
 
-    const mockGames: Jeu[] = [
+    const mockGames: Game[] = [
         {
-            id: 1,
+            id: '1',
             title: 'Test Game',
             description: 'Test Description',
             duration: 10,
@@ -62,8 +62,8 @@ describe('AdminJeuPageComponent', () => {
                 points: 10,
                 type: 'single-choice' as QuestionType,
                 choices: [
-                    { answer: 'Choice 1', isCorrect: true },
-                    { answer: 'Choice 2', isCorrect: false },
+                    { text: 'Choice 1', isCorrect: true },
+                    { text: 'Choice 2', isCorrect: false },
                 ],
             },
         ];
@@ -83,7 +83,7 @@ describe('AdminJeuPageComponent', () => {
 
             choicesFormArray.controls.forEach((choiceControl, choiceIndex) => {
                 const choiceGroup = choiceControl as FormGroup;
-                expect(choiceGroup.get('answer')?.value).toEqual(mockQuestions[index].choices[choiceIndex].answer);
+                expect(choiceGroup.get('text')?.value).toEqual(mockQuestions[index].choices[choiceIndex].text);
                 expect(choiceGroup.get('isCorrect')?.value).toEqual(mockQuestions[index].choices[choiceIndex].isCorrect);
             });
         });
@@ -96,8 +96,8 @@ describe('AdminJeuPageComponent', () => {
     });
 
     it('should export a game', () => {
-        component.exportGame(0);
-        expect(gameHandler.export).toHaveBeenCalledWith(0);
+        component.exportGame('0');
+        expect(gameHandler.export).toHaveBeenCalledWith('0');
     });
 
     it('should toggle the visibility of a game', () => {
@@ -110,7 +110,7 @@ describe('AdminJeuPageComponent', () => {
     it('isGameInList should return true if the game is in the list of games', () => {
         component.games = [...mockGames];
         const game = {
-            id: 1,
+            id: '1',
             title: 'Test2',
             description: 'Test Description',
             duration: 10,
@@ -127,7 +127,7 @@ describe('AdminJeuPageComponent', () => {
         const mockConfirm = spyOn(component, 'confirmDeletion');
         component.games = [...mockGames];
         const game = {
-            id: 1,
+            id: '1',
             title: 'Test2',
             description: 'Test Description',
             duration: 10,
@@ -152,12 +152,6 @@ describe('AdminJeuPageComponent', () => {
         component.confirmDeletion(component.games[0]);
         expect(gameHandler.deleteGame).toHaveBeenCalledWith(mockGames[0].id);
         expect(component.games.length).toBe(initialLength - 1);
-    });
-
-    it('resetForm should call resetGameForm from the form Manager', () => {
-        const mockReset = spyOn(TestBed.inject(FormManagerService), 'resetGameForm');
-        component.resetForm();
-        expect(mockReset).toHaveBeenCalled();
     });
 
     it('readFile should correctly handle valid JSON content', (done) => {
@@ -209,7 +203,7 @@ describe('AdminJeuPageComponent', () => {
     });
 
     it('openImportPopup should open importDialog', () => {
-        const gamesMockObservable: Observable<Jeu[]> = new Observable((subscriber) => subscriber.next(mockGames));
+        const gamesMockObservable: Observable<Game[]> = new Observable((subscriber) => subscriber.next(mockGames));
         const emptyObservable: Observable<void> = new Observable((subscriber) => subscriber.next(undefined));
         const dialogSpy = spyOn(TestBed.inject(MatDialog), 'open').and.returnValue({
             afterClosed: () => gamesMockObservable,

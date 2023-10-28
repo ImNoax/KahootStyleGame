@@ -5,7 +5,7 @@ import { ButtonResponseComponent } from '@app/components/button-response/button-
 import { Button } from '@app/interfaces/button-model';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { TimeService } from '@app/services/time.service';
-import { Jeu, QuestionType } from '@common/jeu';
+import { Game, QuestionType } from '@common/game';
 import { of } from 'rxjs';
 const MOCK_BUTTONS: Button[] = [
     {
@@ -44,17 +44,17 @@ const MOCK_QUESTIONS = [
         points: 10,
         type: QuestionType.QCM,
         choices: [
-            { answer: 'Paris', isCorrect: true },
-            { answer: 'London', isCorrect: false },
-            { answer: 'Berlin', isCorrect: false },
-            { answer: 'Madrid', isCorrect: false },
+            { text: 'Paris', isCorrect: true },
+            { text: 'London', isCorrect: false },
+            { text: 'Berlin', isCorrect: false },
+            { text: 'Madrid', isCorrect: false },
         ],
     },
 ];
 
-const MOCK_GAME: Jeu[] = [
+const MOCK_GAME: Game[] = [
     {
-        id: 1,
+        id: '1',
         title: 'Game 1',
         description: 'Test ',
         duration: 5,
@@ -83,7 +83,7 @@ describe('ButtonResponseComponent', () => {
     });
 
     it('ngOnInit should get list of games &&  call update buttons', () => {
-        const games: Jeu[] = [];
+        const games: Game[] = [];
         const gameHandlingServiceGetGamesSpy = spyOn(TestBed.inject(GameHandlingService), 'getGames').and.returnValue(of(games));
         const updateButtonsSpy = spyOn(component, 'updateButtons');
         component.ngOnInit();
@@ -118,11 +118,11 @@ describe('ButtonResponseComponent', () => {
         expect(verifyResponsesAndCallUpdate).toHaveBeenCalled();
     });
 
-    it('updateButtons should update buttons with correct game and possible answers', () => {
+    it('updateButtons should update buttons with correct game and possible texts', () => {
         component.games = [MOCK_GAME[0], MOCK_GAME[0]];
         const MOCK_BUTTONS_LENGTH = 4;
         const gameService = TestBed.inject(GameHandlingService);
-        gameService.currentGameId = 0;
+        gameService.currentGameId = '1';
         gameService.currentQuestionId = 0;
 
         component.updateButtons();
@@ -133,6 +133,9 @@ describe('ButtonResponseComponent', () => {
 
         component.updateGameQuestions();
         expect(gameService.currentQuestionId).toBe(1);
+
+        gameService.currentGameId = '';
+        expect(component.updateButtons()).toBeUndefined();
     });
 
     it('playerEntries should call onButtonClick', () => {
@@ -161,7 +164,7 @@ describe('ButtonResponseComponent', () => {
         expect(onButtonClickSpy).not.toHaveBeenCalled();
         expect(verifyResponsesAndCallUpdateSpy).toHaveBeenCalled();
     });
-    it('should set and reset button properties correctly with processAnswer', fakeAsync(() => {
+    it('should set and reset button properties correctly with processtext', fakeAsync(() => {
         const TIME_OUT = 3000;
         component.buttons = [
             {
@@ -204,24 +207,31 @@ describe('ButtonResponseComponent', () => {
         component.games = [MOCK_GAME[0]];
         const router = TestBed.inject(Router);
         const gameService = TestBed.inject(GameHandlingService);
-        gameService.currentGameId = 0;
-        gameService.currentQuestionId = component.games[gameService.currentGameId].questions.length - 1;
+        gameService.currentGameId = '1';
+        gameService.currentQuestionId = component.games[0].questions.length - 1;
         const spyRouter = spyOn(router, 'navigate');
         component.updateGameQuestions();
         expect(spyRouter).toHaveBeenCalledWith(['/create-game']);
+
+        gameService.currentGameId = '';
+        expect(component.updateGameQuestions()).toBeUndefined();
     });
-    it('verifyResponsesAndCallUpdate should correctly process answers when answer selected is correct', () => {
+    it('verifyResponsesAndCallUpdate should correctly process texts when text selected is correct', () => {
         component.games = [MOCK_GAME[0]];
         component.buttons = [MOCK_BUTTONS[2]];
         const gameService = TestBed.inject(GameHandlingService);
-        gameService.currentGameId = 0;
+        gameService.currentGameId = '1';
         const incrementScoreSpy = spyOn(gameService, 'incrementScore');
         component.verifyResponsesAndCallUpdate();
         expect(incrementScoreSpy).toHaveBeenCalled();
         expect(component.isProcessing).toBeTrue();
+
+        component.isProcessing = false;
+        gameService.currentGameId = '';
+        expect(component.verifyResponsesAndCallUpdate()).toBeUndefined();
     });
 
-    it('verifyResponsesAndCallUpdate should process answers when selected number of correct answers don t match total correct answers', () => {
+    it('verifyResponsesAndCallUpdate should process texts when selected number of correct texts don t match total correct texts', () => {
         component.games = [MOCK_GAME[0]];
         component.buttons = [MOCK_BUTTONS[3], MOCK_BUTTONS[1]];
         const gameService = TestBed.inject(GameHandlingService);
@@ -231,7 +241,7 @@ describe('ButtonResponseComponent', () => {
         expect(component.isProcessing).toBeTrue();
     });
 
-    it('verifyResponsesAndCallUpdate should correctly process answers when wrong answer is selected', () => {
+    it('verifyResponsesAndCallUpdate should correctly process texts when wrong text is selected', () => {
         component.games = [MOCK_GAME[0]];
         component.buttons = [MOCK_BUTTONS[3]];
 

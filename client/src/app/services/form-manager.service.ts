@@ -2,7 +2,7 @@ import { formatDate } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Jeu } from '@common/jeu';
+import { Game } from '@common/game';
 import { Observable } from 'rxjs';
 import { GameHandlingService } from './game-handling.service';
 
@@ -25,7 +25,7 @@ export class FormManagerService {
         return this.gameForm.get('questions') as FormArray;
     }
 
-    initializeImportForm(gameData: Jeu): FormGroup {
+    initializeImportForm(gameData: Game): FormGroup {
         return (this.gameForm = this.fb.group({
             id: gameData.id,
             title: gameData.title,
@@ -44,7 +44,7 @@ export class FormManagerService {
 
     modifyGame(): void {
         this.gameForm.value.lastModification = formatDate(new Date(), 'yyyy-MM-dd   h:mm:ss a', 'en');
-        this.gameHandler.modifyGame(this.gameForm.value, this.nameModif).subscribe(() => {
+        this.gameHandler.modifyGame(this.gameForm.value).subscribe(() => {
             this.resetGameForm();
             this.router.navigate(['/admin']);
         });
@@ -57,7 +57,7 @@ export class FormManagerService {
         });
     }
 
-    sendGameForm(importedGameForm?: FormGroup): void | Observable<Jeu[]> {
+    sendGameForm(importedGameForm?: FormGroup): void | Observable<Game[]> {
         if (this.nameModif !== '') this.modifyGame();
         else if (importedGameForm === undefined) this.addGame();
         else return this.gameHandler.addGame(importedGameForm.value);

@@ -3,8 +3,8 @@ import { MatIcon } from '@angular/material/icon';
 import { ButtonResponseComponent } from '@app/components/button-response/button-response.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
 import { GameHandlingService } from '@app/services/game-handling.service';
-import { Jeu, QuestionType } from '@common/jeu';
-import { of, Subject } from 'rxjs';
+import { Game, QuestionType } from '@common/game';
+import { Subject, of } from 'rxjs';
 import { GamePageComponent } from './game-page.component';
 
 const MOCK_QUESTIONS = [
@@ -13,17 +13,17 @@ const MOCK_QUESTIONS = [
         points: 10,
         type: QuestionType.QCM,
         choices: [
-            { answer: 'Paris', isCorrect: true },
-            { answer: 'London', isCorrect: false },
-            { answer: 'Berlin', isCorrect: false },
-            { answer: 'Madrid', isCorrect: false },
+            { text: 'Paris', isCorrect: true },
+            { text: 'London', isCorrect: false },
+            { text: 'Berlin', isCorrect: false },
+            { text: 'Madrid', isCorrect: false },
         ],
     },
 ];
 
-const MOCK_GAME: Jeu[] = [
+const MOCK_GAME: Game[] = [
     {
-        id: 1,
+        id: '1',
         title: 'Game 1',
         description: 'Test ',
         duration: 5,
@@ -45,7 +45,7 @@ describe('GamePageComponent', () => {
         gameServiceSpy = jasmine.createSpyObj('GameHandlingService', ['getGames', 'setScore', 'setCurrentQuestionId']);
         gameServiceSpy.currentQuestion$ = currentQuestionObservableSpy.asObservable();
         gameServiceSpy.score$ = scoreObservableSpy.asObservable();
-        gameServiceSpy.currentGameId = 0;
+        gameServiceSpy.currentGameId = '0';
         gameServiceSpy.currentQuestionId = 0;
 
         TestBed.configureTestingModule({
@@ -87,6 +87,7 @@ describe('GamePageComponent', () => {
 
     it('should update question on ngOnInit', () => {
         const testQuestion = 'What is the capital of France?';
+        gameServiceSpy.currentGameId = '1';
         gameServiceSpy.getGames.and.returnValue(of(MOCK_GAME));
         component.ngOnInit();
         currentQuestionObservableSpy.next(testQuestion);

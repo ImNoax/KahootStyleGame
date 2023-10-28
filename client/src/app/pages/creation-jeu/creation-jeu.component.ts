@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { Limit } from '@app/enums';
 import { FormManagerService } from '@app/services/form-manager.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
-import { Jeu } from '@common/jeu';
+import { Limits } from '@common/Limits';
+import { Game } from '@common/game';
 
 @Component({
     selector: 'app-creation-jeu',
@@ -18,7 +18,7 @@ export class CreationJeuComponent implements OnInit {
     isNameEmpty = false;
     isDescEmpty = false;
     isTimerInvalid = false;
-    games: Jeu[];
+    games: Game[];
     gameForm: FormGroup = this.formManager.gameForm;
     nameModif: string;
 
@@ -26,8 +26,8 @@ export class CreationJeuComponent implements OnInit {
         private gameHandler: GameHandlingService,
         private formManager: FormManagerService,
     ) {
-        this.maxTitleLength = Limit.MaxTitleLength;
-        this.maxDescriptionLength = Limit.MaxDescriptionLength;
+        this.maxTitleLength = Limits.MaxTitleLength;
+        this.maxDescriptionLength = Limits.MaxDescriptionLength;
     }
 
     ngOnInit(): void {
@@ -61,8 +61,8 @@ export class CreationJeuComponent implements OnInit {
     verifyTimer(event: Event) {
         this.isTimerInvalid =
             (event.target as HTMLInputElement).value.trim() === '' ||
-            Number((event.target as HTMLInputElement).value) < Limit.MinDuration ||
-            Number((event.target as HTMLInputElement).value) > Limit.MaxDuration;
+            Number((event.target as HTMLInputElement).value) < Limits.MinDuration ||
+            Number((event.target as HTMLInputElement).value) > Limits.MaxDuration;
     }
 
     hasQuestions(): boolean {

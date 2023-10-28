@@ -7,8 +7,3 @@ export interface Button {
     showCorrectButtons?: boolean;
     showWrongButtons?: boolean;
 }
-
-export interface Choice {
-    answer: string;
-    isCorrect: boolean;
-}
