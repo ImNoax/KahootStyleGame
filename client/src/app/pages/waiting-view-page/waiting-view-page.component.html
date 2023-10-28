@@ -3,26 +3,24 @@
     <app-name-definition *ngIf="!isNameDefined"></app-name-definition>
 
     <div *ngIf="isNameDefined">
-        <div>
-            <p>{{ pin }}</p>
-            <p *ngIf="isOrganizer">Vous êtes l'organisateur de la partie!</p>
-            <p>Partagez le code pour inviter vos amis!</p>
+        <div class="room-pin">
+            {{ pin }}
         </div>
-        
-        <table>
-            <tr>
-                <th>Liste de joueurs</th>
-            </tr>
-            <tr *ngFor="let player of players">
-                <td>
-                    {{ player.name }}
-                    <span *ngIf="player.name === playerName">(vous)</span>
-                    <button *ngIf="isOrganizer && player.name !== 'Organisateur'" (click)="banPlayer(player)">
-                        Exclure
-                    </button>
-                </td>
-            </tr>
-        </table>
+
+        <div class="player-list">
+            <ul>
+                <div class="list-title">Liste joueurs</div>
+                <div class="nom">
+                    <li class="player" *ngFor="let player of players">
+                        <button class="exclude-button" *ngIf="player.name !== 'Organisateur' && isOrganizer" (click)="banPlayer(player)">
+                            Exclure
+                        </button>
+                        {{ player.name }}
+                        <span *ngIf="player.name === playerName">(vous)</span>
+                    </li>
+                </div>
+            </ul>
+        </div>
 
         <div *ngIf="isOrganizer" id="nav">
             <button mat-raised-button color="primary" (click)="toggleLobbyLock()">
