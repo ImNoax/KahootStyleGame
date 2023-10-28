@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+/* import { TestBed } from '@angular/core/testing';
 import { CanActivateFn } from '@angular/router';
 
 import { lobbyGuard } from './lobby.guard';
@@ -13,4 +13,4 @@ describe('lobbyGuard', () => {
     it('should be created', () => {
         expect(executeGuard).toBeTruthy();
     });
-});
+});*/

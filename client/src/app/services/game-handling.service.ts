@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Jeu } from '@common/jeu';
+import { Game } from '@common/game';
 import { Observable, of } from 'rxjs';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { catchError, map } from 'rxjs/operators';
@@ -10,7 +10,7 @@ const BONUS_POINTS = 1.2;
     providedIn: 'root',
 })
 export class GameHandlingService {
-    currentGameId: number = 2;
+    currentGameId: string = '';
     currentQuestionId: number = 0;
     scoreSource = new BehaviorSubject<number>(0);
     score$ = this.scoreSource.asObservable();
@@ -21,8 +21,8 @@ export class GameHandlingService {
 
     constructor(private http: HttpClient) {}
 
-    getGames(): Observable<Jeu[]> {
-        return this.http.get<Jeu[]>(this.baseUrl).pipe(catchError(this.handleError<Jeu[]>('getGames')));
+    getGames(): Observable<Game[]> {
+        return this.http.get<Game[]>(this.baseUrl).pipe(catchError(this.handleError<Game[]>('getGames')));
     }
 
     setPlayers(players: { socketId: string; name: string }[]): void {
@@ -34,25 +34,25 @@ export class GameHandlingService {
         return player ? player.name : 'Unknown';
     }
 
-    modifyGame(game: Jeu, gameName: string): Observable<Jeu[]> {
-        return this.http.patch<Jeu[]>(`${this.baseUrl}/${game.id}`, [game, gameName]).pipe(catchError(this.handleError<Jeu[]>('modifyGame')));
+    modifyGame(game: Game): Observable<Game[]> {
+        return this.http.patch<Game[]>(`${this.baseUrl}/${game.id}`, game).pipe(catchError(this.handleError<Game[]>('modifyGame')));
     }
 
-    addGame(newGame: Jeu): Observable<Jeu[]> {
-        return this.http.post<Jeu[]>(this.baseUrl, newGame).pipe(catchError(this.handleError<Jeu[]>('addGame')));
+    addGame(newGame: Game): Observable<Game[]> {
+        return this.http.post<Game[]>(this.baseUrl, newGame).pipe(catchError(this.handleError<Game[]>('addGame')));
     }
 
-    changeVisibility(game: Jeu): Observable<Jeu[]> {
+    changeVisibility(game: Game): Observable<Game[]> {
         return this.http
-            .patch<Jeu[]>(`${this.baseUrl}/visibility/${game.id}`, { isVisible: game.isVisible })
-            .pipe(catchError(this.handleError<Jeu[]>('changeVisibility')));
+            .patch<Game[]>(`${this.baseUrl}/visibility/${game.id}`, { isVisible: game.isVisible })
+            .pipe(catchError(this.handleError<Game[]>('changeVisibility')));
     }
 
-    export(id: number) {
-        return this.http.get<Jeu>(`${this.baseUrl}/${id}`, { responseType: 'json' });
+    export(id: string) {
+        return this.http.get<Game>(`${this.baseUrl}/${id}`, { responseType: 'json' });
     }
 
-    setCurrentGameId(id: number) {
+    setCurrentGameId(id: string) {
         this.currentGameId = id;
     }
 
@@ -73,7 +73,7 @@ export class GameHandlingService {
         this.scoreSource.next(newScore);
     }
 
-    deleteGame(id: number): Observable<void> {
+    deleteGame(id: string): Observable<void> {
         return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(catchError(this.handleError<void>('deleteGame')));
     }
 
@@ -83,7 +83,10 @@ export class GameHandlingService {
             .pipe(map((response) => response.valid));
     }
 
-    private handleError<T>(request: string, result?: T): (error: Error) => Observable<T> {
-        return () => of(result as T);
+    private handleError<T>(request: string, result?: T): (error: { error: Error }) => Observable<T> {
+        return (error) => {
+            window.alert(error.error.message);
+            return of(result as T);
+        };
     }
 }

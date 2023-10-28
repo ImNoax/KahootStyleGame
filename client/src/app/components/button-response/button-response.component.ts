@@ -1,9 +1,9 @@
 import { GameHandlingService } from '@angular/../../client/src/app/services/game-handling.service';
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { Button, Choice } from '@app/interfaces/button-model';
+import { Button } from '@app/interfaces/button-model';
 import { TimeService } from '@app/services/time.service';
-import { Jeu } from '@common/jeu';
+import { Choice, Game } from '@common/game';
 import { Subscription } from 'rxjs/internal/Subscription';
 const TIME_OUT = 3000;
 
@@ -15,7 +15,7 @@ const TIME_OUT = 3000;
 export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('buttonFocus', { static: false }) buttonFocus: ElementRef;
     buttons: Button[] = [];
-    games: Jeu[] = [];
+    games: Game[] = [];
     timerSubscription: Subscription;
     isProcessing: boolean = false;
 
@@ -26,7 +26,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
     ) {}
 
     ngOnInit(): void {
-        this.gameService.getGames().subscribe((data: Jeu[]) => {
+        this.gameService.getGames().subscribe((data: Game[]) => {
             this.games = data;
             this.updateButtons();
         });
@@ -44,7 +44,8 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
     }
 
     updateButtons() {
-        const currentGame = this.games[this.gameService.currentGameId];
+        const currentGame = this.games.find((g) => g.id === this.gameService.currentGameId);
+        if (currentGame === undefined) return;
         const questionOfInterest = currentGame.questions[this.gameService.currentQuestionId];
 
         if (questionOfInterest.choices) {
@@ -53,7 +54,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
                 this.buttons.push({
                     color: 'white',
                     selected: false,
-                    text: choice.answer,
+                    text: choice.text,
                     isCorrect: choice.isCorrect,
                     id: butonIndex + 1,
                 });
@@ -89,7 +90,9 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
         }
         this.isProcessing = true;
         if (isAnswerCorrect) {
-            this.gameService.incrementScore(this.games[this.gameService.currentGameId].questions[this.gameService.currentQuestionId].points);
+            const currentGame = this.games.find((g) => g.id === this.gameService.currentGameId);
+            if (currentGame === undefined) return;
+            this.gameService.incrementScore(currentGame.questions[this.gameService.currentQuestionId].points);
             this.processAnswer();
         } else {
             this.processAnswer();
@@ -110,15 +113,17 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
     }
 
     updateGameQuestions() {
-        if (this.gameService.currentQuestionId === this.games[this.gameService.currentGameId].questions.length - 1) {
+        const currentGame = this.games.find((g) => g.id === this.gameService.currentGameId);
+        if (currentGame === undefined) return;
+        if (this.gameService.currentQuestionId === currentGame.questions.length - 1) {
             this.timeService.stopTimer();
             this.router.navigate(['/create-game']);
         } else {
             this.gameService.setCurrentQuestionId(++this.gameService.currentQuestionId);
             this.updateButtons();
-            this.gameService.setCurrentQuestion(this.games[this.gameService.currentGameId].questions[this.gameService.currentQuestionId].text);
+            this.gameService.setCurrentQuestion(currentGame.questions[this.gameService.currentQuestionId].text);
             this.timeService.stopTimer();
-            this.timeService.startTimer(this.games[this.gameService.currentGameId].duration);
+            this.timeService.startTimer(currentGame.duration);
             this.buttonFocus.nativeElement.focus();
         }
     }

@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { TimeService } from '@app/services/time.service';
-import { Jeu, QuestionType } from '@common/jeu';
+import { Game, QuestionType } from '@common/game';
 import { of } from 'rxjs';
 import { TimerComponent } from './timer.component';
 
@@ -11,17 +11,17 @@ const MOCK_QUESTIONS = [
         points: 10,
         type: QuestionType.QCM,
         choices: [
-            { answer: 'Paris', isCorrect: true },
-            { answer: 'London', isCorrect: false },
-            { answer: 'Berlin', isCorrect: false },
-            { answer: 'Madrid', isCorrect: false },
+            { text: 'Paris', isCorrect: true },
+            { text: 'London', isCorrect: false },
+            { text: 'Berlin', isCorrect: false },
+            { text: 'Madrid', isCorrect: false },
         ],
     },
 ];
 
-const MOCK_GAME: Jeu[] = [
+const MOCK_GAME: Game[] = [
     {
-        id: 1,
+        id: '1',
         title: 'Game 1',
         description: 'Test ',
         duration: 5,
@@ -55,7 +55,7 @@ describe('TimerComponent', () => {
     });
     it('should get games and start initialization', () => {
         gameServiceSpy.getGames.and.returnValue(of(MOCK_GAME));
-        gameServiceSpy.currentGameId = 0;
+        gameServiceSpy.currentGameId = '1';
         component.ngOnInit();
         expect(gameServiceSpy.getGames).toHaveBeenCalled();
     });
@@ -72,7 +72,7 @@ describe('TimerComponent', () => {
     });
     it('should return total time for right gameId', () => {
         const durationGame0 = 5;
-        gameServiceSpy.currentGameId = 0;
+        gameServiceSpy.currentGameId = '1';
         component.games = MOCK_GAME;
         expect(component.totalTime).toEqual(durationGame0);
     });

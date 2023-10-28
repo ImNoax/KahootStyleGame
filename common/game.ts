@@ -4,7 +4,7 @@ export enum QuestionType {
 }
 
 export interface Choice {
-    answer: string;
+    text: string;
     isCorrect: boolean;
 }
 
@@ -15,8 +15,8 @@ export interface Question {
     choices: Choice[];
 }
 
-export interface Jeu {
-    id: number;
+export interface Game {
+    id: string;
     title: string;
     description: string;
     duration: number;

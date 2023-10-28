@@ -24,9 +24,9 @@ describe('HeaderComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('resetForm should call resetGameForm from the formManager', () => {
+    it('reset should call resetGameForm from the formManager', () => {
         const mockReset = spyOn(TestBed.inject(FormManagerService), 'resetGameForm');
-        component.resetForm();
+        component.reset();
         expect(mockReset).toHaveBeenCalled();
     });
 });
