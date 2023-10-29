@@ -54,8 +54,9 @@ export class MainPageComponent {
     }
 
     configureBaseSocketFeatures() {
-        this.clientSocket.socket.on('successfulLobbyConnection', () => {
+        this.clientSocket.socket.on('successfulLobbyConnection', (pin: string, gameId: string) => {
             this.clientSocket.canAccessLobby = true;
+            this.gameHandler.setCurrentGameId(gameId);
             this.router.navigate(['/waiting']);
         });
 

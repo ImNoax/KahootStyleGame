@@ -22,6 +22,8 @@
             </ul>
         </div>
 
+        <p id="startTimer" *ngIf="startTimer !== 0">La partie commence dans {{ startTimer }} secondes !</p>
+
         <div *ngIf="isOrganizer" id="nav">
             <button mat-raised-button color="primary" (click)="toggleLobbyLock()">
                 {{ isLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}

@@ -3,6 +3,8 @@ import * as http from 'http';
 import * as io from 'socket.io';
 
 const MAX_LOBBY_QUANTITY = 10000;
+const BASE_TIMER = 5;
+const MS_TIMER = 1000;
 
 export class SocketManager {
     private sio: io.Server;
@@ -67,7 +69,7 @@ export class SocketManager {
                     else {
                         socket.join(pinToJoin);
                         pin = pinToJoin;
-                        socket.emit('successfulLobbyConnection', pinToJoin);
+                        socket.emit('successfulLobbyConnection', pinToJoin, lobbyToJoin.gameId);
                     }
                 } else socket.emit('failedLobbyConnection', `La partie de PIN ${pinToJoin} n'a pas été trouvée. Êtes-vous sûr du PIN entré?`);
             });
@@ -88,10 +90,10 @@ export class SocketManager {
                 }
             });
 
-            socket.on('createLobby', () => {
+            socket.on('createLobby', (currentGameId: string) => {
                 if (this.lobbies.size <= MAX_LOBBY_QUANTITY) {
                     const newPin = generateUniquePin();
-                    this.lobbies.set(newPin, { isLocked: false, players: [], bannedNames: [] });
+                    this.lobbies.set(newPin, { isLocked: false, players: [], bannedNames: [], gameId: currentGameId });
                     socket.join(newPin);
                     pin = newPin;
 
@@ -128,7 +130,7 @@ export class SocketManager {
             });
 
             socket.on('startGame', () => {
-                this.sio.to(pin).emit('gameStarted');
+                this.startCountDown(pin);
             });
 
             socket.on('chatMessage', (messageData) => {
@@ -139,5 +141,22 @@ export class SocketManager {
                 });
             });
         });
+    }
+
+    startCountDown(pin: Pin) {
+        let timer = BASE_TIMER;
+        const counter = setInterval(() => {
+            this.countDown(pin, timer, counter);
+            timer--;
+        }, MS_TIMER);
+    }
+
+    countDown(pin: Pin, timer: number, counter: NodeJS.Timer) {
+        if (timer > 0) {
+            this.sio.to(pin).emit('countDown', timer);
+        } else {
+            this.sio.to(pin).emit('gameStarted');
+            clearInterval(counter);
+        }
     }
 }

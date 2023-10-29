@@ -61,7 +61,7 @@ export class CreateGamePageComponent implements OnInit {
                     this.gameHandler.setCurrentGameId(this.selectedGame.id);
                     if (mode !== this.testing) {
                         this.clientSocket.isOrganizer = true;
-                        this.clientSocket.send('createLobby');
+                        this.clientSocket.send('createLobby', this.selectedGame.id);
                     } else {
                         this.router.navigate([mode]);
                     }
