@@ -46,7 +46,7 @@ export class CreateGamePageComponent implements OnInit {
     }
 
     allGamesAreHiddenOrListIsEmpty() {
-        if (this.games.length === 0) {
+        if (!this.games || this.games.length === 0) {
             return true;
         }
         return this.games.every((game) => !game.isVisible);
