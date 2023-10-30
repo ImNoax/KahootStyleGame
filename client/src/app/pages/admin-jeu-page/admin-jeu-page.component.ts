@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { GameImportPopupComponent } from '@app/components/game-import-popup/game-import-popup.component';
 import { FormManagerService } from '@app/services/form-manager.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
@@ -20,14 +21,19 @@ export class AdminJeuPageComponent implements OnInit {
     fileName: string = '';
     isFileEmpty: boolean = false;
     isFormInvalid: boolean = false;
+    private dialog: MatDialog = inject(MatDialog);
 
     constructor(
+        private readonly router: Router,
         private gameHandler: GameHandlingService,
-        private dialog: MatDialog,
         private formManager: FormManagerService,
     ) {}
 
     ngOnInit(): void {
+        if (sessionStorage.getItem('isAdminAuthenticated') !== 'true') {
+            this.router.navigate(['/']);
+            return;
+        }
         this.gameHandler.getGames().subscribe((games: Game[]) => {
             this.games = games;
         });
