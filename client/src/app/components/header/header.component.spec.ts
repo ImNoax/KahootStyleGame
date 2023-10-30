@@ -1,7 +1,6 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatIconModule } from '@angular/material/icon';
-
-import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormManagerService } from '@app/services/form-manager.service';
 import { HeaderComponent } from './header.component';
 
@@ -26,7 +25,7 @@ describe('HeaderComponent', () => {
 
     it('resetForm should call resetGameForm from the formManager', () => {
         const mockReset = spyOn(TestBed.inject(FormManagerService), 'resetGameForm');
-        component.resetForm();
+        component.reset();
         expect(mockReset).toHaveBeenCalled();
     });
 });
