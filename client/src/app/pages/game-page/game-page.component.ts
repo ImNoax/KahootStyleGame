@@ -1,5 +1,6 @@
 import { GameHandlingService } from '@angular/../../client/src/app/services/game-handling.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ClientSocketService } from '@app/services/client-socket.service';
 import { Game } from '@common/game';
 import { Subscription } from 'rxjs/internal/Subscription';
 
@@ -15,7 +16,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
     score: number;
     private subscriptionScore: Subscription;
     private questionSubscription: Subscription;
-    constructor(private gameService: GameHandlingService) {}
+    constructor(
+        private gameService: GameHandlingService,
+        private clientSocket: ClientSocketService,
+    ) {}
 
     ngOnInit(): void {
         this.gameService.setScore(0);
@@ -37,6 +41,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
                 this.currentQuestionScore = game.questions[this.gameService.currentQuestionId].points;
             }
         });
+    }
+
+    leaveLobby(): void {
+        this.clientSocket.send('leaveLobby');
     }
 
     ngOnDestroy(): void {

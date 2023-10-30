@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatIcon } from '@angular/material/icon';
 import { ButtonResponseComponent } from '@app/components/button-response/button-response.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
+import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { Game, QuestionType } from '@common/game';
 import { Subject, of } from 'rxjs';
@@ -92,5 +93,13 @@ describe('GamePageComponent', () => {
         component.ngOnInit();
         currentQuestionObservableSpy.next(testQuestion);
         expect(component.currentQuestion).toEqual(testQuestion);
+    });
+
+    it('leaveLobby should send "leaveLobby" with the clientSocketService', () => {
+        const mockSend = spyOn(TestBed.inject(ClientSocketService), 'send');
+
+        component.leaveLobby();
+
+        expect(mockSend).toHaveBeenCalled();
     });
 });

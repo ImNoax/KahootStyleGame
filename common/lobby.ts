@@ -7,4 +7,5 @@ export interface LobbyDetails {
     isLocked: boolean;
     players: { socketId: SocketId; name: string }[];
     bannedNames: string[];
+    gameId: string;
 }
