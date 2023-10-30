@@ -18,6 +18,7 @@ interface MockEvent {
     };
 }
 describe('AdminJeuPageComponent', () => {
+    let mockRouter: jasmine.SpyObj<Router>;
     let component: AdminJeuPageComponent;
     let fixture: ComponentFixture<AdminJeuPageComponent>;
     let gameHandler: GameHandlingService;
@@ -35,10 +36,11 @@ describe('AdminJeuPageComponent', () => {
     ];
 
     beforeEach(async () => {
+        mockRouter = jasmine.createSpyObj('Router', ['navigate']);
         await TestBed.configureTestingModule({
             imports: [HttpClientTestingModule, MatIconModule, MatDialogModule],
             declarations: [AdminJeuPageComponent, HeaderComponent],
-            providers: [GameHandlingService, FormManagerService, Router, FormBuilder],
+            providers: [GameHandlingService, FormManagerService, { provide: Router, useValue: mockRouter }, FormBuilder],
         }).compileComponents();
 
         fixture = TestBed.createComponent(AdminJeuPageComponent);
@@ -53,6 +55,19 @@ describe('AdminJeuPageComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('should retrieve the list of games on initialization', () => {
+        spyOn(sessionStorage, 'getItem').and.returnValue('true');
+        component.ngOnInit();
+        expect(gameHandler.getGames).toHaveBeenCalled();
+        expect(component.games).toEqual(mockGames);
+    });
+
+    it('should redirect to main page if not authenticated', () => {
+        spyOn(sessionStorage, 'getItem').and.returnValue(null);
+        component.ngOnInit();
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
     });
 
     it('modifyGame should save the game information in the formManager', () => {
@@ -90,6 +105,12 @@ describe('AdminJeuPageComponent', () => {
     });
 
     it('should retrieve the list of games on initialization', () => {
+        spyOn(sessionStorage, 'getItem').and.callFake((key: string) => {
+            if (key === 'isAdminAuthenticated') {
+                return 'true';
+            }
+            return null;
+        });
         component.ngOnInit();
         expect(gameHandler.getGames).toHaveBeenCalled();
         expect(component.games).toEqual(mockGames);

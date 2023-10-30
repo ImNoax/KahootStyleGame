@@ -30,6 +30,7 @@ export class MainPageComponent {
             pin: ['', [Validators.required, Validators.minLength(REQUIRED_PIN_LENGTH), this.containsNonNumeric]],
         });
 
+        sessionStorage.setItem('isAdminAuthenticated', 'false');
         this.configureBaseSocketFeatures();
     }
 
@@ -39,6 +40,7 @@ export class MainPageComponent {
             this.gameHandler.verifyAdminPassword(password).subscribe({
                 next: (response) => {
                     if (response) {
+                        sessionStorage.setItem('isAdminAuthenticated', 'true');
                         this.router.navigate(['/admin']);
                     }
                 },
