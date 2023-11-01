@@ -18,8 +18,8 @@ describe('ChatBoxComponent', () => {
             declarations: [ChatBoxComponent],
             providers: [
                 { provide: ClientSocketService, useValue: clientSocketServiceMock },
-                { provide: GameHandlingService, useValue: gameHandlingServiceMock }
-            ]
+                { provide: GameHandlingService, useValue: gameHandlingServiceMock },
+            ],
         });
         fixture = TestBed.createComponent(ChatBoxComponent);
         component = fixture.componentInstance;
@@ -39,7 +39,7 @@ describe('ChatBoxComponent', () => {
         const testMessage = {
             sender: 'TestSocketId',
             content: 'Test',
-            time: new Date().toString()
+            time: new Date().toString(),
         };
         gameHandlingServiceMock.getPlayerNameBySocketId.and.returnValue('TestClient');
         clientSocketServiceMock.listenToMessageReceived.and.returnValue(of(testMessage));
