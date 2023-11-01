@@ -102,9 +102,9 @@ fdescribe('WaitingViewPageComponent', () => {
     it('should handle "lobbyClosed" event', () => {
         component.configureBaseSocketFeatures();
         routerMock.navigate.and.returnValue(Promise.resolve(true));
-        const lobbyClosedCallback = (clientSocketServiceMock.socket.on as jasmine.Spy).calls.argsFor(1)[1]; 
+        const lobbyClosedCallback = (clientSocketServiceMock.socket.on as jasmine.Spy).calls.argsFor(1)[1];
         // Stimule la reception d'une emittion et appel la fonction associer
-        
+
         lobbyClosedCallback();
         expect(routerMock.navigate).toHaveBeenCalledWith(['/home']);
         expect(clientSocketServiceMock.send).toHaveBeenCalledWith('leaveLobby');
