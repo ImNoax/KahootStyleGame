@@ -1,7 +1,7 @@
+import { GameHandlingService } from '@angular/../../client/src/app/services/game-handling.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { TimeService } from '@app/services/time.service';
-import { GameHandlingService } from '@angular/../../client/src/app/services/game-handling.service';
-import { Jeu } from '@common/jeu';
+import { Game } from '@common/game';
 
 @Component({
     selector: 'app-timer',
@@ -9,7 +9,7 @@ import { Jeu } from '@common/jeu';
     styleUrls: ['./timer.component.scss'],
 })
 export class TimerComponent implements OnInit, OnDestroy {
-    games: Jeu[] = [];
+    games: Game[] = [];
 
     constructor(
         private timeService: TimeService,
@@ -21,13 +21,14 @@ export class TimerComponent implements OnInit, OnDestroy {
     }
 
     get totalTime() {
-        return this.games[this.gameService.currentGameId]?.duration;
+        return this.games.find((g) => g.id === this.gameService.currentGameId)?.duration;
     }
 
     ngOnInit() {
-        this.gameService.getGames().subscribe((data: Jeu[]) => {
+        this.gameService.getGames().subscribe((data: Game[]) => {
             this.games = data;
-            this.timeService.startTimer(this.games[this.gameService.currentGameId].duration);
+            const game = this.games.find((g) => g.id === this.gameService.currentGameId);
+            if (game) this.timeService.startTimer(game.duration);
         });
     }
 

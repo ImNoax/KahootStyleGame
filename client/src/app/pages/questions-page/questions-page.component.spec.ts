@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { QuestionCreationPopupComponent } from '@app/components/question-creation-popup/question-creation-popup.component';
 import { FormManagerService } from '@app/services/form-manager.service';
-import { Question, QuestionType } from '@common/jeu';
+import { Question, QuestionType } from '@common/game';
 import { Observable } from 'rxjs';
 import { QuestionsPageComponent } from './questions-page.component';
 

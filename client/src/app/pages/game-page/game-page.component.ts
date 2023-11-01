@@ -1,6 +1,7 @@
 import { GameHandlingService } from '@angular/../../client/src/app/services/game-handling.service';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Jeu } from '@common/jeu';
+import { ClientSocketService } from '@app/services/client-socket.service';
+import { Game } from '@common/game';
 import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
@@ -9,33 +10,41 @@ import { Subscription } from 'rxjs/internal/Subscription';
     styleUrls: ['./game-page.component.scss'],
 })
 export class GamePageComponent implements OnInit, OnDestroy {
-    games: Jeu[] = [];
+    games: Game[] = [];
     currentQuestion: string = '';
     currentQuestionScore: number;
     score: number;
     private subscriptionScore: Subscription;
     private questionSubscription: Subscription;
-    constructor(private gameService: GameHandlingService) {}
+    constructor(
+        private gameService: GameHandlingService,
+        private clientSocket: ClientSocketService,
+    ) {}
 
     ngOnInit(): void {
         this.gameService.setScore(0);
         this.questionSubscription = this.gameService.currentQuestion$.subscribe(() => {
-            if (this.games[this.gameService.currentGameId]) {
-                this.currentQuestion = this.games[this.gameService.currentGameId].questions[this.gameService.currentQuestionId].text;
-                this.currentQuestionScore = this.games[this.gameService.currentGameId].questions[this.gameService.currentQuestionId].points;
+            const game = this.games.find((g) => g.id === this.gameService.currentGameId);
+            if (game) {
+                this.currentQuestion = game.questions[this.gameService.currentQuestionId].text;
             }
         });
         this.subscriptionScore = this.gameService.score$.subscribe((updatedScore) => {
             this.score = updatedScore;
         });
         this.gameService.setCurrentQuestionId(0);
-        this.gameService.getGames().subscribe((data: Jeu[]) => {
+        this.gameService.getGames().subscribe((data: Game[]) => {
             this.games = data;
-            if (this.games.length > 0) {
-                this.currentQuestion = this.games[this.gameService.currentGameId].questions[this.gameService.currentQuestionId].text;
-                this.currentQuestionScore = this.games[this.gameService.currentGameId].questions[this.gameService.currentQuestionId].points;
+            const game = this.games.find((g) => g.id === this.gameService.currentGameId);
+            if (this.games.length > 0 && game) {
+                this.currentQuestion = game.questions[this.gameService.currentQuestionId].text;
+                this.currentQuestionScore = game.questions[this.gameService.currentQuestionId].points;
             }
         });
+    }
+
+    leaveLobby(): void {
+        this.clientSocket.send('leaveLobby');
     }
 
     ngOnDestroy(): void {

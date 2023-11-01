@@ -6,7 +6,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { Choice, Question, QuestionType } from '@common/jeu';
+import { Choice, Question, QuestionType } from '@common/game';
 // eslint-disable-next-line no-restricted-imports
 import { HeaderComponent } from '../header/header.component';
 import { QuestionCreationPopupComponent } from './question-creation-popup.component';
@@ -89,8 +89,8 @@ describe('QuestionCreationPopupComponent', () => {
         expect(component.questionForm.get('points')?.value).toBe(DEFAULT_POINTS);
         expect(component.questionForm.get('type')?.value).toBe(QuestionType.QCM);
         expect(component.questionForm.get('choices')?.value).toEqual([
-            { answer: '', isCorrect: true },
-            { answer: '', isCorrect: false },
+            { text: '', isCorrect: true },
+            { text: '', isCorrect: false },
         ]);
     });
 
@@ -118,8 +118,8 @@ describe('QuestionCreationPopupComponent', () => {
         component.verifyChoice();
         expect(component.choiceDuplicate).toBeTrue();
 
-        component.choices.value[0].answer = 'test1';
-        component.choices.value[1].answer = 'test2';
+        component.choices.value[0].text = 'test1';
+        component.choices.value[1].text = 'test2';
 
         component.verifyChoice();
         expect(component.choiceDuplicate).toBeFalse();
@@ -207,15 +207,15 @@ describe('QuestionCreationPopupComponent', () => {
     });
     it('should reorder choices when dropped', () => {
         const initialChoices: Choice[] = [
-            { answer: 'Choice 1', isCorrect: false },
-            { answer: 'Choice 2', isCorrect: true },
-            { answer: 'Choice 3', isCorrect: false },
+            { text: 'Choice 1', isCorrect: false },
+            { text: 'Choice 2', isCorrect: true },
+            { text: 'Choice 3', isCorrect: false },
         ];
         const formArray = new FormArray(
             initialChoices.map(
                 (choice) =>
                     new FormGroup({
-                        answer: new FormControl(choice.answer),
+                        answer: new FormControl(choice.text),
                         isCorrect: new FormControl(choice.isCorrect),
                     }),
             ),

@@ -1,11 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { Router } from '@angular/router';
 import { GameImportPopupComponent } from '@app/components/game-import-popup/game-import-popup.component';
-import { Limit } from '@app/enums';
 import { FormManagerService } from '@app/services/form-manager.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
-import { Jeu } from '@common/jeu';
+import { Limits } from '@common/Limits';
+import { Game } from '@common/game';
 import { saveAs } from 'file-saver';
 
 const JSON_SPACE = 4;
@@ -16,24 +17,29 @@ const JSON_SPACE = 4;
     styleUrls: ['./admin-jeu-page.component.scss'],
 })
 export class AdminJeuPageComponent implements OnInit {
-    games: Jeu[];
+    games: Game[];
     fileName: string = '';
     isFileEmpty: boolean = false;
     isFormInvalid: boolean = false;
+    private dialog: MatDialog = inject(MatDialog);
 
     constructor(
+        private readonly router: Router,
         private gameHandler: GameHandlingService,
-        private dialog: MatDialog,
         private formManager: FormManagerService,
     ) {}
 
     ngOnInit(): void {
-        this.gameHandler.getGames().subscribe((games: Jeu[]) => {
+        if (sessionStorage.getItem('isAdminAuthenticated') !== 'true') {
+            this.router.navigate(['/']);
+            return;
+        }
+        this.gameHandler.getGames().subscribe((games: Game[]) => {
             this.games = games;
         });
     }
 
-    modifyGame(game: Jeu): void {
+    modifyGame(game: Game): void {
         const fb = new FormBuilder();
         const gameForm: FormGroup = fb.group({
             id: game.id,
@@ -46,12 +52,12 @@ export class AdminJeuPageComponent implements OnInit {
                 game.questions.map((question) => {
                     return fb.group({
                         text: [question.text, [Validators.required, this.formManager.preventEmptyInput]],
-                        points: [question.points, [Validators.required, Validators.pattern('^[1-9][0-9]*0$'), Validators.max(Limit.MaxPoints)]],
+                        points: [question.points, [Validators.required, Validators.pattern('^[1-9][0-9]*0$'), Validators.max(Limits.MaxPoints)]],
                         type: question.type,
                         choices: fb.array(
                             question.choices.map((choice) => {
                                 return fb.group({
-                                    answer: [choice.answer, [Validators.required, this.formManager.preventEmptyInput]],
+                                    text: [choice.text, [Validators.required, this.formManager.preventEmptyInput]],
                                     isCorrect: choice.isCorrect,
                                 });
                             }),
@@ -64,7 +70,7 @@ export class AdminJeuPageComponent implements OnInit {
         this.formManager.nameModif = game.title;
     }
 
-    exportGame(i: number): void {
+    exportGame(i: string): void {
         this.gameHandler.export(i).subscribe((data) => {
             const file = new Blob([JSON.stringify(data, null, JSON_SPACE)], { type: 'application/json' });
             const downloadURL = window.URL.createObjectURL(file);
@@ -72,7 +78,7 @@ export class AdminJeuPageComponent implements OnInit {
         });
     }
 
-    toggleVisibility(game: Jeu): void {
+    toggleVisibility(game: Game): void {
         const toggledVisibility = !game.isVisible;
 
         this.gameHandler.changeVisibility({ ...game, isVisible: toggledVisibility }).subscribe({
@@ -82,7 +88,7 @@ export class AdminJeuPageComponent implements OnInit {
         });
     }
 
-    isGameInList(game: Jeu): boolean {
+    isGameInList(game: Game): boolean {
         for (const g of this.games) {
             if (g.title === game.title) {
                 return true;
@@ -91,7 +97,7 @@ export class AdminJeuPageComponent implements OnInit {
         return false;
     }
 
-    confirmDeletion(game: Jeu): void {
+    confirmDeletion(game: Game): void {
         const confirmation = window.confirm('Are you sure you want to delete this game?');
         if (confirmation) {
             this.gameHandler.deleteGame(game.id).subscribe({
@@ -102,7 +108,7 @@ export class AdminJeuPageComponent implements OnInit {
         }
     }
 
-    deleteGame(game: Jeu): void {
+    deleteGame(game: Game): void {
         this.gameHandler.getGames().subscribe((games) => {
             this.games = games;
             if (!this.isGameInList(game)) {
@@ -146,9 +152,9 @@ export class AdminJeuPageComponent implements OnInit {
         fileReader.readAsText(gameFile);
     }
 
-    openImportPopup(importedGame: Jeu) {
+    openImportPopup(importedGame: Game) {
         const fileName: string = this.fileName;
-        const games: Jeu[] = this.games;
+        const games: Game[] = this.games;
         const importPopup: MatDialogRef<GameImportPopupComponent> = this.dialog.open(GameImportPopupComponent, {
             data: { importedGame, games, fileName },
             width: '60%',
@@ -157,7 +163,7 @@ export class AdminJeuPageComponent implements OnInit {
             disableClose: true,
         });
 
-        importPopup.afterClosed().subscribe((newGames: Jeu[]) => {
+        importPopup.afterClosed().subscribe((newGames: Game[]) => {
             if (newGames !== undefined) {
                 this.games = newGames;
             }

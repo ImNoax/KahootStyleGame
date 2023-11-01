@@ -2,15 +2,15 @@ import { formatDate } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { Jeu } from '@common/jeu';
+import { Game } from '@common/game';
 import { of } from 'rxjs';
 import { GameHandlingService } from './game-handling.service';
 
 describe('GameHandlingService', () => {
     let service: GameHandlingService;
-    const games: Jeu[] = [];
-    const game: Jeu = {
-        id: 0,
+    const games: Game[] = [];
+    const game: Game = {
+        id: '0',
         title: '',
         description: '',
         duration: 30,
@@ -40,7 +40,7 @@ describe('GameHandlingService', () => {
 
     it('modifyGame should send a patch request', () => {
         const mockPost = spyOn(TestBed.inject(HttpClient), 'patch').and.returnValue(of(games));
-        service.modifyGame(game, game.title);
+        service.modifyGame(game);
         expect(mockPost).toHaveBeenCalled();
     });
 
@@ -58,12 +58,12 @@ describe('GameHandlingService', () => {
 
     it('export should send a get request', () => {
         const mockGet = spyOn(TestBed.inject(HttpClient), 'get');
-        service.export(0);
+        service.export('0');
         expect(mockGet).toHaveBeenCalled();
     });
 
     it('setCurrentGameId should change the current Game id', () => {
-        const id = 45;
+        const id = '45';
         service.setCurrentGameId(id);
         expect(service.currentGameId).toEqual(id);
     });
@@ -72,7 +72,8 @@ describe('GameHandlingService', () => {
         const testErrorMessage = 'Test Error';
         const testResult = 'Result Value';
         const res = service['handleError'](testErrorMessage, testResult);
-        res(new Error(testErrorMessage)).subscribe({
+        spyOn(window, 'alert');
+        res({ error: new Error(testErrorMessage) }).subscribe({
             next: (result) => {
                 expect(result).toBe(testResult);
                 done();
@@ -108,7 +109,7 @@ describe('GameHandlingService', () => {
     });
 
     it('deleteGame should send a delete request', () => {
-        const gameId = 1;
+        const gameId = '1';
         const deleteSpy = spyOn(TestBed.inject(HttpClient), 'delete').and.returnValue(of(null));
         service.deleteGame(gameId);
         expect(deleteSpy).toHaveBeenCalled();

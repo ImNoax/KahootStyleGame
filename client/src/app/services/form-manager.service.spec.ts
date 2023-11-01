@@ -3,7 +3,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Jeu, QuestionType } from '@common/jeu';
+import { Game, QuestionType } from '@common/game';
 import { of } from 'rxjs';
 import { FormManagerService } from './form-manager.service';
 import { GameHandlingService } from './game-handling.service';
@@ -41,7 +41,7 @@ describe('FormManagerService', () => {
     });
 
     it('modifyGame should modify the date, call the method from the gameHandler, reset the form and navigate', () => {
-        const games: Jeu[] = [];
+        const games: Game[] = [];
         const mockModif = spyOn(TestBed.inject(GameHandlingService), 'modifyGame').and.returnValue(of(games));
         const mockReset = spyOn(service, 'resetGameForm');
         const mockNavigate = spyOn(TestBed.inject(Router), 'navigate');
@@ -55,7 +55,7 @@ describe('FormManagerService', () => {
     });
 
     it('addGame should modify the date, call the method from the gameHandler, reset the form and navigate', () => {
-        const games: Jeu[] = [];
+        const games: Game[] = [];
         const mockAdd = spyOn(TestBed.inject(GameHandlingService), 'addGame').and.returnValue(of(games));
         const mockReset = spyOn(service, 'resetGameForm');
         const mockNavigate = spyOn(TestBed.inject(Router), 'navigate');
@@ -83,7 +83,7 @@ describe('FormManagerService', () => {
     });
 
     it('sendGameForm with importedGameForm parameter should return an Observable', () => {
-        const games: Jeu[] = [];
+        const games: Game[] = [];
         const importedGameForm = fb.group({
             title: ['', Validators.required],
             description: ['', Validators.required],
@@ -118,8 +118,8 @@ describe('FormManagerService', () => {
     });
 
     it('initializeImportForm should return a FormGroup used for game importation', () => {
-        const gameMock: Jeu = {
-            id: 0,
+        const gameMock: Game = {
+            id: '0',
             title: ' title ',
             description: '  description ',
             duration: 0,
@@ -129,7 +129,7 @@ describe('FormManagerService', () => {
                     text: '  text   ',
                     points: 0,
                     type: QuestionType.QCM,
-                    choices: [{ answer: ' answer  ', isCorrect: true }],
+                    choices: [{ text: ' answer  ', isCorrect: true }],
                 },
             ],
         };

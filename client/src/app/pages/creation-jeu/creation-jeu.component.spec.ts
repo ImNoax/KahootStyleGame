@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { FormManagerService } from '@app/services/form-manager.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
-import { Jeu } from '@common/jeu';
+import { Game } from '@common/game';
 import { of } from 'rxjs';
 import { CreationJeuComponent } from './creation-jeu.component';
 
@@ -27,7 +27,7 @@ describe('CreationJeuComponent', () => {
     });
 
     it('ngOnInit should get the list of games', () => {
-        const games: Jeu[] = [];
+        const games: Game[] = [];
         const mockGetGames = spyOn(TestBed.inject(GameHandlingService), 'getGames').and.returnValue(of(games));
 
         component.ngOnInit();
@@ -44,7 +44,7 @@ describe('CreationJeuComponent', () => {
         const event = new InputEvent('keyup');
         component.games = new Array();
         component.games.push({
-            id: 0,
+            id: '0',
             title: 'Game 1',
             description: '',
             duration: 0,
@@ -92,7 +92,7 @@ describe('CreationJeuComponent', () => {
     it('verifyNameDuplicate should change isNameDuplicate if the name is already existing', () => {
         component.games = new Array();
         component.games.push({
-            id: 0,
+            id: '0',
             title: 'Game 1',
             description: '',
             duration: 0,
@@ -167,7 +167,7 @@ describe('CreationJeuComponent', () => {
     });
 
     it('games should be equal to the games from the GameHandlingService', () => {
-        const response: Jeu[] = [];
+        const response: Game[] = [];
         spyOn(TestBed.inject(GameHandlingService), 'getGames').and.returnValue(of(response));
 
         component.ngOnInit();

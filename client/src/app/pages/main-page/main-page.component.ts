@@ -30,6 +30,7 @@ export class MainPageComponent {
             pin: ['', [Validators.required, Validators.minLength(REQUIRED_PIN_LENGTH), this.containsNonNumeric]],
         });
 
+        sessionStorage.setItem('isAdminAuthenticated', 'false');
         this.configureBaseSocketFeatures();
     }
 
@@ -39,6 +40,7 @@ export class MainPageComponent {
             this.gameHandler.verifyAdminPassword(password).subscribe({
                 next: (response) => {
                     if (response) {
+                        sessionStorage.setItem('isAdminAuthenticated', 'true');
                         this.router.navigate(['/admin']);
                     }
                 },
@@ -54,8 +56,9 @@ export class MainPageComponent {
     }
 
     configureBaseSocketFeatures() {
-        this.clientSocket.socket.on('successfulLobbyConnection', () => {
+        this.clientSocket.socket.on('successfulLobbyConnection', (pin: string, gameId: string) => {
             this.clientSocket.canAccessLobby = true;
+            this.gameHandler.setCurrentGameId(gameId);
             this.router.navigate(['/waiting']);
         });
 

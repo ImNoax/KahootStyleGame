@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Limit } from '@app/enums';
 import { ClientSocketService } from '@app/services/client-socket.service';
+import { Limits } from '@common/Limits';
 
 @Component({
     selector: 'app-name-definition',
@@ -10,7 +10,7 @@ import { ClientSocketService } from '@app/services/client-socket.service';
 })
 export class NameDefinitionComponent {
     nameForm: FormGroup;
-    maxNameLength: number = Limit.MaxNameLength;
+    maxNameLength: number = Limits.MaxNameLength;
     nameIsInvalid: boolean = false;
     serverMessage: string = '';
 

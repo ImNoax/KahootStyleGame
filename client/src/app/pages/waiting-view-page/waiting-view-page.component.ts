@@ -15,6 +15,7 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
     pin: Pin = '';
     isLocked: boolean = false;
     gameStarted: boolean = false;
+    startTimer: number = 0;
     private startGameSubscription: Subscription;
 
     constructor(
@@ -68,6 +69,10 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
 
         this.clientSocket.socket.on('lockToggled', (isLocked: boolean) => {
             this.isLocked = isLocked;
+        });
+
+        this.clientSocket.socket.on('countDown', (countDown: number) => {
+            this.startTimer = countDown;
         });
     }
 

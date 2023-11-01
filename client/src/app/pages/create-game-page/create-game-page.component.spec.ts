@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { GameMode } from '@app/enums';
 import { GameHandlingService } from '@app/services/game-handling.service';
-import { Jeu } from '@common/jeu';
+import { Game } from '@common/game';
 import { of } from 'rxjs';
 import { CreateGamePageComponent } from './create-game-page.component';
 
@@ -30,7 +30,7 @@ describe('CreateGamePageComponent', () => {
         expect(component).toBeTruthy();
     });
     it('ngOnInit should get the list of games', () => {
-        const games: Jeu[] = [];
+        const games: Game[] = [];
         const mockGetGames = spyOn(gameHandler, 'getGames').and.returnValue(of(games));
 
         component.ngOnInit();
@@ -40,8 +40,8 @@ describe('CreateGamePageComponent', () => {
 
     it('selectRow should select a row and set selectedGame', () => {
         const mockGames = [
-            { id: 0, title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
-            { id: 1, title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
+            { id: '0', title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
+            { id: '1', title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
         ];
 
         component.games = mockGames;
@@ -53,7 +53,7 @@ describe('CreateGamePageComponent', () => {
 
     it('selectRow should clear selection when index is null', () => {
         component.selectedRowIndex = 1;
-        component.selectedGame = { id: 2, title: 'Game 3', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] };
+        component.selectedGame = { id: '2', title: 'Game 3', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] };
 
         component.selectRow(null);
 
@@ -63,10 +63,10 @@ describe('CreateGamePageComponent', () => {
 
     it('initializeGame with argument GameMode.Testing should navigate to /game when game is visible and existing', () => {
         const games = [
-            { id: 0, title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
-            { id: 1, title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: true, questions: [] },
+            { id: '0', title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
+            { id: '1', title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: true, questions: [] },
         ];
-        component.selectedGame = { id: 1, title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: true, questions: [] };
+        component.selectedGame = { id: '1', title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: true, questions: [] };
 
         const mockGetGames = spyOn(gameHandler, 'getGames').and.returnValue(of(games));
         spyOn(gameHandler, 'setCurrentGameId');
@@ -77,16 +77,16 @@ describe('CreateGamePageComponent', () => {
         expect(mockGetGames).toHaveBeenCalled();
         expect(component.games).toBeDefined();
 
-        expect(gameHandler.setCurrentGameId).toHaveBeenCalledWith(1);
+        expect(gameHandler.setCurrentGameId).toHaveBeenCalledWith('1');
         expect(navigateSpy).toHaveBeenCalledWith(['/game']);
     });
 
     it('initializeGame should show an alert if game is no longer visible', () => {
         const games = [
-            { id: 0, title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
-            { id: 1, title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
+            { id: '0', title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
+            { id: '1', title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
         ];
-        component.selectedGame = { id: 1, title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: true, questions: [] };
+        component.selectedGame = { id: '1', title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: true, questions: [] };
 
         const mockGetGames = spyOn(gameHandler, 'getGames').and.returnValue(of(games));
 
@@ -102,15 +102,15 @@ describe('CreateGamePageComponent', () => {
     });
 
     it('should return true when the list is empty', () => {
-        const mockGames: Jeu[] = [];
+        const mockGames: Game[] = [];
         component.games = mockGames;
         expect(component.allGamesAreHiddenOrListIsEmpty()).toBeTrue();
     });
 
     it('should return true when all games are hidden', () => {
         const mockGames = [
-            { id: 0, title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
-            { id: 1, title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
+            { id: '0', title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
+            { id: '1', title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
         ];
         component.games = mockGames;
 
@@ -119,8 +119,8 @@ describe('CreateGamePageComponent', () => {
 
     it('should return false when at least one game is visible', () => {
         const mockGames = [
-            { id: 0, title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
-            { id: 1, title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: true, questions: [] },
+            { id: '0', title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
+            { id: '1', title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: true, questions: [] },
         ];
         component.games = mockGames;
 
