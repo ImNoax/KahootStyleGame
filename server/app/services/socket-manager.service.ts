@@ -80,7 +80,6 @@ export class SocketManager {
 
                 if (currentLobby.players.find((player) => player.name.toLowerCase() === nameToValidate))
                     socket.emit('invalidName', 'Nom réservé par un autre joueur');
-                else if (nameToValidate === 'organisateur') socket.emit('invalidName', "Nom réservé par l'organisateur");
                 else if (currentLobby.bannedNames.find((bannedName) => bannedName.toLowerCase() === nameToValidate))
                     socket.emit('invalidName', 'Nom Banni');
                 else {
