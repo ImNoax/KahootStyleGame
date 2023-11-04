@@ -5,6 +5,18 @@
     background-size: cover;
 }
 
+.fa-solid {
+    color: whitesmoke;
+}
+
+.fa-shake {
+    animation-iteration-count: 1;
+}
+
+#lock-text {
+    margin-right: 20px;
+}
+
 .room-pin {
     font-size: 24px;
     background-color: #007bff;
@@ -14,6 +26,15 @@
     border: 2px solid blue;
     margin: 10px 40%;
     text-align: center;
+    cursor: pointer;
+}
+
+.room-pin:hover {
+    background-color: #1f8bff;
+}
+
+.room-pin:active {
+    background-color: #0066d3;
 }
 
 .player-list {
@@ -54,7 +75,9 @@ li {
     padding: 3px 10px;
     margin: 0;
     border-radius: 5px;
+    cursor: pointer;
 }
+
 .exclude-button:hover {
     background-color: rgba(242, 75, 75, 0.863);
     transform: scale(0.95);
@@ -101,4 +124,8 @@ li {
     text-align: center;
     color: white;
     font-size: 30px;
+}
+
+#no-player {
+    color: rgb(255, 21, 21);
 }

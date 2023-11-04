@@ -1,9 +1,15 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
+import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
+import { SocketMock } from '@app/classes/socket-mock';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { GameMode } from '@app/enums';
+// import { snackBarConfiguration } from '@app/constants/snack-bar-configuration';
+import { GameMode, Route } from '@app/enums';
+import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { Game } from '@common/game';
 import { of } from 'rxjs';
@@ -13,22 +19,38 @@ describe('CreateGamePageComponent', () => {
     let component: CreateGamePageComponent;
     let fixture: ComponentFixture<CreateGamePageComponent>;
     let gameHandler: GameHandlingService;
+    let routerMock: jasmine.SpyObj<Router>;
+    let socketMock: SocketMock;
+    let clientSocketServiceMock: ClientSocketServiceMock;
+    let nEmittedEvents: number;
 
     beforeEach(() => {
+        routerMock = jasmine.createSpyObj('Router', ['navigate']);
+        clientSocketServiceMock = new ClientSocketServiceMock(routerMock);
+
         TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule, MatIconModule],
             declarations: [CreateGamePageComponent, HeaderComponent],
-            providers: [GameHandlingService, Router],
+            imports: [HttpClientTestingModule, MatIconModule, MatSnackBarModule, BrowserAnimationsModule],
+            providers: [
+                { provide: Router, useValue: routerMock },
+                { provide: ClientSocketService, useValue: clientSocketServiceMock },
+            ],
         }).compileComponents();
+
         fixture = TestBed.createComponent(CreateGamePageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
         gameHandler = TestBed.inject(GameHandlingService);
+        socketMock = clientSocketServiceMock.socket as unknown as SocketMock;
+        spyOn(socketMock, 'emit').and.callThrough();
+        socketMock.clientUniqueEvents.clear();
+        nEmittedEvents = 0;
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
     });
+
     it('ngOnInit should get the list of games', () => {
         const games: Game[] = [];
         const mockGetGames = spyOn(gameHandler, 'getGames').and.returnValue(of(games));
@@ -70,7 +92,6 @@ describe('CreateGamePageComponent', () => {
 
         const mockGetGames = spyOn(gameHandler, 'getGames').and.returnValue(of(games));
         spyOn(gameHandler, 'setCurrentGameId');
-        const navigateSpy = spyOn(component.router, 'navigate');
 
         component.initializeGame(GameMode.Testing);
 
@@ -78,7 +99,28 @@ describe('CreateGamePageComponent', () => {
         expect(component.games).toBeDefined();
 
         expect(gameHandler.setCurrentGameId).toHaveBeenCalledWith('1');
-        expect(navigateSpy).toHaveBeenCalledWith(['/game']);
+        expect(routerMock.navigate).toHaveBeenCalledWith([Route.InGame]);
+    });
+
+    it('initializeGame with argument GameMode.RealGame should put isOrganizer to true and send createLobby event', () => {
+        const games = [
+            { id: '0', title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
+            { id: '1', title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: true, questions: [] },
+        ];
+        component.selectedGame = { id: '1', title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: true, questions: [] };
+
+        spyOn(gameHandler, 'getGames').and.returnValue(of(games));
+        spyOn(gameHandler, 'setCurrentGameId');
+
+        expect(clientSocketServiceMock.isOrganizer).toBeFalse();
+        component.initializeGame(GameMode.RealGame);
+        expect(clientSocketServiceMock.isOrganizer).toBeTrue();
+        expect(socketMock.emit).toHaveBeenCalledWith('createLobby');
+        expect(socketMock.nEmittedEvents).toEqual(++nEmittedEvents);
+
+        component.initializeGame();
+        expect(clientSocketServiceMock.isOrganizer).toBeTrue();
+        expect(socketMock.emit).toHaveBeenCalledWith('createLobby');
     });
 
     it('initializeGame should show an alert if game is no longer visible', () => {
@@ -126,4 +168,22 @@ describe('CreateGamePageComponent', () => {
 
         expect(component.allGamesAreHiddenOrListIsEmpty()).toBeFalse();
     });
+
+    // it('should handle successfulLobbyCreation event by navigating to the waiting view', () => {
+    //     const event = 'successfulLobbyCreation';
+    //     const clientSocketSpy = spyOn(clientSocketServiceMock, 'configureOrganisatorLobby');
+
+    //     socketMock.simulateServerEmit(event);
+    //     expect(clientSocketSpy).toHaveBeenCalledOnceWith(true);
+    //     expect(routerMock.navigate).toHaveBeenCalledWith([Route.Lobby]);
+    // });
+
+    // it('should handle failedLobbyCreation event by opening a snackbar', () => {
+    //     const event = 'failedLobbyCreation';
+    //     const reason = 'reason for failed lobby creation';
+
+    //     spyOn(component.snackBar, 'open');
+    //     socketMock.simulateServerEmit(event, reason);
+    //     expect(component.snackBar.open).toHaveBeenCalledWith(reason, '', snackBarConfiguration);
+    // });
 });

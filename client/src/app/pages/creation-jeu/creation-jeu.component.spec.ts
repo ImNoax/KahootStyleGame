@@ -158,14 +158,6 @@ describe('CreationJeuComponent', () => {
         expect(mockSend).toHaveBeenCalled();
     });
 
-    it('resetForm should call resetGameForm from the form Manager', () => {
-        const mockReset = spyOn(TestBed.inject(FormManagerService), 'resetGameForm');
-
-        component.resetForm();
-
-        expect(mockReset).toHaveBeenCalled();
-    });
-
     it('games should be equal to the games from the GameHandlingService', () => {
         const response: Game[] = [];
         spyOn(TestBed.inject(GameHandlingService), 'getGames').and.returnValue(of(response));

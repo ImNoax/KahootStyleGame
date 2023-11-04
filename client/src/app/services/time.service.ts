@@ -5,14 +5,14 @@ import { EventEmitter, Injectable } from '@angular/core';
 })
 export class TimeService {
     timerEnded = new EventEmitter<void>();
-    // TODO : Permettre plus qu'une minuterie à la fois
     private interval: number | undefined;
     private readonly tick = 1000;
-
     private counter = 0;
+
     get time() {
         return this.counter;
     }
+
     private set time(newTime: number) {
         this.counter = newTime;
     }

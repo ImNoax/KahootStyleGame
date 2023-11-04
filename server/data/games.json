@@ -1,50 +1,103 @@
 [
     {
-        "id": "2a2b3c",
-        "title": "Game 2",
-        "description": "This is the description for Game 2",
-        "duration": 25,
-        "lastModification": "2023-10-19   9:21:06 PM",
+        "id": "c7D8Pu",
+        "title": "Testing Quiz",
+        "description": "Quiz for testing",
+        "duration": 15,
+        "lastModification": "2023-11-02   10:17:18 AM",
         "isVisible": true,
         "questions": [
             {
-                "text": "What is 2 + 2?",
-                "points": 20,
+                "text": "Question 1 - should be 10 points + 2 points bonus",
+                "points": 10,
                 "type": "QCM",
                 "choices": [
                     {
-                        "text": "3",
-                        "isCorrect": false
-                    },
-                    {
-                        "text": "4",
+                        "text": "Good ",
                         "isCorrect": true
                     },
                     {
-                        "text": "5",
+                        "text": "Bad",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Bad.",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Bad..",
                         "isCorrect": false
                     }
                 ]
             },
             {
-                "text": "Which is the largest planet?",
+                "text": "Question 2 - should be 20 points + 4 points bonus",
+                "points": 20,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Bad.",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Good",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Bad..",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Good.",
+                        "isCorrect": true
+                    }
+                ]
+            },
+            {
+                "text": "Question 3 -  should be 30 points + 6 points bonus",
                 "points": 30,
                 "type": "QCM",
                 "choices": [
                     {
-                        "text": "Earth",
-                        "isCorrect": false
-                    },
-                    {
-                        "text": "Mars",
-                        "isCorrect": false
-                    },
-                    {
-                        "text": "Jupiter",
+                        "text": "Good",
                         "isCorrect": true
                     },
                     {
-                        "text": "Venus",
+                        "text": "Bad",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Good.",
+                        "isCorrect": true
+                    }
+                ]
+            },
+            {
+                "text": "Question 4 - should be 40 points + 8 points bonus",
+                "points": 40,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Bad",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Good",
+                        "isCorrect": true
+                    }
+                ]
+            },
+            {
+                "text": "Question 5 -  should be 50 points + 10 points bonus",
+                "points": 50,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Good",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Bad",
                         "isCorrect": false
                     }
                 ]
@@ -52,178 +105,193 @@
         ]
     },
     {
-        "id": "1a2b4c",
-        "title": "Game 3",
-        "description": "This is the description for Game 3",
-        "duration": 25,
-        "lastModification": "2023-10-12   7:03:50 PM",
-        "isVisible": false,
+        "id": "fHlQRf",
+        "title": "Quiz sur les chats",
+        "description": "Un quiz sur les chats",
+        "duration": 20,
+        "lastModification": "2023-11-02   10:17:18 AM",
+        "isVisible": true,
         "questions": [
             {
-                "text": "What is 10 + 10?",
-                "points": 20,
+                "text": "Êtes-vous un fan des chats?",
+                "points": 10,
                 "type": "QCM",
                 "choices": [
                     {
-                        "text": "30",
-                        "isCorrect": false
-                    },
-                    {
-                        "text": "20",
+                        "text": "Oui",
                         "isCorrect": true
                     },
                     {
-                        "text": "50",
+                        "text": "Évidemment",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Absolument",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Non",
                         "isCorrect": false
                     }
                 ]
             },
             {
-                "text": "What is 10-3",
-                "points": 30,
+                "text": "Quel est l'âge, en équivalent humain, d'un chat de 6 ans ?",
+                "points": 50,
                 "type": "QCM",
                 "choices": [
                     {
-                        "text": "3",
+                        "text": "28 ans",
                         "isCorrect": false
                     },
                     {
-                        "text": "4",
-                        "isCorrect": false
-                    },
-                    {
-                        "text": "7",
+                        "text": "40 ans",
                         "isCorrect": true
                     },
                     {
-                        "text": "8",
-                        "isCorrect": false
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "id": "JALKEp",
-        "title": "asda",
-        "description": "sad",
-        "duration": 30,
-        "lastModification": "2023-10-12   7:01:46 PM",
-        "isVisible": true,
-        "questions": [
-            {
-                "text": "sda",
-                "points": 10,
-                "type": "QCM",
-                "choices": [
-                    {
-                        "text": "asd",
-                        "isCorrect": true
-                    },
-                    {
-                        "text": "as",
-                        "isCorrect": false
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "id": "G5N0kq",
-        "title": "gfdg",
-        "description": "dfgdf",
-        "duration": 30,
-        "lastModification": "2023-10-12   8:57:55 PM",
-        "isVisible": true,
-        "questions": [
-            {
-                "text": "dfgdf",
-                "points": 10,
-                "type": "QCM",
-                "choices": [
-                    {
-                        "text": "fd",
-                        "isCorrect": true
-                    },
-                    {
-                        "text": "dfg",
-                        "isCorrect": false
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "id": "frXRWP",
-        "title": "Game 1",
-        "description": "fdsf",
-        "duration": 52,
-        "lastModification": "2023-10-12",
-        "isVisible": false,
-        "questions": [
-            {
-                "text": "as",
-                "points": 10,
-                "type": "QCM",
-                "choices": [
-                    {
-                        "text": "d",
-                        "isCorrect": true
-                    },
-                    {
-                        "text": "a",
-                        "isCorrect": false
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "id": "PYyb20",
-        "title": "Game 2f",
-        "description": "This is the description for Game 2",
-        "duration": 25,
-        "lastModification": "2023-10-19",
-        "isVisible": false,
-        "questions": [
-            {
-                "text": "What is 2 + 2?",
-                "points": 20,
-                "type": "QCM",
-                "choices": [
-                    {
-                        "text": "3",
+                        "text": "52 ans",
                         "isCorrect": false
                     },
                     {
-                        "text": "4",
-                        "isCorrect": true
-                    },
-                    {
-                        "text": "5",
+                        "text": "59 ans",
                         "isCorrect": false
                     }
                 ]
             },
             {
-                "text": "Which is the largest planet?",
+                "text": "Dans quel pays est située \"l'île aux chats\" ?",
+                "points": 40,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Grèce",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Indonésie",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Italie",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Japon",
+                        "isCorrect": true
+                    }
+                ]
+            },
+            {
+                "text": "Quelle déesse égyptienne a une tête de chat ?",
+                "points": 20,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Isis",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Maât",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Khepri",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Bastet",
+                        "isCorrect": true
+                    }
+                ]
+            },
+            {
+                "text": "Quel est le nom du chat dans la série Les Simpson ?",
+                "points": 10,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Boule de neige",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Petit papa noël ",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Santa",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Étoile polaire",
+                        "isCorrect": false
+                    }
+                ]
+            },
+            {
+                "text": "D'après le Guinness Book, quel est le poids du chat le plus gros du monde ?",
+                "points": 10,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "21,3 kg",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "26,4 kg",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "31 kg",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "35,2 kg",
+                        "isCorrect": false
+                    }
+                ]
+            },
+            {
+                "text": "Quelle est la durée moyenne de gestation des chats ?",
                 "points": 30,
                 "type": "QCM",
                 "choices": [
                     {
-                        "text": "Earth",
+                        "text": "4 semaines",
                         "isCorrect": false
                     },
                     {
-                        "text": "Mars",
-                        "isCorrect": false
-                    },
-                    {
-                        "text": "Jupiter",
+                        "text": "9 semaines",
                         "isCorrect": true
                     },
                     {
-                        "text": "Venus",
+                        "text": "15 semaines",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "22 semaines",
+                        "isCorrect": false
+                    }
+                ]
+            },
+            {
+                "text": "Qu'est-ce qu'un chat anoure ?",
+                "points": 60,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Un chat sans poils",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Un chat sans griffes",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Un chat sans queue",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Un chat castré",
                         "isCorrect": false
                     }
                 ]

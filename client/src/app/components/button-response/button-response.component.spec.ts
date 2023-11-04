@@ -2,6 +2,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { ButtonResponseComponent } from '@app/components/button-response/button-response.component';
+import { Route } from '@app/enums';
 import { Button } from '@app/interfaces/button-model';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { TimeService } from '@app/services/time.service';
@@ -211,7 +212,7 @@ describe('ButtonResponseComponent', () => {
         gameService.currentQuestionId = component.games[0].questions.length - 1;
         const spyRouter = spyOn(router, 'navigate');
         component.updateGameQuestions();
-        expect(spyRouter).toHaveBeenCalledWith(['/create-game']);
+        expect(spyRouter).toHaveBeenCalledWith([Route.GameCreation]);
 
         gameService.currentGameId = '';
         expect(component.updateGameQuestions()).toBeUndefined();

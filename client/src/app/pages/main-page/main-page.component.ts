@@ -1,10 +1,12 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Route } from '@app/enums';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
-import { REQUIRED_PIN_LENGTH } from '@common/lobby';
+import { RouteControllerService } from '@app/services/route-controller.service';
+import { Pin, REQUIRED_PIN_LENGTH } from '@common/lobby';
 import { BehaviorSubject } from 'rxjs';
 
 const ERROR401 = 401;
@@ -14,11 +16,13 @@ const ERROR401 = 401;
     templateUrl: './main-page.component.html',
     styleUrls: ['./main-page.component.scss'],
 })
-export class MainPageComponent {
-    readonly title: string = 'Survey Genius';
+export class MainPageComponent implements OnInit, OnDestroy {
+    gameCreationRoute: string = '/' + Route.GameCreation;
+    title: string = 'Survey Genius';
     message: BehaviorSubject<string> = new BehaviorSubject<string>('');
     pinForm: FormGroup;
     serverErrorMessage: string = '';
+    private routeController: RouteControllerService = inject(RouteControllerService);
 
     constructor(
         private readonly gameHandler: GameHandlingService,
@@ -30,8 +34,16 @@ export class MainPageComponent {
             pin: ['', [Validators.required, Validators.minLength(REQUIRED_PIN_LENGTH), this.containsNonNumeric]],
         });
 
-        sessionStorage.setItem('isAdminAuthenticated', 'false');
         this.configureBaseSocketFeatures();
+    }
+
+    ngOnInit(): void {
+        this.routeController.setRouteAccess(Route.Admin, false);
+    }
+
+    ngOnDestroy(): void {
+        this.clientSocket.socket.removeAllListeners('successfulLobbyConnection');
+        this.clientSocket.socket.removeAllListeners('failedLobbyConnection');
     }
 
     adminLogin(): void {
@@ -40,8 +52,8 @@ export class MainPageComponent {
             this.gameHandler.verifyAdminPassword(password).subscribe({
                 next: (response) => {
                     if (response) {
-                        sessionStorage.setItem('isAdminAuthenticated', 'true');
-                        this.router.navigate(['/admin']);
+                        this.routeController.setRouteAccess(Route.Admin, true);
+                        this.router.navigate([Route.Admin]);
                     }
                 },
                 error: (error: HttpErrorResponse) => {
@@ -56,10 +68,11 @@ export class MainPageComponent {
     }
 
     configureBaseSocketFeatures() {
-        this.clientSocket.socket.on('successfulLobbyConnection', (pin: string, gameId: string) => {
-            this.clientSocket.canAccessLobby = true;
+        this.clientSocket.socket.on('successfulLobbyConnection', (gameId: string, pin: Pin) => {
+            this.routeController.setRouteAccess(Route.Lobby, true);
+            this.clientSocket.pin = pin;
             this.gameHandler.setCurrentGameId(gameId);
-            this.router.navigate(['/waiting']);
+            this.router.navigate([Route.Lobby]);
         });
 
         this.clientSocket.socket.on('failedLobbyConnection', (message: string) => {
@@ -76,6 +89,6 @@ export class MainPageComponent {
     }
 
     onSubmit(): void {
-        this.clientSocket.send('joinLobby', this.pinForm.value.pin);
+        this.clientSocket.socket.emit('joinLobby', this.pinForm.value.pin);
     }
 }

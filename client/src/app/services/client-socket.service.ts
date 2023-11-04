@@ -1,8 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { snackBarErrorConfiguration } from '@app/constants/snack-bar-configuration';
+import { Route } from '@app/enums';
+import { Pin } from '@common/lobby';
 import { MessageData } from '@common/message';
-import { Observable } from 'rxjs';
-import { io, Socket } from 'socket.io-client';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { Socket, io } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -10,10 +14,12 @@ import { environment } from 'src/environments/environment';
 })
 export class ClientSocketService {
     socket: Socket;
-    canAccessLobby: boolean = false;
     isOrganizer: boolean = false;
-    isNameDefined: boolean = false;
     playerName: string = '';
+    pin: Pin = '';
+    histogramData: BehaviorSubject<{ [key: string]: number }> = new BehaviorSubject({});
+    histogramData$: Observable<{ [key: string]: number }> = this.histogramData.asObservable();
+    private snackBar: MatSnackBar = inject(MatSnackBar);
 
     constructor(private router: Router) {}
 
@@ -26,25 +32,37 @@ export class ClientSocketService {
             this.socket = io(environment.serverBaseUrl, { transports: ['websocket'], upgrade: false });
 
             this.socket.on('disconnect', () => {
-                this.router.navigate(['/home']);
+                this.snackBar.open('Erreur du serveur ⚠️', '', snackBarErrorConfiguration);
+                this.router.navigate([Route.MainMenu]);
             });
         }
     }
 
-    send(event: string, ...data: (string | number | object | boolean)[]): void {
-        this.socket.emit(event, ...data);
+    giveOrganiserPermissions(): void {
+        this.isOrganizer = true;
+        this.playerName = 'Organisateur';
     }
 
-    configureOrganisatorLobby(canAccessLobby: boolean): void {
-        this.canAccessLobby = canAccessLobby;
-        this.isOrganizer = canAccessLobby;
-        this.isNameDefined = canAccessLobby;
-
-        if (canAccessLobby) {
-            this.playerName = 'Organisateur';
-            return;
-        }
+    resetPlayerInfo(): void {
+        this.isOrganizer = false;
         this.playerName = '';
+        this.socket.emit('leaveLobby');
+    }
+
+    listenForGameClosureByOrganiser() {
+        this.socket.on('lobbyClosed', (reason, message) => {
+            this.router.navigate([Route.MainMenu]);
+            if (reason === 'NO HOST') {
+                this.snackBar.open(message, '', snackBarErrorConfiguration);
+            } else {
+                this.snackBar
+                    .open(message, 'Rentrer', snackBarErrorConfiguration)
+                    .onAction()
+                    .subscribe(() => {
+                        this.socket.emit('joinLobby', this.pin);
+                    });
+            }
+        });
     }
 
     listenForStartGame(): Observable<void> {
@@ -61,5 +79,22 @@ export class ClientSocketService {
                 observer.next(messageData);
             });
         });
+    }
+
+    listenUpdateHistogram(): Observable<{ [key: string]: number }> {
+        return new Observable((observer) => {
+            this.socket.on('updateHistogram', (histogram: { [key: string]: number }) => {
+                this.histogramData.next(histogram);
+                observer.next(histogram);
+            });
+        });
+    }
+
+    sendUpdateHistogram(histogramData: { [key: string]: number }): void {
+        this.socket.emit('histogramUpdate', histogramData);
+    }
+
+    sendResetHistogram(): void {
+        this.socket.emit('resetHistogram');
     }
 }

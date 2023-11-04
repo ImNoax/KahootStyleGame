@@ -1,15 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { GameMode } from '@app/enums';
 import { Game } from '@common/game';
 import { Observable, of } from 'rxjs';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-const BONUS_POINTS = 1.2;
+
 @Injectable({
     providedIn: 'root',
 })
 export class GameHandlingService {
+    gameMode: GameMode = GameMode.RealGame;
     currentGameId: string = '';
     currentQuestionId: number = 0;
     scoreSource = new BehaviorSubject<number>(0);
@@ -69,7 +71,7 @@ export class GameHandlingService {
     }
 
     incrementScore(amount: number): void {
-        const newScore = this.scoreSource.value + amount * BONUS_POINTS;
+        const newScore = this.scoreSource.value + amount;
         this.scoreSource.next(newScore);
     }
 

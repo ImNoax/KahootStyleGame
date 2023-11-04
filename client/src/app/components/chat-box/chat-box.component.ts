@@ -45,7 +45,6 @@ export class ChatBoxComponent implements OnInit, OnDestroy {
                 time: new Date(),
             };
             this.clientSocket.socket.emit('chatMessage', messageData);
-            // console.log("emited messageData to server", messageData);
             this.newMessage = '';
         }
     }

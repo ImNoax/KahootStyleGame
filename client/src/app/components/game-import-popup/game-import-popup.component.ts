@@ -4,7 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ImportStates } from '@app/enums';
 import { FormManagerService } from '@app/services/form-manager.service';
 import { Game } from '@common/game';
-import { Limits } from '@common/Limits';
+import { Limit } from '@common/limit';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -16,7 +16,7 @@ export class GameImportPopupComponent implements OnInit {
     games: Game[];
     gameForm: FormGroup = this.formManager.gameForm;
     importState: string = '';
-    maxTitleLength = Limits.MaxTitleLength;
+    maxTitleLength = Limit.MaxTitleLength;
     importedGame: Game;
 
     constructor(

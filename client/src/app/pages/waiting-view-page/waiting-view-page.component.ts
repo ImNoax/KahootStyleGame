@@ -1,7 +1,11 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { snackBarErrorConfiguration, snackBarNormalConfiguration } from '@app/constants/snack-bar-configuration';
+import { Route } from '@app/enums';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
+import { RouteControllerService } from '@app/services/route-controller.service';
 import { LobbyDetails, Pin, SocketId } from '@common/lobby';
 import { Subscription } from 'rxjs/internal/Subscription';
 
@@ -12,21 +16,19 @@ import { Subscription } from 'rxjs/internal/Subscription';
 })
 export class WaitingViewPageComponent implements OnInit, OnDestroy {
     players: { socketId: SocketId; name: string }[] = [];
-    pin: Pin = '';
     isLocked: boolean = false;
     gameStarted: boolean = false;
     startTimer: number = 0;
+    gameStarting: boolean = false;
+    private snackBar: MatSnackBar = inject(MatSnackBar);
+    private routeController: RouteControllerService = inject(RouteControllerService);
     private startGameSubscription: Subscription;
 
     constructor(
-        public router: Router,
+        private router: Router,
         private clientSocket: ClientSocketService,
         private gameHandler: GameHandlingService,
     ) {}
-
-    get isNameDefined(): boolean {
-        return this.clientSocket.isNameDefined;
-    }
 
     get isOrganizer(): boolean {
         return this.clientSocket.isOrganizer;
@@ -36,35 +38,38 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
         return this.clientSocket.playerName;
     }
 
+    get pin(): Pin {
+        return this.clientSocket.pin;
+    }
+
     ngOnInit(): void {
         this.configureBaseSocketFeatures();
-        this.clientSocket.send('getPlayers');
+        this.clientSocket.socket.emit('getPlayers');
         this.startGameSubscription = this.clientSocket.listenForStartGame().subscribe(() => {
             this.startGame();
         });
     }
 
     ngOnDestroy(): void {
-        this.clientSocket.configureOrganisatorLobby(false);
         if (this.startGameSubscription) {
             this.startGameSubscription.unsubscribe();
         }
+
+        this.clientSocket.socket.removeAllListeners('latestPlayerList');
+        this.clientSocket.socket.removeAllListeners('lockToggled');
+        this.clientSocket.socket.removeAllListeners('countDown');
+        if (this.gameStarted) return;
+        this.clientSocket.resetPlayerInfo();
+        this.routeController.setRouteAccess(Route.Lobby, false);
     }
 
     configureBaseSocketFeatures() {
-        this.clientSocket.socket.on('latestPlayerList', (pin: Pin, lobbyDetails: LobbyDetails) => {
-            this.pin = pin;
+        this.clientSocket.listenForGameClosureByOrganiser();
+
+        this.clientSocket.socket.on('latestPlayerList', (lobbyDetails: LobbyDetails) => {
             this.isLocked = lobbyDetails.isLocked;
             this.players = lobbyDetails.players;
             this.gameHandler.setPlayers(this.players);
-        });
-
-        this.clientSocket.socket.on('lobbyClosed', (/* reason*/) => {
-            this.clientSocket.send('leaveLobby');
-            this.router.navigate(['/home']).then(() => {
-                // BUG: Parfois, on reçoit plusieurs alertes. Je sais pas le problème est où
-                // window.alert(reason);
-            });
         });
 
         this.clientSocket.socket.on('lockToggled', (isLocked: boolean) => {
@@ -77,19 +82,30 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
     }
 
     banPlayer(player: { socketId: SocketId; name: string }) {
-        this.clientSocket.send('banPlayer', player);
+        this.clientSocket.socket.emit('banPlayer', player);
     }
 
     toggleLobbyLock() {
-        this.clientSocket.send('toggleLock');
+        this.clientSocket.socket.emit('toggleLock');
     }
 
     startGameEmit() {
-        this.clientSocket.socket.emit('startGame', { pin: this.pin });
+        this.gameStarting = true;
+        this.clientSocket.socket.emit('startGame');
     }
 
     startGame() {
-        this.gameStarted = true;
-        this.router.navigate(['/game']);
+        if (this.clientSocket.playerName) {
+            this.gameStarted = true;
+            this.routeController.setRouteAccess(Route.InGame, true);
+            this.router.navigate([Route.InGame]);
+            return;
+        }
+        this.router.navigate([Route.MainMenu]);
+        this.snackBar.open("Votre nom de joueur n'a pas été défini avant le début de la partie", '', snackBarErrorConfiguration);
+    }
+
+    notifyClipboardCopy() {
+        this.snackBar.open('PIN copié!', '', snackBarNormalConfiguration);
     }
 }

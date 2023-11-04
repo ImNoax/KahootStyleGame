@@ -6,16 +6,15 @@
                 <button type="submit" mat-raised-button color="primary" [disabled]="pinForm.invalid">Joindre une partie</button>
                 <mat-form-field id="pin-input">
                     <mat-label>PIN de jeu</mat-label>
-                    <input formControlName="pin" matInput maxlength="4" placeholder="1234" autofocus>
+                    <input formControlName="pin" matInput maxlength="4" placeholder="1234" autofocus />
                     <p class="error" *ngIf="pinContainsNonNumeric()">Entrez un PIN à 4 chiffres</p>
                 </mat-form-field>
-                <p id="server-error-message" class="error">{{serverErrorMessage}}</p>
+                <p id="server-error-message" class="error">{{ serverErrorMessage }}</p>
             </div>
-            <button type="button" mat-raised-button color="primary" routerLink="/create-game">Créer une partie</button>
-            <button type="button" mat-raised-button color="primary" (click)="adminLogin()">Administrer les jeux</button> 
+            <button type="button" mat-raised-button color="primary" [routerLink]="gameCreationRoute">Créer une partie</button>
+            <button type="button" mat-raised-button color="primary" (click)="adminLogin()">Administrer les jeux</button>
         </form>
     </section>
-
 
     <footer class="footer-item">
         <h4 class="team-name">Équipe 106</h4>
