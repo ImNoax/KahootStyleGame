@@ -1,6 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatIcon } from '@angular/material/icon';
+import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
+import { SocketMock } from '@app/classes/socket-mock';
 import { ButtonResponseComponent } from '@app/components/button-response/button-response.component';
+import { ChatBoxComponent } from '@app/components/chat-box/chat-box.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
@@ -38,11 +41,14 @@ describe('GamePageComponent', () => {
     let gameServiceSpy: jasmine.SpyObj<GameHandlingService>;
     let currentQuestionObservableSpy: Subject<string>;
     let scoreObservableSpy: Subject<number>;
+    let clientSocketServiceMock: ClientSocketServiceMock;
+    let socketMock: SocketMock;
+    let nEmittedEvents: number;
 
     beforeEach(() => {
         currentQuestionObservableSpy = new Subject<string>();
         scoreObservableSpy = new Subject<number>();
-
+        clientSocketServiceMock = new ClientSocketServiceMock(jasmine.createSpyObj('Router', ['']));
         gameServiceSpy = jasmine.createSpyObj('GameHandlingService', ['getGames', 'setScore', 'setCurrentQuestionId']);
         gameServiceSpy.currentQuestion$ = currentQuestionObservableSpy.asObservable();
         gameServiceSpy.score$ = scoreObservableSpy.asObservable();
@@ -50,12 +56,19 @@ describe('GamePageComponent', () => {
         gameServiceSpy.currentQuestionId = 0;
 
         TestBed.configureTestingModule({
-            declarations: [GamePageComponent, ButtonResponseComponent, TimerComponent, MatIcon],
-            providers: [{ provide: GameHandlingService, useValue: gameServiceSpy }],
+            declarations: [GamePageComponent, ButtonResponseComponent, TimerComponent, MatIcon, ChatBoxComponent],
+            providers: [
+                { provide: ClientSocketService, useValue: clientSocketServiceMock },
+                { provide: GameHandlingService, useValue: gameServiceSpy },
+            ],
         });
 
         fixture = TestBed.createComponent(GamePageComponent);
         component = fixture.componentInstance;
+        socketMock = clientSocketServiceMock.socket as unknown as SocketMock;
+        spyOn(socketMock, 'emit').and.callThrough();
+        socketMock.clientUniqueEvents.clear();
+        nEmittedEvents = 0;
     });
 
     it('should create', () => {
@@ -96,10 +109,8 @@ describe('GamePageComponent', () => {
     });
 
     it('leaveLobby should send "leaveLobby" with the clientSocketService', () => {
-        const mockSend = spyOn(TestBed.inject(ClientSocketService), 'send');
-
-        component.leaveLobby();
-
-        expect(mockSend).toHaveBeenCalled();
+        component.leaveGame();
+        expect(socketMock.emit).toHaveBeenCalledWith('leaveLobby');
+        expect(socketMock.nEmittedEvents).toEqual(++nEmittedEvents);
     });
 });

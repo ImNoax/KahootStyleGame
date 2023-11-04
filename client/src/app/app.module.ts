@@ -1,3 +1,4 @@
+import { ClipboardModule } from '@angular/cdk/clipboard';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
@@ -5,6 +6,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { QuestionCreationPopupComponent } from '@app/components/question-creation-popup/question-creation-popup.component';
@@ -25,6 +27,8 @@ import { NameDefinitionComponent } from './components/name-definition/name-defin
 import { TimerComponent } from './components/timer/timer.component';
 import { CreationJeuComponent } from './pages/creation-jeu/creation-jeu.component';
 import { QuestionsPageComponent } from './pages/questions-page/questions-page.component';
+import { HistogramComponent } from './components/histogram/histogram.component';
+import { PlayerListComponent } from './components/player-list/player-list.component';
 
 /**
  * Main module that is used in main.ts.
@@ -50,6 +54,8 @@ import { QuestionsPageComponent } from './pages/questions-page/questions-page.co
         WaitingViewPageComponent,
         NameDefinitionComponent,
         ChatBoxComponent,
+        HistogramComponent,
+        PlayerListComponent,
     ],
     imports: [
         AppMaterialModule,
@@ -63,6 +69,8 @@ import { QuestionsPageComponent } from './pages/questions-page/questions-page.co
         MatSlideToggleModule,
         MatInputModule,
         MatIconModule,
+        MatSnackBarModule,
+        ClipboardModule,
     ],
     providers: [],
     bootstrap: [AppComponent],

@@ -57,19 +57,6 @@ describe('AdminJeuPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should retrieve the list of games on initialization', () => {
-        spyOn(sessionStorage, 'getItem').and.returnValue('true');
-        component.ngOnInit();
-        expect(gameHandler.getGames).toHaveBeenCalled();
-        expect(component.games).toEqual(mockGames);
-    });
-
-    it('should redirect to main page if not authenticated', () => {
-        spyOn(sessionStorage, 'getItem').and.returnValue(null);
-        component.ngOnInit();
-        expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
-    });
-
     it('modifyGame should save the game information in the formManager', () => {
         const mockQuestions = [
             {
@@ -105,12 +92,6 @@ describe('AdminJeuPageComponent', () => {
     });
 
     it('should retrieve the list of games on initialization', () => {
-        spyOn(sessionStorage, 'getItem').and.callFake((key: string) => {
-            if (key === 'isAdminAuthenticated') {
-                return 'true';
-            }
-            return null;
-        });
         component.ngOnInit();
         expect(gameHandler.getGames).toHaveBeenCalled();
         expect(component.games).toEqual(mockGames);

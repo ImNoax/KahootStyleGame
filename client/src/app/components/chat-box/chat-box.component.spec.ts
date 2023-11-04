@@ -1,8 +1,10 @@
+import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ChatBoxComponent } from '@app/components/chat-box/chat-box.component';
+import { FormsModule } from '@angular/forms';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { of } from 'rxjs';
+import { ChatBoxComponent } from './chat-box.component';
 
 describe('ChatBoxComponent', () => {
     let component: ChatBoxComponent;
@@ -16,6 +18,7 @@ describe('ChatBoxComponent', () => {
 
         TestBed.configureTestingModule({
             declarations: [ChatBoxComponent],
+            imports: [HttpClientModule, FormsModule],
             providers: [
                 { provide: ClientSocketService, useValue: clientSocketServiceMock },
                 { provide: GameHandlingService, useValue: gameHandlingServiceMock },

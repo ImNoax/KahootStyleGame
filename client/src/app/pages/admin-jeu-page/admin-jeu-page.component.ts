@@ -1,12 +1,12 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { Router } from '@angular/router';
 import { GameImportPopupComponent } from '@app/components/game-import-popup/game-import-popup.component';
+import { Route } from '@app/enums';
 import { FormManagerService } from '@app/services/form-manager.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
-import { Limits } from '@common/Limits';
 import { Game } from '@common/game';
+import { Limit } from '@common/limit';
 import { saveAs } from 'file-saver';
 
 const JSON_SPACE = 4;
@@ -17,6 +17,7 @@ const JSON_SPACE = 4;
     styleUrls: ['./admin-jeu-page.component.scss'],
 })
 export class AdminJeuPageComponent implements OnInit {
+    quizCreationRoute: string = '/' + Route.QuizCreation;
     games: Game[];
     fileName: string = '';
     isFileEmpty: boolean = false;
@@ -24,16 +25,11 @@ export class AdminJeuPageComponent implements OnInit {
     private dialog: MatDialog = inject(MatDialog);
 
     constructor(
-        private readonly router: Router,
         private gameHandler: GameHandlingService,
         private formManager: FormManagerService,
     ) {}
 
     ngOnInit(): void {
-        if (sessionStorage.getItem('isAdminAuthenticated') !== 'true') {
-            this.router.navigate(['/']);
-            return;
-        }
         this.gameHandler.getGames().subscribe((games: Game[]) => {
             this.games = games;
         });
@@ -52,7 +48,7 @@ export class AdminJeuPageComponent implements OnInit {
                 game.questions.map((question) => {
                     return fb.group({
                         text: [question.text, [Validators.required, this.formManager.preventEmptyInput]],
-                        points: [question.points, [Validators.required, Validators.pattern('^[1-9][0-9]*0$'), Validators.max(Limits.MaxPoints)]],
+                        points: [question.points, [Validators.required, Validators.pattern('^[1-9][0-9]*0$'), Validators.max(Limit.MaxPoints)]],
                         type: question.type,
                         choices: fb.array(
                             question.choices.map((choice) => {

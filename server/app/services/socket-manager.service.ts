@@ -17,30 +17,26 @@ export class SocketManager {
     handleSockets(): void {
         this.sio.on('connection', (socket) => {
             let pin: Pin = '';
+            let isOrganizer = false;
 
             const sendLatestPlayersList = () => {
                 const lobbyDetails = this.lobbies.get(pin);
-                this.sio.to(pin).emit('latestPlayerList', pin, lobbyDetails);
+                this.sio.to(pin).emit('latestPlayerList', lobbyDetails);
             };
 
             const leaveLobby = () => {
                 if (pin) {
                     const currentLobby = this.lobbies.get(pin);
-
-                    if (isOrganizer()) socket.broadcast.to(pin).emit('lobbyClosed', "L'organisateur a quitté la salle d'attente.");
-
-                    currentLobby.players = currentLobby.players.filter((player) => player.socketId !== socket.id);
-                    if (currentLobby.players.length === 0) this.lobbies.delete(pin);
-                    else sendLatestPlayersList();
-
-                    socket.leave(pin);
-                    pin = '';
+                    if (currentLobby) {
+                        if (isOrganizer) socket.broadcast.to(pin).emit('lobbyClosed', 'NO HOST', "L'organisateur a quitté la partie.");
+                        currentLobby.players = currentLobby.players.filter((player) => player.socketId !== socket.id);
+                        if (currentLobby.players.length === 0) this.lobbies.delete(pin);
+                        else sendLatestPlayersList();
+                    }
                 }
-            };
-
-            const isOrganizer = () => {
-                const currentLobby = this.lobbies.get(pin);
-                return currentLobby.players.some((player) => player.socketId === socket.id && player.name.toLowerCase() === 'organisateur');
+                socket.leave(pin);
+                pin = '';
+                isOrganizer = false;
             };
 
             const generateRandomPin = () => {
@@ -69,9 +65,13 @@ export class SocketManager {
                     else {
                         socket.join(pinToJoin);
                         pin = pinToJoin;
-                        socket.emit('successfulLobbyConnection', pinToJoin, lobbyToJoin.gameId);
+                        socket.emit('successfulLobbyConnection', lobbyToJoin.gameId, pin);
                     }
-                } else socket.emit('failedLobbyConnection', `La partie de PIN ${pinToJoin} n'a pas été trouvée. Êtes-vous sûr du PIN entré?`);
+                } else
+                    socket.emit(
+                        'failedLobbyConnection',
+                        `La partie de PIN ${pinToJoin} n'a pas été trouvée. Elle a soit commencé ou le PIN n'existe pas.`,
+                    );
             });
 
             socket.on('validateName', (nameToValidate: string) => {
@@ -83,7 +83,14 @@ export class SocketManager {
                 else if (currentLobby.bannedNames.find((bannedName) => bannedName.toLowerCase() === nameToValidate))
                     socket.emit('invalidName', 'Nom Banni');
                 else {
-                    currentLobby.players.push({ socketId: socket.id, name: nameToValidate });
+                    currentLobby.players.push({
+                        socketId: socket.id,
+                        name: nameToValidate,
+                        answerSubmitted: false,
+                        score: 0,
+                        isStillInGame: true,
+                        isAbleToChat: true,
+                    });
                     sendLatestPlayersList();
                     socket.emit('validName', nameToValidate);
                 }
@@ -97,8 +104,16 @@ export class SocketManager {
                     pin = newPin;
 
                     const lobbyCreated = this.lobbies.get(newPin);
-                    lobbyCreated.players.push({ socketId: socket.id, name: 'Organisateur' });
-                    socket.emit('successfulLobbyCreation');
+                    lobbyCreated.players.push({
+                        socketId: socket.id,
+                        name: 'Organisateur',
+                        answerSubmitted: true,
+                        score: 0,
+                        isStillInGame: true,
+                        isAbleToChat: true,
+                    });
+                    isOrganizer = true;
+                    socket.emit('successfulLobbyCreation', pin);
                 } else socket.emit('failedLobbyCreation', "Quantité maximale de salles d'attente atteinte");
             });
 
@@ -111,7 +126,7 @@ export class SocketManager {
                 const currentLobby = this.lobbies.get(pin);
                 currentLobby.players = currentLobby.players.filter((player) => player.name !== playerToBan.name);
                 currentLobby.bannedNames.push(playerToBan.name);
-                socketToBan.emit('lobbyClosed', "Vous avez été exclu de la salle d'attente.");
+                socketToBan.emit('lobbyClosed', 'BAN', "Vous avez été expulsé de la salle d'attente.");
             });
 
             socket.on('toggleLock', () => {
@@ -138,6 +153,60 @@ export class SocketManager {
                     content: messageData.content,
                     time: new Date(),
                 });
+            });
+
+            socket.on('loadNextQuestion', () => {
+                this.sio.to(pin).emit('nextQuestionLoading');
+            });
+
+            socket.on('answerSubmitted', (isCorrect: boolean, submittedFromTimer: boolean) => {
+                const currentLobby = this.lobbies.get(pin);
+                if (currentLobby) {
+                    if (!currentLobby.bonusRecipient && isCorrect && !submittedFromTimer) currentLobby.bonusRecipient = socket.id;
+
+                    currentLobby.players.forEach((player) => {
+                        if (player.socketId === socket.id) player.answerSubmitted = true;
+                    });
+
+                    const areAllSubmitted = !currentLobby.players.some((player) => player.answerSubmitted === false);
+                    if (areAllSubmitted) {
+                        const organisatorSocketId = currentLobby.players[0].socketId;
+                        const organisatorSocket = this.sio.sockets.sockets.get(organisatorSocketId);
+
+                        organisatorSocket.broadcast.to(pin).emit('allSubmitted', currentLobby.bonusRecipient);
+                        organisatorSocket.emit('canLoadNextQuestion');
+
+                        currentLobby.players.forEach((player) => {
+                            if (player.name !== 'Organisateur') player.answerSubmitted = false;
+                        });
+                        currentLobby.bonusRecipient = '';
+                    }
+                }
+            });
+            socket.on('histogramUpdate', (updateData: { [key: string]: number }) => {
+                const currentLobby = this.lobbies.get(pin);
+                if (currentLobby) {
+                    for (const key in updateData) {
+                        if (Object.prototype.hasOwnProperty.call(updateData, key)) {
+                            if (!currentLobby.histogram) {
+                                currentLobby.histogram = {};
+                            }
+                            if (!currentLobby.histogram[key]) {
+                                currentLobby.histogram[key] = 0;
+                            }
+                            currentLobby.histogram[key] += updateData[key];
+                        }
+                    }
+                    this.sio.to(pin).emit('updateHistogram', currentLobby.histogram);
+                }
+            });
+
+            socket.on('resetHistogram', () => {
+                const currentLobby = this.lobbies.get(pin);
+                if (currentLobby) {
+                    currentLobby.histogram = {};
+                }
+                this.sio.to(pin).emit('updateHistogram', currentLobby.histogram);
             });
         });
     }

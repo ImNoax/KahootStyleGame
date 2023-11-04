@@ -13,14 +13,17 @@
     align-items: center;
 }
 
+button,
+.btn:not(:disabled) {
+    cursor: pointer;
+}
+
 .btn {
     flex-basis: calc(48% - 10px);
-    padding-left: 1%;
-    padding-right: 1%;
-    padding-top: 1%;
-    padding-bottom: 1%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     margin-top: 6%;
-    height: 100px;
     font-size: 90%;
     border-radius: 20px;
     border: 5px solid black;
@@ -28,7 +31,17 @@
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
+#button-id {
+    background-color: lightgray;
+    width: 10%;
+}
+
+#button-text {
+    width: 90%;
+}
+
 .validate-btn {
+    color: white;
     align-self: flex-start;
     margin-top: 70px;
     width: 20%;
@@ -36,29 +49,54 @@
     font-size: 100%;
     border-radius: 20px;
     border: 5px solid black;
-    background-color: lightgreen;
+    background-color: #f75c1e;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 .validate-btn:hover {
-    background-color: rgb(0, 255, 0);
-    cursor: pointer;
+    background-color: #f18053;
+}
 
+.validate-btn:active {
+    background-color: #ff530f;
+}
+
+.validate-btn:disabled {
+    border: 5px solid gray;
+    background-color: silver;
+    color: gray;
+    pointer-events: none;
+    cursor: default;
 }
 
 .buttons-parent:focus {
     outline: none;
 }
 
+.btn:hover {
+    background-color: #72a8ff;
+}
+
+.btn:active {
+    background-color: #2478ff;
+}
+
 .btn-selected {
-    background-color: lightblue;
+    background-color: #4d90fc;
 }
 
 .highlight-correct {
     background-color: #aaffaa;
-    
 }
 
 .highlight-wrong {
     background-color: #ffaaaa;
+}
+
+.correct {
+    color: green;
+}
+
+.incorrect {
+    color: red;
 }

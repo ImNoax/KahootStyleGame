@@ -56,8 +56,8 @@
         <p id="units">secondes</p>
         <br /><span class="note incorrectField" *ngIf="isTimerInvalid">Temps invalide</span>
         <p class="note">Note: Les questions à réponse libre (QRL) ont un temps fixé à 60 secondes.</p>
-        <button class="questions-button" mat-raised-button color="primary" routerLink="/questions">Modifier la liste de questions</button>
-        <button type="reset" (click)="resetForm()" mat-raised-button color="primary" class="navigation" routerLink="/admin">Retourner</button>
+        <button class="questions-button" mat-raised-button color="primary" (click)="accessQuestionCreation()">Modifier la liste de questions</button>
+        <button type="button" mat-raised-button color="primary" class="navigation" [routerLink]="adminRoute">Retourner</button>
         <button
             (click)="onSubmit()"
             type="submit"

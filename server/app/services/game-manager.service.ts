@@ -1,6 +1,6 @@
 import { FileManagerService } from '@app/services/file-manager.service';
-import { Limits } from '@common/Limits';
 import { Choice, Game, Question } from '@common/game';
+import { Limit } from '@common/limit';
 import Ajv from 'ajv';
 import * as randomstring from 'randomstring';
 import { Service } from 'typedi';
@@ -76,15 +76,15 @@ export class GameManagerService {
     }
 
     validateGame(game: Game): boolean {
-        if (game.title.length > Limits.MaxTitleLength) {
+        if (game.title.length > Limit.MaxTitleLength) {
             this.error = new Error('Nom trop long');
             return false;
         }
-        if (game.description.length === 0 || game.description.length > Limits.MaxDescriptionLength) {
+        if (game.description.length === 0 || game.description.length > Limit.MaxDescriptionLength) {
             this.error = new Error('Description invalide');
             return false;
         }
-        if (game.duration < Limits.MinDuration || game.duration > Limits.MaxDuration) {
+        if (game.duration < Limit.MinDuration || game.duration > Limit.MaxDuration) {
             this.error = new Error('Temps invalide');
             return false;
         }
@@ -98,19 +98,19 @@ export class GameManagerService {
     validateQuestions(questions: Question[]): boolean {
         let choicesValid = true;
         for (const question of questions) {
-            if (question.text.length === 0 || question.text.length > Limits.MaxQuestionLength) {
+            if (question.text.length === 0 || question.text.length > Limit.MaxQuestionLength) {
                 this.error = new Error(`Question: "${question.text}" invalide`);
                 return false;
             }
-            if (question.points < Limits.MinPoints || question.points > Limits.MaxPoints) {
+            if (question.points < Limit.MinPoints || question.points > Limit.MaxPoints) {
                 this.error = new Error(`Points de la question: "${question.text}" invalides`);
                 return false;
             }
-            if (question.points % Limits.MinPoints !== 0) {
+            if (question.points % Limit.MinPoints !== 0) {
                 this.error = new Error(`Points de la question: "${question.text}" invalides`);
                 return false;
             }
-            if (question.choices.length < Limits.MinChoicesNumber || question.choices.length > Limits.MaxChoicesNumber) {
+            if (question.choices.length < Limit.MinChoicesNumber || question.choices.length > Limit.MaxChoicesNumber) {
                 this.error = new Error(`Choix de la question: "${question.text}" invalides`);
                 return false;
             }
@@ -123,18 +123,18 @@ export class GameManagerService {
         let nBadChoices = 0;
         let nGoodChoices = 0;
         for (const choice of choices) {
-            if (choice.text.length === 0 || choice.text.length > Limits.MaxChoiceLength) {
+            if (choice.text.length === 0 || choice.text.length > Limit.MaxChoiceLength) {
                 this.error = new Error(`Choix: "${choice.text}" invalide`);
                 return false;
             }
             if (choice.isCorrect) nGoodChoices++;
             else nBadChoices++;
         }
-        if (nBadChoices < Limits.MinBadChoices) {
+        if (nBadChoices < Limit.MinBadChoices) {
             this.error = new Error('Nombre de mauvais choix invalides');
             return false;
         }
-        if (nGoodChoices < Limits.MinGoodChoices) {
+        if (nGoodChoices < Limit.MinGoodChoices) {
             this.error = new Error('Nombre de bons choix invalides');
             return false;
         }

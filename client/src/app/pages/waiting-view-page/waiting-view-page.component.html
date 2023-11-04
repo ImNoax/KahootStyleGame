@@ -1,15 +1,15 @@
 <div class="container">
     <app-header title="Salle d'attente"></app-header>
-    <app-name-definition *ngIf="!isNameDefined"></app-name-definition>
+    <app-name-definition *ngIf="!playerName"></app-name-definition>
 
-    <div *ngIf="isNameDefined">
-        <div class="room-pin">
+    <div *ngIf="playerName">
+        <div class="room-pin" [cdkCopyToClipboard]="pin" (click)="notifyClipboardCopy()">
             {{ pin }}
         </div>
 
         <div class="player-list">
             <ul>
-                <div class="list-title">Liste joueurs</div>
+                <div class="list-title">Liste de joueurs</div>
                 <div class="nom">
                     <li class="player" *ngFor="let player of players">
                         <button class="exclude-button" *ngIf="player.name !== 'Organisateur' && isOrganizer" (click)="banPlayer(player)">
@@ -19,16 +19,27 @@
                         <span *ngIf="player.name === playerName">(vous)</span>
                     </li>
                 </div>
+                <p *ngIf="players.length === 1" id="no-player">Besoin de joueurs</p>
             </ul>
         </div>
 
         <p id="startTimer" *ngIf="startTimer !== 0">La partie commence dans {{ startTimer }} secondes !</p>
 
         <div *ngIf="isOrganizer" id="nav">
-            <button mat-raised-button color="primary" (click)="toggleLobbyLock()">
-                {{ isLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}
+            <button mat-raised-button color="primary" (click)="toggleLobbyLock()" [disabled]="gameStarting">
+                <span id="lock-text">{{ isLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}</span>
+                <i *ngIf="!isLocked" class="fa-solid fa-unlock fa-2xl"></i>
+                <i *ngIf="isLocked" class="fa-solid fa-lock fa-shake fa-2xl"></i>
             </button>
-            <button mat-raised-button color="primary" *ngIf="isOrganizer" [disabled]="!isLocked" (click)="startGameEmit()">Start Game</button>
+            <button
+                mat-raised-button
+                color="primary"
+                *ngIf="isOrganizer"
+                [disabled]="!isLocked || gameStarting || players.length === 1"
+                (click)="startGameEmit()"
+            >
+                Start Game
+            </button>
         </div>
     </div>
 </div>

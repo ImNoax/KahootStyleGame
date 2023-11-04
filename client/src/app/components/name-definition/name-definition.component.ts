@@ -1,36 +1,39 @@
-import { Component } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnDestroy } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ClientSocketService } from '@app/services/client-socket.service';
-import { Limits } from '@common/Limits';
+import { FormManagerService } from '@app/services/form-manager.service';
+import { Limit } from '@common/limit';
 
 @Component({
     selector: 'app-name-definition',
     templateUrl: './name-definition.component.html',
     styleUrls: ['./name-definition.component.scss'],
 })
-export class NameDefinitionComponent {
+export class NameDefinitionComponent implements OnDestroy {
     nameForm: FormGroup;
-    maxNameLength: number = Limits.MaxNameLength;
+    maxNameLength: number = Limit.MaxNameLength;
     nameIsInvalid: boolean = false;
     serverMessage: string = '';
 
-    constructor(private clientSocket: ClientSocketService) {
+    constructor(
+        private clientSocket: ClientSocketService,
+        private formManager: FormManagerService,
+    ) {
         const fb: FormBuilder = new FormBuilder();
         this.nameForm = fb.group({
-            name: ['', [Validators.required, this.preventEmptyInput]],
+            name: ['', [Validators.required, this.formManager.preventEmptyInput]],
         });
 
         this.configureBaseSocketFeatures();
     }
 
-    preventEmptyInput(control: AbstractControl) {
-        const whiteSpaceRemoved = control.value.trim();
-        return whiteSpaceRemoved.length === 0 ? { isEmpty: true } : null;
+    ngOnDestroy(): void {
+        this.clientSocket.socket.removeAllListeners('validName');
+        this.clientSocket.socket.removeAllListeners('invalidName');
     }
 
     configureBaseSocketFeatures() {
         this.clientSocket.socket.on('validName', (name) => {
-            this.clientSocket.isNameDefined = true;
             this.clientSocket.playerName = name;
         });
 
@@ -42,6 +45,6 @@ export class NameDefinitionComponent {
 
     onSubmit() {
         const nameToValidate: string = this.nameForm.value.name.trim();
-        this.clientSocket.send('validateName', nameToValidate);
+        this.clientSocket.socket.emit('validateName', nameToValidate);
     }
 }

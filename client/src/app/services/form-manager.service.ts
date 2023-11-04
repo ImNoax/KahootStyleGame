@@ -2,6 +2,7 @@ import { formatDate } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Route } from '@app/enums';
 import { Game } from '@common/game';
 import { Observable } from 'rxjs';
 import { GameHandlingService } from './game-handling.service';
@@ -46,14 +47,14 @@ export class FormManagerService {
         this.gameForm.value.lastModification = formatDate(new Date(), 'yyyy-MM-dd   h:mm:ss a', 'en');
         this.gameHandler.modifyGame(this.gameForm.value).subscribe(() => {
             this.resetGameForm();
-            this.router.navigate(['/admin']);
+            this.router.navigate([Route.Admin]);
         });
     }
 
     addGame(): void {
         this.gameHandler.addGame(this.gameForm.value).subscribe(() => {
             this.resetGameForm();
-            this.router.navigate(['/admin']);
+            this.router.navigate([Route.Admin]);
         });
     }
 

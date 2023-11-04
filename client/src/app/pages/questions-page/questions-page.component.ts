@@ -1,11 +1,13 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormArray, FormGroup } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { QuestionCreationPopupComponent } from '@app/components/question-creation-popup/question-creation-popup.component';
+import { Route } from '@app/enums';
 import { FormManagerService } from '@app/services/form-manager.service';
-import { Limits } from '@common/Limits';
+import { RouteControllerService } from '@app/services/route-controller.service';
 import { Question } from '@common/game';
+import { Limit } from '@common/limit';
 import * as _ from 'lodash';
 
 @Component({
@@ -14,10 +16,13 @@ import * as _ from 'lodash';
     styleUrls: ['./questions-page.component.scss'],
 })
 export class QuestionsPageComponent {
+    quizCreationRoute: string = '/' + Route.QuizCreation;
+    isAccessingQuizCreation: boolean = false;
     pageTitle: string = 'Liste des questions';
     gameName: string = this.formManager.gameForm.value.title;
     gameNameUnavailable: string = 'À déterminer';
     questionsFormArray: FormArray = _.cloneDeep(this.formManager.questions) as FormArray;
+    routeController: RouteControllerService = inject(RouteControllerService);
 
     constructor(
         private dialog: MatDialog,
@@ -64,11 +69,11 @@ export class QuestionsPageComponent {
         this.questionsFormArray.removeAt(index);
     }
 
-    saveQuestions() {
+    saveQuestions(): void {
         this.formManager.saveQuestions(this.questionsFormArray);
     }
 
-    isEmpty() {
-        return this.questionsFormArray.length < Limits.MinQuestionsNumber;
+    isEmpty(): boolean {
+        return this.questionsFormArray.length < Limit.MinQuestionsNumber;
     }
 }
