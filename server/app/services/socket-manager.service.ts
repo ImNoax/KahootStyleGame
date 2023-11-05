@@ -205,8 +205,8 @@ export class SocketManager {
                 const currentLobby = this.lobbies.get(pin);
                 if (currentLobby) {
                     currentLobby.histogram = {};
+                    this.sio.to(pin).emit('updateHistogram', currentLobby.histogram);
                 }
-                this.sio.to(pin).emit('updateHistogram', currentLobby.histogram);
             });
         });
     }
