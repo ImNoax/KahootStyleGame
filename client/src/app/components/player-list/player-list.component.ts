@@ -21,7 +21,22 @@ export class PlayerListComponent implements OnInit, OnDestroy {
 
     configureBaseSocketFeatures() {
         this.clientSocket.socket.on('latestPlayerList', (lobbyDetails: LobbyDetails) => {
-            this.players = lobbyDetails.players;
+            if (this.players.length === 0) {
+                this.players = lobbyDetails.players;
+            }
+            this.players.forEach((player) => {
+                const updatedPlayer = lobbyDetails.players.find((p) => p.socketId === player.socketId);
+                if (!updatedPlayer) {
+                    player.isStillInGame = false;
+                }
+            });
+        });
+
+        this.clientSocket.socket.on('scoreUpdated', (updatedPlayer: Player) => {
+            const player = this.players.find((p) => p.socketId === updatedPlayer.socketId);
+            if (player) {
+                player.score = updatedPlayer.score;
+            }
         });
     }
 }
