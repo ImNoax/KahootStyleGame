@@ -21,14 +21,15 @@ import { MaterialPageComponent } from '@app/pages/material-page/material-page.co
 import { WaitingViewPageComponent } from '@app/pages/waiting-view-page/waiting-view-page.component';
 import { ButtonResponseComponent } from './components/button-response/button-response.component';
 import { ChatBoxComponent } from './components/chat-box/chat-box.component';
+import { EndResultComponent } from './components/end-result/end-result.component';
 import { GameImportPopupComponent } from './components/game-import-popup/game-import-popup.component';
 import { HeaderComponent } from './components/header/header.component';
+import { HistogramComponent } from './components/histogram/histogram.component';
 import { NameDefinitionComponent } from './components/name-definition/name-definition.component';
+import { PlayerListComponent } from './components/player-list/player-list.component';
 import { TimerComponent } from './components/timer/timer.component';
 import { CreationJeuComponent } from './pages/creation-jeu/creation-jeu.component';
 import { QuestionsPageComponent } from './pages/questions-page/questions-page.component';
-import { HistogramComponent } from './components/histogram/histogram.component';
-import { PlayerListComponent } from './components/player-list/player-list.component';
 
 /**
  * Main module that is used in main.ts.
@@ -54,6 +55,7 @@ import { PlayerListComponent } from './components/player-list/player-list.compon
         WaitingViewPageComponent,
         NameDefinitionComponent,
         ChatBoxComponent,
+        EndResultComponent,
         HistogramComponent,
         PlayerListComponent,
     ],

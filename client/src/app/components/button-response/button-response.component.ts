@@ -30,6 +30,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
     canLoadNextQuestion: boolean = false;
     submitted: boolean = false;
     submittedFromTimer: boolean = false;
+    bonusTimes: number = 0;
     hasBonus: boolean = false;
     isAnswerCorrect: boolean = true;
     private clientSocket: ClientSocketService = inject(ClientSocketService);
@@ -173,7 +174,11 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
         if (currentGame === undefined) return;
         if (this.gameService.currentQuestionId === currentGame.questions.length - 1) {
             this.timeService.stopTimer();
-            this.router.navigate([Route.GameCreation]);
+            if (this.gameService.gameMode === GameMode.Testing) {
+                this.router.navigate([Route.GameCreation]);
+                return;
+            }
+            this.clientSocket.socket.emit('gameEnded');
         } else {
             this.gameService.setCurrentQuestionId(++this.gameService.currentQuestionId);
             this.updateButtons();
@@ -196,7 +201,9 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
             if (this.hasBonus || this.gameService.gameMode === GameMode.Testing) {
                 const bonus = rewardedPoints * BONUS_POINTS;
                 rewardedPoints += bonus;
-                message += ` + ${bonus} points bonis 🎉🎊`;
+                message += ` + ${bonus} points bonus 🎉🎊`;
+                this.bonusTimes++;
+                this.clientSocket.socket.emit('updateBonusTimes', this.bonusTimes);
             }
             this.gameService.incrementScore(rewardedPoints);
             this.snackBar.open(message, '', snackBarNormalConfiguration);
