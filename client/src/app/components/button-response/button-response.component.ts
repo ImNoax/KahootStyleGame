@@ -245,13 +245,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
     }
 
     startNextQuestionCountDown() {
-        let nextQuestionMessage = '';
         this.clientSocket.sendResetHistogram();
-
-        if (this.gameService.currentQuestionId === this.currentGame.questions.length - 1) nextQuestionMessage = 'Résultats';
-        else nextQuestionMessage = 'Prochaine question';
-
-        this.timer.transitionMessage = nextQuestionMessage;
         this.timer.startCountDown(TIME_OUT, true);
         this.canLoadNextQuestion = false;
     }
