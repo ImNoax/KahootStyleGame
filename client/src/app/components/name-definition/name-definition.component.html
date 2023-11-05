@@ -2,8 +2,8 @@
     <div>
         <mat-form-field>
             <mat-label>Nom de joueur</mat-label>
-            <input #nameInput formControlName="name" matInput placeholder="Nom" maxlength="50" autofocus>
-            <p class="error" *ngIf="nameIsInvalid">{{serverMessage}}</p>
+            <input #nameInput formControlName="name" matInput placeholder="Nom" maxlength="20" autofocus />
+            <p class="error" *ngIf="nameIsInvalid">{{ serverMessage }}</p>
         </mat-form-field>
         <p id="name-length">{{ nameForm.value.name.length }}/{{ maxNameLength }}</p>
     </div>
