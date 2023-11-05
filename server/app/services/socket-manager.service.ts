@@ -209,6 +209,7 @@ export class SocketManager {
                     const currentPlayer = currentLobby.players.find((player) => player.socketId === socket.id);
                     if (currentPlayer) {
                         currentPlayer.score = updatedScore;
+                        this.sio.to(pin).emit('scoreUpdated', currentPlayer);
                     }
                 }
             });
