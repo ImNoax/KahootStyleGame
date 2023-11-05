@@ -65,9 +65,9 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
         this.clientSocket.socket.removeAllListeners('noPlayers');
 
         this.timer.reset();
+        this.routeController.setRouteAccess(Route.Lobby, false);
         if (this.gameStarted) return;
         this.clientSocket.resetPlayerInfo();
-        this.routeController.setRouteAccess(Route.Lobby, false);
     }
 
     configureBaseSocketFeatures() {

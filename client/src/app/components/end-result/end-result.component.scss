@@ -1,5 +1,4 @@
 .table-container {
-    display: flex;
     justify-content: center;
     align-items: center;
 }
@@ -30,4 +29,8 @@ tr:nth-child(even) {
 
 tr:nth-child(odd) {
     background-color: #4c0852;
+}
+
+h1 {
+    color: solid white;
 }

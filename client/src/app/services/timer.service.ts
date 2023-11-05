@@ -29,6 +29,13 @@ export class TimerService {
 
         this.clientSocket.socket.on('isQuestionTransition', (isQuestionTransition: boolean) => {
             this.isQuestionTransition = isQuestionTransition;
+
+            if (isQuestionTransition) {
+                let nextQuestionMessage = '';
+                if (this.gameHandler.currentQuestionId === this.gameHandler.currentGame.questions.length - 1) nextQuestionMessage = 'Résultats';
+                else nextQuestionMessage = 'Prochaine question';
+                this.transitionMessage = nextQuestionMessage;
+            }
         });
     }
 
