@@ -90,6 +90,7 @@ export class SocketManager {
                         score: 0,
                         isStillInGame: true,
                         isAbleToChat: true,
+                        bonusTimes: 0,
                     });
                     sendLatestPlayersList();
                     socket.emit('validName', nameToValidate);
@@ -111,6 +112,7 @@ export class SocketManager {
                         score: 0,
                         isStillInGame: true,
                         isAbleToChat: true,
+                        bonusTimes: 0,
                     });
                     isOrganizer = true;
                     socket.emit('successfulLobbyCreation', pin);
@@ -201,12 +203,37 @@ export class SocketManager {
                 }
             });
 
+            socket.on('submitScore', (updatedScore: number) => {
+                const currentLobby = this.lobbies.get(pin);
+                if (currentLobby) {
+                    const currentPlayer = currentLobby.players.find((player) => player.socketId === socket.id);
+                    if (currentPlayer) {
+                        currentPlayer.score = updatedScore;
+                    }
+                }
+            });
+
+            socket.on('gameEnded', () => {
+                this.sio.to(pin).emit('showResults');
+            });
+
             socket.on('resetHistogram', () => {
                 const currentLobby = this.lobbies.get(pin);
                 if (currentLobby) {
                     currentLobby.histogram = {};
                 }
                 this.sio.to(pin).emit('updateHistogram', currentLobby.histogram);
+            });
+
+            socket.on('updateBonusTimes', (bonusTimes: number) => {
+                const currentLobby = this.lobbies.get(pin);
+                if (currentLobby) {
+                    const currentPlayer = currentLobby.players.find((player) => player.socketId === socket.id);
+                    if (currentPlayer) {
+                        currentPlayer.bonusTimes = bonusTimes;
+                        this.sio.to(pin).emit('latestPlayerList', currentLobby);
+                    }
+                }
             });
         });
     }

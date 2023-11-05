@@ -16,7 +16,9 @@ export class GamePageComponent implements OnInit, OnDestroy {
     games: Game[] = [];
     currentQuestion: string = '';
     currentQuestionScore: number;
+    bonusTimes: number;
     score: number;
+    showResults: boolean = false;
     histogramData: { [key: string]: number };
     private subscriptionScore: Subscription;
     private questionSubscription: Subscription;
@@ -43,6 +45,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
         });
         this.subscriptionScore = this.gameService.score$.subscribe((updatedScore) => {
             this.score = updatedScore;
+            this.clientSocket.socket.emit('submitScore', updatedScore);
+        });
+        this.histogramSubscription = this.clientSocket.listenUpdateHistogram().subscribe((data) => {
+            this.histogramData = data;
         });
         this.histogramSubscription = this.clientSocket.listenUpdateHistogram().subscribe((data) => {
             this.histogramData = data;
@@ -58,6 +64,9 @@ export class GamePageComponent implements OnInit, OnDestroy {
         });
 
         this.clientSocket.listenForGameClosureByOrganiser();
+        this.clientSocket.socket.on('showResults', () => {
+            this.showResults = true;
+        });
     }
 
     ngOnDestroy(): void {
@@ -72,7 +81,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         if (this.histogramSubscription) {
             this.histogramSubscription.unsubscribe();
         }
-
+        this.clientSocket.socket.removeAllListeners('showResults');
         this.clientSocket.resetPlayerInfo();
         this.routeController.setRouteAccess(Route.InGame, false);
     }

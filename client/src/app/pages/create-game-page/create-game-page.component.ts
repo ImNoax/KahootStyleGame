@@ -74,8 +74,10 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
                 if (game.id === this.selectedGame?.id && game.isVisible) {
                     this.gameHandler.setCurrentGameId(this.selectedGame.id);
                     this.gameHandler.gameMode = mode;
-                    if (mode === GameMode.Testing) this.router.navigate([mode]);
-                    else this.clientSocket.socket.emit('createLobby', this.gameHandler.currentGameId);
+                    if (mode === GameMode.Testing) {
+                        this.routeController.setRouteAccess(Route.InGame, true);
+                        this.router.navigate([mode]);
+                    } else this.clientSocket.socket.emit('createLobby', this.gameHandler.currentGameId);
 
                     return;
                 }

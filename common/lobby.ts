@@ -17,6 +17,7 @@ export interface Player {
     name: string;
     answerSubmitted: boolean;
     score: number;
+    bonusTimes: number;
     isStillInGame: boolean;
     isAbleToChat: boolean;
 }
