@@ -1,3 +1,5 @@
+import { Game } from './game';
+
 export type SocketId = string;
 export type Pin = string;
 
@@ -7,7 +9,7 @@ export interface LobbyDetails {
     isLocked: boolean;
     players: Player[];
     bannedNames: string[];
-    gameId: string;
+    game: Game;
     bonusRecipient?: string;
     histogram?: { [key: string]: number };
 }

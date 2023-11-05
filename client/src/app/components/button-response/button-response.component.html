@@ -28,4 +28,6 @@
         </li>
     </ul>
 </div>
-<button (click)="loadNextQuestion()" [disabled]="!canLoadNextQuestion" *ngIf="isOrganiser">Bouton de l'organisateur pour prochaine question</button>
+<button mat-raised-button (click)="startNextQuestionCountDown()" [disabled]="!canLoadNextQuestion" *ngIf="isOrganiser">
+    Charger la prochaine question
+</button>

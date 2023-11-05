@@ -67,12 +67,6 @@ export class QuestionCreationPopupComponent implements OnInit {
 
     drop(event: CdkDragDrop<Question[]>): void {
         moveItemInArray(this.choices.controls, event.previousIndex, event.currentIndex);
-
-        const choices: Choice[] = this.choices.value;
-        // Sources: https://stackoverflow.com/questions/49273499/angular-formarray-contents-order
-        // www.freecodecamp.org/news/swap-two-array-elements-in-javascript/
-        [choices[event.previousIndex], choices[event.currentIndex]] = [choices[event.currentIndex], choices[event.previousIndex]];
-        this.choices.setValue(choices);
     }
 
     addChoice(isChoiceCorrect: boolean) {

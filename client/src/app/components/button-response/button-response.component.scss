@@ -13,8 +13,7 @@
     align-items: center;
 }
 
-button,
-.btn:not(:disabled) {
+button {
     cursor: pointer;
 }
 
@@ -66,7 +65,6 @@ button,
     background-color: silver;
     color: gray;
     pointer-events: none;
-    cursor: default;
 }
 
 .buttons-parent:focus {

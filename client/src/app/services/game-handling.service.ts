@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { GameMode } from '@app/enums';
 import { Game } from '@common/game';
+import { GameMode } from '@common/game-mode';
 import { Observable, of } from 'rxjs';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { catchError, map } from 'rxjs/operators';
@@ -11,8 +11,8 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root',
 })
 export class GameHandlingService {
+    currentGame: Game;
     gameMode: GameMode = GameMode.RealGame;
-    currentGameId: string = '';
     currentQuestionId: number = 0;
     scoreSource = new BehaviorSubject<number>(0);
     score$ = this.scoreSource.asObservable();
@@ -52,10 +52,6 @@ export class GameHandlingService {
 
     export(id: string) {
         return this.http.get<Game>(`${this.baseUrl}/${id}`, { responseType: 'json' });
-    }
-
-    setCurrentGameId(id: string) {
-        this.currentGameId = id;
     }
 
     setCurrentQuestion(question: string): void {

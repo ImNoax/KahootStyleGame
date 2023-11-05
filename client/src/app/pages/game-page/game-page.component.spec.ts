@@ -4,7 +4,7 @@ import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock
 import { SocketMock } from '@app/classes/socket-mock';
 import { ButtonResponseComponent } from '@app/components/button-response/button-response.component';
 import { ChatBoxComponent } from '@app/components/chat-box/chat-box.component';
-import { TimerComponent } from '@app/components/timer/timer.component';
+import { TimerComponent } from '@app/components/progress-bar/progress-bar.component';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { Game, QuestionType } from '@common/game';

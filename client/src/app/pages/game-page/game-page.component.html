@@ -2,8 +2,9 @@
     <button id="quit-button" class="navigation" mat-raised-button color="primary" (click)="leaveGame()">
         <mat-icon id="leave-icon">exit_to_app</mat-icon> Quitter
     </button>
+    <p id="startTimer" *ngIf="isQuestionTransition">{{ transitionMessage }} dans {{ transitionCount }} secondes!</p>
     <div id="top-page">
-        <app-timer *ngIf="!showResults"></app-timer>
+        <app-progress-bar *ngIf="!showResults"></app-progress-bar>
         <div class="question-container" *ngIf="!showResults">
             <div id="question">{{ currentQuestion }} (+{{ currentQuestionScore }} points)</div>
             <div id="pointage" *ngIf="!isOrganiser">Score: {{ score }}</div>

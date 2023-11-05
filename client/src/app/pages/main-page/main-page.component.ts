@@ -6,6 +6,7 @@ import { Route } from '@app/enums';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { RouteControllerService } from '@app/services/route-controller.service';
+import { Game } from '@common/game';
 import { Pin, REQUIRED_PIN_LENGTH } from '@common/lobby';
 import { BehaviorSubject } from 'rxjs';
 
@@ -68,10 +69,10 @@ export class MainPageComponent implements OnInit, OnDestroy {
     }
 
     configureBaseSocketFeatures() {
-        this.clientSocket.socket.on('successfulLobbyConnection', (gameId: string, pin: Pin) => {
+        this.clientSocket.socket.on('successfulLobbyConnection', (game: Game, pin: Pin) => {
             this.routeController.setRouteAccess(Route.Lobby, true);
             this.clientSocket.pin = pin;
-            this.gameHandler.setCurrentGameId(gameId);
+            this.gameHandler.currentGame = game;
             this.router.navigate([Route.Lobby]);
         });
 

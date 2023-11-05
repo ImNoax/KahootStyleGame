@@ -30,18 +30,12 @@ export class QuestionsPageComponent {
     ) {}
 
     setQuestionStyle(question: Question) {
-        if (question.type === 'QCM') return { background: '#78B9DE' };
+        if (question.type === 'QCM') return { background: '#3F51B5' };
         return { background: '#F2BB7B' };
     }
 
     drop(event: CdkDragDrop<Question[]>): void {
         moveItemInArray(this.questionsFormArray.controls, event.previousIndex, event.currentIndex);
-        const questions: Question[] = this.questionsFormArray.value;
-
-        // Sources: https://stackoverflow.com/questions/49273499/angular-formarray-contents-order
-        // www.freecodecamp.org/news/swap-two-array-elements-in-javascript/
-        [questions[event.previousIndex], questions[event.currentIndex]] = [questions[event.currentIndex], questions[event.previousIndex]];
-        this.questionsFormArray.setValue(questions);
     }
 
     openQuestionCreator(index?: number): void {

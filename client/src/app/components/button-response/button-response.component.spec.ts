@@ -5,7 +5,7 @@ import { ButtonResponseComponent } from '@app/components/button-response/button-
 import { Route } from '@app/enums';
 import { Button } from '@app/interfaces/button-model';
 import { GameHandlingService } from '@app/services/game-handling.service';
-import { TimeService } from '@app/services/time.service';
+import { TimeService } from '@app/services/timer.service';
 import { Game, QuestionType } from '@common/game';
 import { of } from 'rxjs';
 const MOCK_BUTTONS: Button[] = [
