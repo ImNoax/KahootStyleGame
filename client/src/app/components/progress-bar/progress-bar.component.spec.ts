@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GameHandlingService } from '@app/services/game-handling.service';
-import { TimeService } from '@app/services/time.service';
+import { TimerService } from '@app/services/timer.service';
 import { Game, QuestionType } from '@common/game';
 import { of } from 'rxjs';
-import { TimerComponent } from './timer.component';
+import { ProgressBarComponent } from './progress-bar.component';
 
 const MOCK_QUESTIONS = [
     {
@@ -29,10 +29,11 @@ const MOCK_GAME: Game[] = [
         questions: [MOCK_QUESTIONS[0], MOCK_QUESTIONS[0]],
     },
 ];
+
 describe('TimerComponent', () => {
-    let component: TimerComponent;
-    let fixture: ComponentFixture<TimerComponent>;
-    let timeServiceSpy: jasmine.SpyObj<TimeService>;
+    let component: ProgressBarComponent;
+    let fixture: ComponentFixture<ProgressBarComponent>;
+    let timeServiceSpy: jasmine.SpyObj<TimerService>;
     let gameServiceSpy: jasmine.SpyObj<GameHandlingService>;
 
     beforeEach(() => {
@@ -40,25 +41,28 @@ describe('TimerComponent', () => {
         gameServiceSpy = jasmine.createSpyObj('GameHandlingService', ['getGames']);
 
         TestBed.configureTestingModule({
-            declarations: [TimerComponent],
+            declarations: [ProgressBarComponent],
             providers: [
-                { provide: TimeService, useValue: timeServiceSpy },
+                { provide: TimerService, useValue: timeServiceSpy },
                 { provide: GameHandlingService, useValue: gameServiceSpy },
             ],
         });
 
-        fixture = TestBed.createComponent(TimerComponent);
+        fixture = TestBed.createComponent(ProgressBarComponent);
         component = fixture.componentInstance;
     });
+
     it('should create', () => {
         expect(component).toBeTruthy();
     });
+
     it('should get games and start initialization', () => {
         gameServiceSpy.getGames.and.returnValue(of(MOCK_GAME));
         gameServiceSpy.currentGameId = '1';
         component.ngOnInit();
         expect(gameServiceSpy.getGames).toHaveBeenCalled();
     });
+
     it('should stop timer on ngOnDestroy', () => {
         component.ngOnDestroy();
         expect(timeServiceSpy.stopTimer).toHaveBeenCalled();
@@ -70,6 +74,7 @@ describe('TimerComponent', () => {
         const time = component.currentTime;
         expect(time).toEqual(durationGame);
     });
+
     it('should return total time for right gameId', () => {
         const durationGame0 = 5;
         gameServiceSpy.currentGameId = '1';

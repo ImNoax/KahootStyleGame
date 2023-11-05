@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { LobbyDetails, Player } from '@common/lobby';
+
 @Component({
     selector: 'app-player-list',
     templateUrl: './player-list.component.html',
@@ -17,6 +18,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.clientSocket.socket.removeAllListeners('latestPlayerList');
+        this.clientSocket.socket.removeAllListeners('scoreUpdated');
     }
 
     configureBaseSocketFeatures() {

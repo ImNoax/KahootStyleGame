@@ -6,8 +6,11 @@ import { Route } from '@app/enums';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { RouteControllerService } from '@app/services/route-controller.service';
+import { TimerService } from '@app/services/timer.service';
 import { LobbyDetails, Pin, SocketId } from '@common/lobby';
 import { Subscription } from 'rxjs/internal/Subscription';
+
+const GAME_START_INITIAL_COUNT = 5;
 
 @Component({
     selector: 'app-waiting-view-page',
@@ -18,10 +21,10 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
     players: { socketId: SocketId; name: string }[] = [];
     isLocked: boolean = false;
     gameStarted: boolean = false;
-    startTimer: number = 0;
-    gameStarting: boolean = false;
+    countDownStarted: boolean = false;
     private snackBar: MatSnackBar = inject(MatSnackBar);
     private routeController: RouteControllerService = inject(RouteControllerService);
+    private timer: TimerService = inject(TimerService);
     private startGameSubscription: Subscription;
 
     constructor(
@@ -42,12 +45,13 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
         return this.clientSocket.pin;
     }
 
+    get count(): number {
+        return this.timer.count;
+    }
+
     ngOnInit(): void {
         this.configureBaseSocketFeatures();
         this.clientSocket.socket.emit('getPlayers');
-        this.startGameSubscription = this.clientSocket.listenForStartGame().subscribe(() => {
-            this.startGame();
-        });
     }
 
     ngOnDestroy(): void {
@@ -57,15 +61,16 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
 
         this.clientSocket.socket.removeAllListeners('latestPlayerList');
         this.clientSocket.socket.removeAllListeners('lockToggled');
-        this.clientSocket.socket.removeAllListeners('countDown');
+        this.clientSocket.socket.removeAllListeners('countDownEnd');
+        this.clientSocket.socket.removeAllListeners('noPlayers');
+
+        this.timer.reset();
         if (this.gameStarted) return;
         this.clientSocket.resetPlayerInfo();
         this.routeController.setRouteAccess(Route.Lobby, false);
     }
 
     configureBaseSocketFeatures() {
-        this.clientSocket.listenForGameClosureByOrganiser();
-
         this.clientSocket.socket.on('latestPlayerList', (lobbyDetails: LobbyDetails) => {
             this.isLocked = lobbyDetails.isLocked;
             this.players = lobbyDetails.players;
@@ -76,8 +81,18 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
             this.isLocked = isLocked;
         });
 
-        this.clientSocket.socket.on('countDown', (countDown: number) => {
-            this.startTimer = countDown;
+        this.clientSocket.socket.on('countDownEnd', (lastCount: number) => {
+            this.timer.count = lastCount;
+            this.startGame();
+        });
+
+        this.clientSocket.socket.on('noPlayers', () => {
+            if (this.countDownStarted) {
+                this.timer.reset();
+                this.countDownStarted = false;
+                this.toggleLobbyLock();
+                this.snackBar.open("Tous les joueurs ont quitté la salle d'attente.", '', snackBarErrorConfiguration);
+            }
         });
     }
 
@@ -90,8 +105,8 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
     }
 
     startGameEmit() {
-        this.gameStarting = true;
-        this.clientSocket.socket.emit('startGame');
+        this.countDownStarted = true;
+        this.timer.startCountDown(GAME_START_INITIAL_COUNT);
     }
 
     startGame() {

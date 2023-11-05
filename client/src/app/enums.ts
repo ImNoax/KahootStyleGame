@@ -13,8 +13,3 @@ export enum Route {
     QuizCreation = 'quiz-creation',
     QuestionCreation = 'question-creation',
 }
-
-export enum GameMode {
-    Testing = Route.InGame,
-    RealGame = Route.Lobby,
-}

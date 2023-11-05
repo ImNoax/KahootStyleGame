@@ -23,10 +23,10 @@
             </ul>
         </div>
 
-        <p id="startTimer" *ngIf="startTimer !== 0">La partie commence dans {{ startTimer }} secondes !</p>
+        <p id="startTimer" *ngIf="count > 0">La partie commence dans {{ count }} secondes !</p>
 
         <div *ngIf="isOrganizer" id="nav">
-            <button mat-raised-button color="primary" (click)="toggleLobbyLock()" [disabled]="gameStarting">
+            <button mat-raised-button color="primary" (click)="toggleLobbyLock()" [disabled]="countDownStarted">
                 <span id="lock-text">{{ isLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}</span>
                 <i *ngIf="!isLocked" class="fa-solid fa-unlock fa-2xl"></i>
                 <i *ngIf="isLocked" class="fa-solid fa-lock fa-shake fa-2xl"></i>
@@ -35,7 +35,7 @@
                 mat-raised-button
                 color="primary"
                 *ngIf="isOrganizer"
-                [disabled]="!isLocked || gameStarting || players.length === 1"
+                [disabled]="!isLocked || countDownStarted || players.length === 1"
                 (click)="startGameEmit()"
             >
                 Start Game

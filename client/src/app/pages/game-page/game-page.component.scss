@@ -64,8 +64,15 @@
 }
 
 app-histogram {
-  position: fixed; 
-  bottom: 20%;    
-  left: 20%;        
-  z-index: 9999;   // peut etre a enlever
+    position: fixed;
+    bottom: 20%;
+    left: 20%;
+    z-index: 9999;
+}
+
+#startTimer {
+    position: absolute;
+    text-align: center;
+    color: white;
+    font-size: 30px;
 }

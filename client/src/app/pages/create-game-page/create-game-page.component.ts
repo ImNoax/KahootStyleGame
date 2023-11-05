@@ -2,11 +2,12 @@ import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { snackBarErrorConfiguration } from '@app/constants/snack-bar-configuration';
-import { GameMode, Route } from '@app/enums';
+import { Route } from '@app/enums';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { RouteControllerService } from '@app/services/route-controller.service';
 import { Game } from '@common/game';
+import { GameMode } from '@common/game-mode';
 import { Pin } from '@common/lobby';
 
 @Component({
@@ -72,13 +73,12 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
 
             for (const game of this.games) {
                 if (game.id === this.selectedGame?.id && game.isVisible) {
-                    this.gameHandler.setCurrentGameId(this.selectedGame.id);
+                    this.gameHandler.currentGame = game;
                     this.gameHandler.gameMode = mode;
                     if (mode === GameMode.Testing) {
                         this.routeController.setRouteAccess(Route.InGame, true);
                         this.router.navigate([mode]);
-                    } else this.clientSocket.socket.emit('createLobby', this.gameHandler.currentGameId);
-
+                    } else this.clientSocket.socket.emit('createLobby', this.gameHandler.currentGame);
                     return;
                 }
             }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { LobbyDetails, Player } from '@common/lobby';
 @Component({
@@ -6,17 +6,23 @@ import { LobbyDetails, Player } from '@common/lobby';
     templateUrl: './end-result.component.html',
     styleUrls: ['./end-result.component.scss'],
 })
-export class EndResultComponent implements OnInit {
+export class EndResultComponent implements OnInit, OnDestroy {
     players: Player[] = [];
+
     constructor(private clientSocket: ClientSocketService) {}
+
     ngOnInit(): void {
         this.configureBaseSocketFeatures();
         this.clientSocket.socket.emit('getPlayers');
     }
 
+    ngOnDestroy(): void {
+        this.clientSocket.socket.removeAllListeners('latestPlayerList');
+    }
+
     configureBaseSocketFeatures() {
         this.clientSocket.socket.on('latestPlayerList', (lobbyDetails: LobbyDetails) => {
-            this.players = lobbyDetails.players;
+            if (!this.players.length) this.players = lobbyDetails.players;
         });
     }
 }

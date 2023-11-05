@@ -1,10 +1,13 @@
+import { Game } from '@common/game';
+import { GameMode } from '@common/game-mode';
+
 import { LobbyDetails, Pin, REQUIRED_PIN_LENGTH, SocketId } from '@common/lobby';
 import * as http from 'http';
 import * as io from 'socket.io';
 
 const MAX_LOBBY_QUANTITY = 10000;
-const BASE_TIMER = 5;
-const MS_TIMER = 1000;
+const COUNTDOWN_PERIOD = 1000;
+const ORGANISER = 'Organisateur';
 
 export class SocketManager {
     private sio: io.Server;
@@ -18,6 +21,7 @@ export class SocketManager {
         this.sio.on('connection', (socket) => {
             let pin: Pin = '';
             let isOrganizer = false;
+            let counter: NodeJS.Timer;
 
             const sendLatestPlayersList = () => {
                 const lobbyDetails = this.lobbies.get(pin);
@@ -29,12 +33,17 @@ export class SocketManager {
                     const currentLobby = this.lobbies.get(pin);
                     if (currentLobby) {
                         if (isOrganizer) socket.broadcast.to(pin).emit('lobbyClosed', 'NO HOST', "L'organisateur a quitté la partie.");
+
                         currentLobby.players = currentLobby.players.filter((player) => player.socketId !== socket.id);
+                        if (currentLobby.players.length === 1 && currentLobby.players[0].name === ORGANISER) {
+                            this.sio.to(pin).emit('noPlayers');
+                        }
+
                         if (currentLobby.players.length === 0) this.lobbies.delete(pin);
                         else sendLatestPlayersList();
                     }
                 }
-                socket.leave(pin);
+                if (pin !== socket.id) socket.leave(pin);
                 pin = '';
                 isOrganizer = false;
             };
@@ -54,6 +63,20 @@ export class SocketManager {
                 return newPin;
             };
 
+            const startCountDown = (initialCount: number, gameMode: GameMode): void => {
+                if (gameMode === GameMode.Testing) pin = socket.id;
+                counter = setInterval(() => {
+                    initialCount--;
+
+                    if (initialCount > 0) {
+                        this.sio.to(pin).emit('countDown', initialCount);
+                    } else {
+                        this.sio.to(pin).emit('countDownEnd', initialCount);
+                        clearInterval(counter);
+                    }
+                }, COUNTDOWN_PERIOD);
+            };
+
             socket.on('joinLobby', (pinToJoin: Pin) => {
                 if (this.lobbies.has(pinToJoin)) {
                     const lobbyToJoin = this.lobbies.get(pinToJoin);
@@ -65,7 +88,7 @@ export class SocketManager {
                     else {
                         socket.join(pinToJoin);
                         pin = pinToJoin;
-                        socket.emit('successfulLobbyConnection', lobbyToJoin.gameId, pin);
+                        socket.emit('successfulLobbyConnection', lobbyToJoin.game, pin);
                     }
                 } else
                     socket.emit(
@@ -75,12 +98,12 @@ export class SocketManager {
             });
 
             socket.on('validateName', (nameToValidate: string) => {
-                nameToValidate = nameToValidate.toLowerCase();
+                const lowerCaseNameToValide = nameToValidate.toLowerCase();
                 const currentLobby = this.lobbies.get(pin);
 
-                if (currentLobby.players.find((player) => player.name.toLowerCase() === nameToValidate))
+                if (currentLobby.players.find((player) => player.name.toLowerCase() === lowerCaseNameToValide))
                     socket.emit('invalidName', 'Nom réservé par un autre joueur');
-                else if (currentLobby.bannedNames.find((bannedName) => bannedName.toLowerCase() === nameToValidate))
+                else if (currentLobby.bannedNames.find((bannedName) => bannedName.toLowerCase() === lowerCaseNameToValide))
                     socket.emit('invalidName', 'Nom Banni');
                 else {
                     currentLobby.players.push({
@@ -97,17 +120,17 @@ export class SocketManager {
                 }
             });
 
-            socket.on('createLobby', (currentGameId: string) => {
+            socket.on('createLobby', (currentGame: Game) => {
                 if (this.lobbies.size <= MAX_LOBBY_QUANTITY) {
                     const newPin = generateUniquePin();
-                    this.lobbies.set(newPin, { isLocked: false, players: [], bannedNames: [], gameId: currentGameId });
+                    this.lobbies.set(newPin, { isLocked: false, players: [], bannedNames: [], game: currentGame });
                     socket.join(newPin);
                     pin = newPin;
 
                     const lobbyCreated = this.lobbies.get(newPin);
                     lobbyCreated.players.push({
                         socketId: socket.id,
-                        name: 'Organisateur',
+                        name: ORGANISER,
                         answerSubmitted: true,
                         score: 0,
                         isStillInGame: true,
@@ -145,8 +168,13 @@ export class SocketManager {
                 leaveLobby();
             });
 
-            socket.on('startGame', () => {
-                this.startCountDown(pin);
+            socket.on('startCountDown', (initialCount: number, isQuestionTransition: boolean, gameMode: GameMode) => {
+                if (isQuestionTransition) this.sio.emit('isQuestionTransition', isQuestionTransition);
+                startCountDown(initialCount, gameMode);
+            });
+
+            socket.on('stopCountDown', () => {
+                clearInterval(counter);
             });
 
             socket.on('chatMessage', (messageData) => {
@@ -155,10 +183,6 @@ export class SocketManager {
                     content: messageData.content,
                     time: new Date(),
                 });
-            });
-
-            socket.on('loadNextQuestion', () => {
-                this.sio.to(pin).emit('nextQuestionLoading');
             });
 
             socket.on('answerSubmitted', (isCorrect: boolean, submittedFromTimer: boolean) => {
@@ -179,12 +203,13 @@ export class SocketManager {
                         organisatorSocket.emit('canLoadNextQuestion');
 
                         currentLobby.players.forEach((player) => {
-                            if (player.name !== 'Organisateur') player.answerSubmitted = false;
+                            if (player.name !== ORGANISER) player.answerSubmitted = false;
                         });
                         currentLobby.bonusRecipient = '';
                     }
                 }
             });
+
             socket.on('histogramUpdate', (updateData: { [key: string]: number }) => {
                 const currentLobby = this.lobbies.get(pin);
                 if (currentLobby) {
@@ -237,22 +262,5 @@ export class SocketManager {
                 }
             });
         });
-    }
-
-    startCountDown(pin: Pin) {
-        let timer = BASE_TIMER;
-        const counter = setInterval(() => {
-            this.countDown(pin, timer, counter);
-            timer--;
-        }, MS_TIMER);
-    }
-
-    countDown(pin: Pin, timer: number, counter: NodeJS.Timer) {
-        if (timer > 0) {
-            this.sio.to(pin).emit('countDown', timer);
-        } else {
-            this.sio.to(pin).emit('gameStarted');
-            clearInterval(counter);
-        }
     }
 }

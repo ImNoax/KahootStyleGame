@@ -1,0 +1,7 @@
+<div id="timer">
+    Temps restant : {{ count }} secondes
+
+    <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="count && totalTime ? (count / totalTime) * 100 : 0"></div>
+    </div>
+</div>

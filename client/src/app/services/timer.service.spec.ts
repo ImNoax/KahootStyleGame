@@ -1,15 +1,15 @@
 import { TestBed, discardPeriodicTasks, fakeAsync, tick } from '@angular/core/testing';
 
-import { TimeService } from './time.service';
+import { TimerService } from './timer.service';
 
-describe('TimeService', () => {
-    let service: TimeService;
+describe('TimerService', () => {
+    let service: TimerService;
     const TIMEOUT = 5;
     const MS_SECOND = 1000;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
-        service = TestBed.inject(TimeService);
+        service = TestBed.inject(TimerService);
     });
 
     it('should be created', () => {

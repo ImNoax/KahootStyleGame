@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { snackBarErrorConfiguration } from '@app/constants/snack-bar-configuration';
+import { serverErrorMessage, snackBarErrorConfiguration } from '@app/constants/snack-bar-configuration';
 import { Route } from '@app/enums';
 import { Pin } from '@common/lobby';
 import { MessageData } from '@common/message';
@@ -32,9 +32,11 @@ export class ClientSocketService {
             this.socket = io(environment.serverBaseUrl, { transports: ['websocket'], upgrade: false });
 
             this.socket.on('disconnect', () => {
-                this.snackBar.open('Erreur du serveur ⚠️', '', snackBarErrorConfiguration);
+                this.snackBar.open(serverErrorMessage, '', snackBarErrorConfiguration);
                 this.router.navigate([Route.MainMenu]);
             });
+
+            this.listenForGameClosureByOrganiser();
         }
     }
 
@@ -62,14 +64,6 @@ export class ClientSocketService {
                         this.socket.emit('joinLobby', this.pin);
                     });
             }
-        });
-    }
-
-    listenForStartGame(): Observable<void> {
-        return new Observable((observer) => {
-            this.socket.on('gameStarted', () => {
-                observer.next();
-            });
         });
     }
 

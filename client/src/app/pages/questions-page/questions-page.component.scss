@@ -26,7 +26,8 @@ p {
     font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
 }
 
-p, h3 {
+p,
+h3 {
     margin: 0;
 }
 
@@ -45,11 +46,11 @@ p, h3 {
     align-items: center;
     font-size: 14px;
     padding: 1% 2%;
+    margin: 2px 0;
+    border-radius: 5px;
     cursor: move;
-}
-
-.question-box:not(:last-child) {
-    border-bottom: solid black 1px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: whitesmoke;
 }
 
 .question-text {
@@ -90,7 +91,7 @@ button#question-insertion {
     height: 10%;
     font-size: x-large;
     bottom: 3%;
-    background-color: #F75C1E;
+    background-color: #f75c1e;
 }
 
 #nav {

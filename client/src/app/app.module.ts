@@ -27,7 +27,7 @@ import { HeaderComponent } from './components/header/header.component';
 import { HistogramComponent } from './components/histogram/histogram.component';
 import { NameDefinitionComponent } from './components/name-definition/name-definition.component';
 import { PlayerListComponent } from './components/player-list/player-list.component';
-import { TimerComponent } from './components/timer/timer.component';
+import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
 import { CreationJeuComponent } from './pages/creation-jeu/creation-jeu.component';
 import { QuestionsPageComponent } from './pages/questions-page/questions-page.component';
 
@@ -44,7 +44,7 @@ import { QuestionsPageComponent } from './pages/questions-page/questions-page.co
         GamePageComponent,
         MainPageComponent,
         MaterialPageComponent,
-        TimerComponent,
+        ProgressBarComponent,
         ButtonResponseComponent,
         CreationJeuComponent,
         HeaderComponent,
