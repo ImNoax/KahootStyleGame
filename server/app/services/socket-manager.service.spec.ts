@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
-import { LobbyDetails, Pin } from '@common/lobby';
+import { GameMode } from '@common/game-mode';
+import { LobbyDetails, Pin, Player } from '@common/lobby';
 import { Server } from 'app/server';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
@@ -37,52 +38,6 @@ describe('SocketManager service tests', () => {
         clientSocket.close();
         service['sio'].close();
         sinon.restore();
-    });
-
-    it('startCountDown should call countDown multiple times', (done) => {
-        const mockCountDown = sinon.stub(service, 'countDown');
-        const time = 3000;
-
-        service.startCountDown('');
-
-        setTimeout(() => {
-            expect(mockCountDown.getCalls().length).greaterThan(1);
-            done();
-        }, time);
-    });
-
-    it('countDown should emit countDown if the timer is greater than 0', (done) => {
-        const time = 4;
-
-        createGame();
-
-        setTimeout(() => {
-            service.countDown(roomPin, time, null);
-
-            clientSocket.on('countDown', (timer) => {
-                expect(timer).to.equal(time);
-                done();
-            });
-        }, RESPONSE_DELAY);
-    });
-
-    it('countDown should emit gameStarted if the timer is equal to 0', (done) => {
-        let isGameStarted = false;
-
-        createGame();
-
-        setTimeout(() => {
-            service.countDown(roomPin, 0, undefined);
-
-            clientSocket.on('gameStarted', () => {
-                isGameStarted = true;
-            });
-
-            setTimeout(() => {
-                expect(isGameStarted).to.equal(true);
-                done();
-            }, RESPONSE_DELAY);
-        }, RESPONSE_DELAY);
     });
 
     it('joinLobby should return failedLobbyConnection if the pin is invalid', (done) => {
@@ -194,12 +149,12 @@ describe('SocketManager service tests', () => {
     });
 
     it('getPlayers should return latestPlayerList with the lobby details', (done) => {
-        clientSocket.emit('createLobby', '');
+        clientSocket.emit('createLobby', null);
         clientSocket.emit('getPlayers');
 
         clientSocket.on('latestPlayerList', (lobbyDetails: LobbyDetails) => {
             expect(lobbyDetails.bannedNames.length).to.equal(0);
-            expect(lobbyDetails.gameId).to.equal('');
+            expect(lobbyDetails.game).to.equal(null);
             expect(lobbyDetails.isLocked).to.equal(false);
             expect(lobbyDetails.players.length).to.equal(1);
 
@@ -325,16 +280,58 @@ describe('SocketManager service tests', () => {
         });
     });
 
-    it('startGame should call startCountDown', (done) => {
-        const mockStartCountDown = sinon.stub(service, 'startCountDown');
+    it('startCountDown should emit isQuestionTransition if the next question is loading', (done) => {
         createGame();
 
-        clientSocket.emit('startGame');
+        clientSocket.emit('startCountDown', 0, true);
+
+        clientSocket.on('isQuestionTransition', (isQuestionTransition: boolean) => {
+            expect(isQuestionTransition).to.equal(true);
+            done();
+        });
+    });
+
+    it('startCountDown should emit countDown if the timer is greater than 0', (done) => {
+        const time = 4;
 
         setTimeout(() => {
-            expect(mockStartCountDown.called).to.equal(true);
-            done();
+            clientSocket.emit('startCountDown', time, false, GameMode.Testing);
+
+            clientSocket.on('countDown', (timer: number) => {
+                expect(timer).to.equal(time - 1);
+                done();
+            });
         }, RESPONSE_DELAY);
+    });
+
+    it('startCountDown should emit countDownEnd if the timer is less or equal than 1', (done) => {
+        createGame();
+
+        setTimeout(() => {
+            clientSocket.emit('startCountDown', 1, false, GameMode.RealGame);
+
+            clientSocket.on('countDownEnd', (timer: number) => {
+                expect(timer).to.equal(0);
+                done();
+            });
+        }, RESPONSE_DELAY);
+    });
+
+    it('stopCountDown should stop the timer', (done) => {
+        let countDownEnded = false;
+        const waitTime = 2500;
+        clientSocket.emit('startCountDown', 2, false, GameMode.Testing);
+
+        clientSocket.emit('stopCountDown');
+
+        clientSocket.on('countDownEnd', () => {
+            countDownEnded = true;
+        });
+
+        setTimeout(() => {
+            expect(countDownEnded).to.equal(false);
+            done();
+        }, waitTime);
     });
 
     it('chatMessage should return messageReceived', (done) => {
@@ -347,16 +344,6 @@ describe('SocketManager service tests', () => {
             expect(messageData.sender).to.equal(clientSocket.id);
             expect(messageData.content).to.equal(message);
 
-            done();
-        });
-    });
-
-    it('loadNextQuestion should return nextQuestionLoading', (done) => {
-        createGame();
-
-        clientSocket.emit('loadNextQuestion');
-
-        clientSocket.on('nextQuestionLoading', () => {
             done();
         });
     });
@@ -485,5 +472,117 @@ describe('SocketManager service tests', () => {
             expect(updateData).to.deep.equal({});
             done();
         });
+    });
+
+    it('submitScore should update the player score and emit scoreUpdated', (done) => {
+        const score = 50;
+        createGame();
+
+        setTimeout(() => {
+            clientSocket.emit('submitScore', score);
+
+            clientSocket.on('scoreUpdated', (player: Player) => {
+                expect(player.socketId).to.equal(clientSocket.id);
+                expect(service['lobbies'].get(roomPin).players[0].score).to.equal(score);
+                done();
+            });
+        }, RESPONSE_DELAY);
+    });
+
+    it('submitScore without a room should do nothing', (done) => {
+        const score = 30;
+        let scoreSubmitted = false;
+        clientSocket.emit('submitScore', score);
+
+        clientSocket.on('scoreUpdated', () => {
+            scoreSubmitted = true;
+        });
+
+        setTimeout(() => {
+            expect(scoreSubmitted).to.equal(false);
+            done();
+        }, RESPONSE_DELAY);
+    });
+
+    it('submitScore should do nothing if the player is not in the room', (done) => {
+        const score = 30;
+        let scoreSubmitted = false;
+        createGame();
+
+        setTimeout(() => {
+            service['lobbies'].get(roomPin).players.pop();
+            clientSocket.emit('submitScore', score);
+
+            clientSocket.on('scoreUpdated', () => {
+                scoreSubmitted = true;
+            });
+
+            setTimeout(() => {
+                expect(scoreSubmitted).to.equal(false);
+                done();
+            }, RESPONSE_DELAY);
+        }, RESPONSE_DELAY);
+    });
+
+    it('gameEnded should emit showResults', (done) => {
+        createGame();
+
+        setTimeout(() => {
+            clientSocket.emit('gameEnded');
+
+            clientSocket.on('showResults', () => {
+                done();
+            });
+        }, RESPONSE_DELAY);
+    });
+
+    it('updateBonusTimes should update the player bonusTimes and emit latestPlayerList', (done) => {
+        const bonusTimes = 6;
+        createGame();
+
+        setTimeout(() => {
+            clientSocket.emit('updateBonusTimes', bonusTimes);
+
+            clientSocket.on('latestPlayerList', (lobby: LobbyDetails) => {
+                expect(lobby).to.deep.equal(service['lobbies'].get(roomPin));
+                expect(lobby.players[0].bonusTimes).to.equal(bonusTimes);
+                done();
+            });
+        }, RESPONSE_DELAY);
+    });
+
+    it('updateBonusTimes without a room should do nothing', (done) => {
+        const bonusTimes = 3;
+        let playerListReceived = false;
+        clientSocket.emit('updateBonusTimes', bonusTimes);
+
+        clientSocket.on('latestPlayerList', () => {
+            playerListReceived = true;
+        });
+
+        setTimeout(() => {
+            expect(playerListReceived).to.equal(false);
+            done();
+        }, RESPONSE_DELAY);
+    });
+
+    it('updateBonusTimes should do nothing if the player is not in the room', (done) => {
+        const bonusTimes = 3;
+        let playerListReceived = false;
+        createGame();
+
+        setTimeout(() => {
+            service['lobbies'].get(roomPin).players.pop();
+            clientSocket.emit('updateBonusTimes', bonusTimes);
+
+            clientSocket.on('latestPlayerList', () => {
+                playerListReceived = true;
+            });
+
+            setTimeout(() => {
+                expect(playerListReceived).to.equal(false);
+                done();
+            }, RESPONSE_DELAY);
+        }, RESPONSE_DELAY);
     });
 });
