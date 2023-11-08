@@ -9,12 +9,12 @@ import { CreateGamePageComponent } from '@app/pages/create-game-page/create-game
 import { CreationJeuComponent } from '@app/pages/creation-jeu/creation-jeu.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
-import { MainPageComponent } from '@app/pages/main-page/main-page.component';
+import { MainMenuPageComponent } from '@app/pages/main-menu-page/main-menu-page.component';
 import { QuestionsPageComponent } from '@app/pages/questions-page/questions-page.component';
 
 const routes: Routes = [
     { path: '', redirectTo: Route.MainMenu, pathMatch: 'full' },
-    { path: Route.MainMenu, component: MainPageComponent },
+    { path: Route.MainMenu, component: MainMenuPageComponent },
     { path: Route.Lobby, component: LobbyPageComponent, canActivate: [lobbyGuard] },
     { path: Route.GameCreation, component: CreateGamePageComponent },
     { path: Route.InGame, component: GamePageComponent, canActivate: [inGameGuard] },

@@ -17,7 +17,6 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { CreateGamePageComponent } from '@app/pages/create-game-page/create-game-page.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
-import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { ButtonResponseComponent } from './components/button-response/button-response.component';
 import { ChatBoxComponent } from './components/chat-box/chat-box.component';
@@ -29,6 +28,7 @@ import { NameDefinitionComponent } from './components/name-definition/name-defin
 import { PlayerListComponent } from './components/player-list/player-list.component';
 import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
 import { CreationJeuComponent } from './pages/creation-jeu/creation-jeu.component';
+import { MainMenuPageComponent } from './pages/main-menu-page/main-menu-page.component';
 import { QuestionsPageComponent } from './pages/questions-page/questions-page.component';
 
 /**
@@ -42,7 +42,7 @@ import { QuestionsPageComponent } from './pages/questions-page/questions-page.co
         AppComponent,
         AdminJeuPageComponent,
         GamePageComponent,
-        MainPageComponent,
+        MainMenuPageComponent,
         MaterialPageComponent,
         ProgressBarComponent,
         ButtonResponseComponent,
