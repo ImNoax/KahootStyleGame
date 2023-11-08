@@ -10,15 +10,15 @@ import { QuestionCreationPopupComponent } from '@app/components/question-creatio
 import { FormManagerService } from '@app/services/form-manager.service';
 import { Question, QuestionType } from '@common/game';
 import { Observable, of } from 'rxjs';
-import { QCM_COLOR, QRL_COLOR, QuestionsPageComponent } from './questions-page.component';
+import { QCM_COLOR, QRL_COLOR, QuestionCreationPageComponent } from './question-creation-page.component';
 
-describe('QuestionsPageComponent', () => {
-    let component: QuestionsPageComponent;
-    let fixture: ComponentFixture<QuestionsPageComponent>;
+describe('QuestionCreationPageComponent', () => {
+    let component: QuestionCreationPageComponent;
+    let fixture: ComponentFixture<QuestionCreationPageComponent>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [QuestionsPageComponent, HeaderComponent],
+            declarations: [QuestionCreationPageComponent, HeaderComponent],
             imports: [MatDialogModule, HttpClientTestingModule, MatIconModule, RouterModule],
             providers: [
                 FormManagerService,
@@ -34,7 +34,7 @@ describe('QuestionsPageComponent', () => {
                 },
             ],
         });
-        fixture = TestBed.createComponent(QuestionsPageComponent);
+        fixture = TestBed.createComponent(QuestionCreationPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

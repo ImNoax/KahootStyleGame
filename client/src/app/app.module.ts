@@ -28,7 +28,7 @@ import { NameDefinitionComponent } from './components/name-definition/name-defin
 import { PlayerListComponent } from './components/player-list/player-list.component';
 import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
 import { MainMenuPageComponent } from './pages/main-menu-page/main-menu-page.component';
-import { QuestionsPageComponent } from './pages/questions-page/questions-page.component';
+import { QuestionCreationPageComponent } from './pages/question-creation-page/question-creation-page.component';
 import { QuizCreationPageComponent } from './pages/quiz-creation-page/quiz-creation-page.component';
 
 /**
@@ -48,7 +48,7 @@ import { QuizCreationPageComponent } from './pages/quiz-creation-page/quiz-creat
         ButtonResponseComponent,
         QuizCreationPageComponent,
         HeaderComponent,
-        QuestionsPageComponent,
+        QuestionCreationPageComponent,
         CreateGamePageComponent,
         QuestionCreationPopupComponent,
         GameImportPopupComponent,
