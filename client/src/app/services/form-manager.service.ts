@@ -1,7 +1,9 @@
 import { formatDate } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Jeu } from '@common/jeu';
+import { Router } from '@angular/router';
+import { Route } from '@app/enums';
+import { Game } from '@common/game';
 import { Observable } from 'rxjs';
 import { GameHandlingService } from './game-handling.service';
 
@@ -17,13 +19,14 @@ export class FormManagerService {
     constructor(
         private fb: FormBuilder,
         private gameHandler: GameHandlingService,
+        private router: Router,
     ) {}
 
     get questions(): FormArray {
         return this.gameForm.get('questions') as FormArray;
     }
 
-    initializeImportForm(gameData: Jeu): FormGroup {
+    initializeImportForm(gameData: Game): FormGroup {
         return (this.gameForm = this.fb.group({
             id: gameData.id,
             title: gameData.title,
@@ -40,18 +43,25 @@ export class FormManagerService {
         this.nameModif = '';
     }
 
-    sendGameForm(importedGameForm?: FormGroup): void | Observable<Jeu[]> {
-        if (this.nameModif !== '') {
-            this.gameHandler.modifyGame(this.gameForm.value, this.nameModif).subscribe(() => {
-                this.resetGameForm();
-                // location.reload();
-            });
-        } else if (importedGameForm === undefined) {
-            this.gameHandler.addGame(this.gameForm.value).subscribe(() => {
-                this.resetGameForm();
-                // location.reload();
-            });
-        } else return this.gameHandler.addGame(importedGameForm.value);
+    modifyGame(): void {
+        this.gameForm.value.lastModification = formatDate(new Date(), 'yyyy-MM-dd   h:mm:ss a', 'en');
+        this.gameHandler.modifyGame(this.gameForm.value).subscribe(() => {
+            this.resetGameForm();
+            this.router.navigate([Route.Admin]);
+        });
+    }
+
+    addGame(): void {
+        this.gameHandler.addGame(this.gameForm.value).subscribe(() => {
+            this.resetGameForm();
+            this.router.navigate([Route.Admin]);
+        });
+    }
+
+    sendGameForm(importedGameForm?: FormGroup): void | Observable<Game[]> {
+        if (this.nameModif !== '') this.modifyGame();
+        else if (importedGameForm === undefined) this.addGame();
+        else return this.gameHandler.addGame(importedGameForm.value);
     }
 
     hasQuestions(): boolean {
@@ -75,7 +85,7 @@ export class FormManagerService {
             title: ['', Validators.required],
             description: ['', Validators.required],
             duration: [BASE_TIMER, Validators.required],
-            lastModification: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+            lastModification: formatDate(new Date(), 'yyyy-MM-dd   h:mm:ss a', 'en'),
             isVisible: false,
             questions: this.fb.array([]),
         });

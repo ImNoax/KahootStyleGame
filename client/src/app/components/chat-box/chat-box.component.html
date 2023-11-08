@@ -1,0 +1,14 @@
+<div class="chatbox">
+  <div class="messages">
+    <div *ngFor="let message of messages" class="message">
+      <span class="sender">{{ message.sender }}</span>
+      <span class="current-time">{{ message.time | date:'shortTime' }}</span>
+      <div class="content">
+        {{ message.content }}
+      </div>
+    </div>
+  </div>
+  <div class="chat-input-container">
+    <input type="text" placeholder="Écrire un message..." class="chat-input" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" maxlength="200" />
+  </div>
+</div>

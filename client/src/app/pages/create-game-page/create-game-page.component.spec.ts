@@ -1,10 +1,19 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatIconModule } from '@angular/material/icon';
-import { Router } from '@angular/router';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ActivatedRoute, Router, RouterModule, convertToParamMap } from '@angular/router';
+import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
+import { SocketMock } from '@app/classes/socket-mock';
 import { HeaderComponent } from '@app/components/header/header.component';
+import { snackBarErrorConfiguration } from '@app/constants/snack-bar-configuration';
+import { Route } from '@app/enums';
+import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
-import { Jeu } from '@common/jeu';
+import { RouteControllerService } from '@app/services/route-controller.service';
+import { Game } from '@common/game';
+import { GameMode } from '@common/game-mode';
 import { of } from 'rxjs';
 import { CreateGamePageComponent } from './create-game-page.component';
 
@@ -12,35 +21,114 @@ describe('CreateGamePageComponent', () => {
     let component: CreateGamePageComponent;
     let fixture: ComponentFixture<CreateGamePageComponent>;
     let gameHandler: GameHandlingService;
+    let routerMock: jasmine.SpyObj<Router>;
+    let routeControllerServiceMock: jasmine.SpyObj<RouteControllerService>;
+    let socketMock: SocketMock;
+    let clientSocketServiceMock: ClientSocketServiceMock;
+    let nEmittedEvents: number;
+    const gameMock = {
+        id: '1',
+        title: 'Game 1',
+        description: 'Test ',
+        duration: 5,
+        lastModification: '2018-11-13',
+        questions: [],
+    };
 
     beforeEach(() => {
+        routerMock = jasmine.createSpyObj('Router', ['navigate']);
+        routeControllerServiceMock = jasmine.createSpyObj('RouteControllerService', ['setRouteAccess']);
+        clientSocketServiceMock = new ClientSocketServiceMock();
+
         TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule, MatIconModule],
             declarations: [CreateGamePageComponent, HeaderComponent],
-            providers: [GameHandlingService, Router],
+            imports: [HttpClientTestingModule, MatIconModule, MatSnackBarModule, BrowserAnimationsModule, RouterModule],
+            providers: [
+                { provide: Router, useValue: routerMock },
+                { provide: ClientSocketService, useValue: clientSocketServiceMock },
+                { provide: RouteControllerService, useValue: routeControllerServiceMock },
+                {
+                    provide: ActivatedRoute,
+                    useValue: {
+                        queryParams: of(
+                            convertToParamMap({
+                                search: '',
+                            }),
+                        ),
+                    },
+                },
+            ],
         }).compileComponents();
+
         fixture = TestBed.createComponent(CreateGamePageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
         gameHandler = TestBed.inject(GameHandlingService);
+        socketMock = clientSocketServiceMock.socket as unknown as SocketMock;
+        spyOn(socketMock, 'emit').and.callThrough();
+        socketMock.clientUniqueEvents.clear();
+        nEmittedEvents = 0;
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
     });
-    it('ngOnInit should get the list of games', () => {
-        const games: Jeu[] = [];
-        const mockGetGames = spyOn(gameHandler, 'getGames').and.returnValue(of(games));
+
+    it('should get the list of games on component initialization', () => {
+        const games: Game[] = [gameMock];
+        const getGamesSpy = spyOn(gameHandler, 'getGames').and.returnValue(of(games));
 
         component.ngOnInit();
-        expect(mockGetGames).toHaveBeenCalled();
-        expect(component.games).toBeDefined();
+        expect(getGamesSpy).toHaveBeenCalled();
+        expect(component.games).toEqual(games);
+    });
+
+    it('should call setRouteAccess from RouteControllerService and configureBaseSocketFeatures on component initialization', () => {
+        spyOn(component, 'configureBaseSocketFeatures');
+        component.ngOnInit();
+        expect(routeControllerServiceMock.setRouteAccess).toHaveBeenCalledWith(Route.Admin, false);
+        expect(component.configureBaseSocketFeatures).toHaveBeenCalled();
+    });
+
+    it('should remove listeners on component destruction', () => {
+        spyOn(socketMock, 'removeAllListeners');
+        component.ngOnDestroy();
+        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('successfulLobbyCreation');
+        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('failedLobbyCreation');
+    });
+
+    it('should handle successfulLobbyCreation event by calling giveOrganiserPermissions from ClientSocketService and assigning a new pin', () => {
+        const newPin = '1234';
+        const event = 'successfulLobbyCreation';
+        spyOn(clientSocketServiceMock, 'giveOrganiserPermissions');
+        clientSocketServiceMock.pin = '';
+
+        socketMock.simulateServerEmit(event, newPin);
+        expect(clientSocketServiceMock.giveOrganiserPermissions).toHaveBeenCalledOnceWith();
+        expect(clientSocketServiceMock.pin).toEqual(newPin);
+    });
+
+    it('should handle successfulLobbyCreation event by calling setRouteAccess from RouteControllerService and navigating to lobby', () => {
+        const event = 'successfulLobbyCreation';
+
+        socketMock.simulateServerEmit(event);
+        expect(routeControllerServiceMock.setRouteAccess).toHaveBeenCalledWith(Route.Lobby, true);
+        expect(routerMock.navigate).toHaveBeenCalledWith([Route.Lobby]);
+    });
+
+    it('should handle failedLobbyCreation event by opening a snackbar', () => {
+        const event = 'failedLobbyCreation';
+        const reason = 'reason for failed lobby creation';
+
+        spyOn(component.snackBar, 'open');
+        socketMock.simulateServerEmit(event, reason);
+        expect(component.snackBar.open).toHaveBeenCalledWith(reason, '', snackBarErrorConfiguration);
     });
 
     it('selectRow should select a row and set selectedGame', () => {
         const mockGames = [
-            { id: 0, title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
-            { id: 1, title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
+            { id: '0', title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
+            { id: '1', title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
         ];
 
         component.games = mockGames;
@@ -52,7 +140,7 @@ describe('CreateGamePageComponent', () => {
 
     it('selectRow should clear selection when index is null', () => {
         component.selectedRowIndex = 1;
-        component.selectedGame = { id: 2, title: 'Game 3', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] };
+        component.selectedGame = { id: '2', title: 'Game 3', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] };
 
         component.selectRow(null);
 
@@ -60,41 +148,87 @@ describe('CreateGamePageComponent', () => {
         expect(component.selectedGame).toBeNull();
     });
 
-    it('testerJeu should navigate to /game when game is visible and existing', () => {
-        const games = [
-            { id: 0, title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
-            { id: 1, title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: true, questions: [] },
-        ];
-        component.selectedGame = { id: 1, title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: true, questions: [] };
-
-        const mockGetGames = spyOn(gameHandler, 'getGames').and.returnValue(of(games));
-        spyOn(gameHandler, 'setCurrentGameId');
-        const navigateSpy = spyOn(component.router, 'navigate');
-
-        component.testerJeu();
-
-        expect(mockGetGames).toHaveBeenCalled();
-        expect(component.games).toBeDefined();
-
-        expect(gameHandler.setCurrentGameId).toHaveBeenCalledWith(1);
-        expect(navigateSpy).toHaveBeenCalledWith(['/game']);
+    it('should return true when the list is empty', () => {
+        const mockGames: Game[] = [];
+        component.games = mockGames;
+        expect(component.allGamesAreHiddenOrListIsEmpty()).toBeTrue();
     });
 
-    it('testerJeu should show an alert if game is no longer visible', () => {
-        const games = [
-            { id: 0, title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
-            { id: 1, title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
+    it('should return true when all games are hidden', () => {
+        const mockGames = [
+            { id: '0', title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
+            { id: '1', title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
         ];
-        component.selectedGame = { id: 1, title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: true, questions: [] };
+        component.games = mockGames;
+
+        expect(component.allGamesAreHiddenOrListIsEmpty()).toBeTrue();
+    });
+
+    it('should return false when at least one game is visible', () => {
+        const mockGames = [
+            { id: '0', title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
+            { id: '1', title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: true, questions: [] },
+        ];
+        component.games = mockGames;
+
+        expect(component.allGamesAreHiddenOrListIsEmpty()).toBeFalse();
+    });
+
+    it('initializeGame with argument GameMode.Testing should navigate to In-Game page when game is visible and existing', () => {
+        const games = [
+            { id: '0', title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
+            { id: '1', title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: true, questions: [] },
+        ];
+        component.selectedGame = games[1];
 
         const mockGetGames = spyOn(gameHandler, 'getGames').and.returnValue(of(games));
 
-        spyOn(component, 'selectRow');
-        spyOn(window, 'alert');
+        component.initializeGame(GameMode.Testing);
 
-        component.testerJeu();
         expect(mockGetGames).toHaveBeenCalled();
-        expect(component.games).toBeDefined();
+        expect(component.games).toEqual(games);
+        expect(gameHandler.currentGame).toEqual(games[1]);
+        expect(gameHandler.gameMode).toEqual(GameMode.Testing);
+        expect(routeControllerServiceMock.setRouteAccess).toHaveBeenCalledWith(Route.InGame, true);
+        expect(routerMock.navigate).toHaveBeenCalledWith([Route.InGame]);
+    });
+
+    it('initializeGame with argument GameMode.RealGame should emit a createLobby event', () => {
+        const games = [
+            { id: '0', title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
+            { id: '1', title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: true, questions: [] },
+        ];
+        component.selectedGame = games[1];
+
+        spyOn(gameHandler, 'getGames').and.returnValue(of(games));
+
+        component.initializeGame(GameMode.RealGame);
+        expect(gameHandler.currentGame).toEqual(games[1]);
+        expect(gameHandler.gameMode).toEqual(GameMode.RealGame);
+        expect(socketMock.emit).toHaveBeenCalledWith('createLobby', games[1]);
+        expect(socketMock.nEmittedEvents).toEqual(++nEmittedEvents);
+
+        component.initializeGame();
+        expect(gameHandler.currentGame).toEqual(games[1]);
+        expect(gameHandler.gameMode).toEqual(GameMode.RealGame);
+        expect(socketMock.emit).toHaveBeenCalledWith('createLobby', games[1]);
+    });
+
+    it('initializeGame should show an alert if game is no longer visible', () => {
+        const games = [
+            { id: '0', title: 'Game 1', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
+            { id: '1', title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: false, questions: [] },
+        ];
+        component.selectedGame = { id: '1', title: 'Game 2', description: '', duration: 0, lastModification: '', isVisible: true, questions: [] };
+
+        const mockGetGames = spyOn(gameHandler, 'getGames').and.returnValue(of(games));
+
+        spyOn(window, 'alert');
+        spyOn(component, 'selectRow');
+
+        component.initializeGame(GameMode.Testing);
+        expect(mockGetGames).toHaveBeenCalled();
+        expect(component.games).toEqual(games);
 
         expect(window.alert).toHaveBeenCalledWith('Erreur: Jeu Indisponible... Rafraichissement de page.');
         expect(component.selectRow).toHaveBeenCalledWith(null);

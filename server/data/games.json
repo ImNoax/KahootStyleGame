@@ -1,0 +1,301 @@
+[
+    {
+        "id": "fHlQRf",
+        "title": "Quiz sur les chats",
+        "description": "Un quiz sur les chats",
+        "duration": 20,
+        "lastModification": "2023-11-02   10:17:18 AM",
+        "isVisible": true,
+        "questions": [
+            {
+                "text": "Êtes-vous un fan des chats?",
+                "points": 10,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Oui",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Évidemment",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Absolument",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Non",
+                        "isCorrect": false
+                    }
+                ]
+            },
+            {
+                "text": "Quel est l'âge, en équivalent humain, d'un chat de 6 ans ?",
+                "points": 50,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "28 ans",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "40 ans",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "52 ans",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "59 ans",
+                        "isCorrect": false
+                    }
+                ]
+            },
+            {
+                "text": "Dans quel pays est située \"l'île aux chats\" ?",
+                "points": 40,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Grèce",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Indonésie",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Italie",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Japon",
+                        "isCorrect": true
+                    }
+                ]
+            },
+            {
+                "text": "Quelle déesse égyptienne a une tête de chat ?",
+                "points": 20,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Isis",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Maât",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Khepri",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Bastet",
+                        "isCorrect": true
+                    }
+                ]
+            },
+            {
+                "text": "Quel est le nom du chat dans la série Les Simpson ?",
+                "points": 10,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Boule de neige",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Petit papa noël ",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Santa",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Étoile polaire",
+                        "isCorrect": false
+                    }
+                ]
+            },
+            {
+                "text": "D'après le Guinness Book, quel est le poids du chat le plus gros du monde ?",
+                "points": 10,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "21,3 kg",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "26,4 kg",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "31 kg",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "35,2 kg",
+                        "isCorrect": false
+                    }
+                ]
+            },
+            {
+                "text": "Quelle est la durée moyenne de gestation des chats ?",
+                "points": 30,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "4 semaines",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "9 semaines",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "15 semaines",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "22 semaines",
+                        "isCorrect": false
+                    }
+                ]
+            },
+            {
+                "text": "Qu'est-ce qu'un chat anoure ?",
+                "points": 60,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Un chat sans poils",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Un chat sans griffes",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Un chat sans queue",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Un chat castré",
+                        "isCorrect": false
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "c7D8Pu",
+        "title": "Testing Quiz",
+        "description": "Quiz for testing",
+        "duration": 15,
+        "lastModification": "2023-11-04   3:32:31 PM",
+        "isVisible": true,
+        "questions": [
+            {
+                "text": "Question 1 - should be 10 points + 2 points bonus",
+                "points": 10,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Good ",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Bad",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Bad.",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Bad..",
+                        "isCorrect": false
+                    }
+                ]
+            },
+            {
+                "text": "Question 2 - should be 20 points + 4 points bonus",
+                "points": 20,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Bad.",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Good",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Bad..",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Good.",
+                        "isCorrect": true
+                    }
+                ]
+            },
+            {
+                "text": "Question 3 -  should be 30 points + 6 points bonus",
+                "points": 30,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Good",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Bad",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Good.",
+                        "isCorrect": true
+                    }
+                ]
+            },
+            {
+                "text": "Question 4 - should be 40 points + 8 points bonus",
+                "points": 40,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Bad",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Good",
+                        "isCorrect": true
+                    }
+                ]
+            },
+            {
+                "text": "Question 5 -  should be 50 points + 10 points bonus",
+                "points": 50,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Good",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Bad",
+                        "isCorrect": false
+                    }
+                ]
+            }
+        ]
+    }
+]

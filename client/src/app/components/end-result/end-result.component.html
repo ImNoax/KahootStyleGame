@@ -1,0 +1,31 @@
+<div class="table-container">
+    <div>
+        <h1>Vue des résultats</h1>
+    </div>
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nom du joueur</th>
+                    <th>Score</th>
+                    <th>Bonus</th>
+                </tr>
+            </thead>
+            <tbody>
+                <ng-container *ngFor="let player of players">
+                    <tr *ngIf="player.name !== 'Organisateur'">
+                        <td>
+                            <a>{{ player.name }}</a>
+                        </td>
+                        <td>
+                            <a>{{ player.score }}</a>
+                        </td>
+                        <td>
+                            <a>{{ player.bonusTimes }}</a>
+                        </td>
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+    </div>
+</div>

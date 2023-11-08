@@ -4,12 +4,13 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { ActivatedRoute, RouterModule, convertToParamMap } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { QuestionCreationPopupComponent } from '@app/components/question-creation-popup/question-creation-popup.component';
 import { FormManagerService } from '@app/services/form-manager.service';
-import { Question, QuestionType } from '@common/jeu';
-import { Observable } from 'rxjs';
-import { QuestionsPageComponent } from './questions-page.component';
+import { Question, QuestionType } from '@common/game';
+import { Observable, of } from 'rxjs';
+import { QCM_COLOR, QRL_COLOR, QuestionsPageComponent } from './questions-page.component';
 
 describe('QuestionsPageComponent', () => {
     let component: QuestionsPageComponent;
@@ -18,8 +19,20 @@ describe('QuestionsPageComponent', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             declarations: [QuestionsPageComponent, HeaderComponent],
-            imports: [MatDialogModule, HttpClientTestingModule, MatIconModule],
-            providers: [FormManagerService],
+            imports: [MatDialogModule, HttpClientTestingModule, MatIconModule, RouterModule],
+            providers: [
+                FormManagerService,
+                {
+                    provide: ActivatedRoute,
+                    useValue: {
+                        queryParams: of(
+                            convertToParamMap({
+                                search: '',
+                            }),
+                        ),
+                    },
+                },
+            ],
         });
         fixture = TestBed.createComponent(QuestionsPageComponent);
         component = fixture.componentInstance;
@@ -31,8 +44,8 @@ describe('QuestionsPageComponent', () => {
     });
 
     it('setQuestionStyle should return the good color depending of the type of question', () => {
-        const qcmColor = { background: '#78B9DE' };
-        const qrlColor = { background: '#F2BB7B' };
+        const qcmColor = { background: QCM_COLOR };
+        const qrlColor = { background: QRL_COLOR };
         const question: Question = {
             text: '',
             points: 0,

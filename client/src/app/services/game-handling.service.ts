@@ -1,49 +1,61 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Jeu } from '@common/jeu';
+import { Game } from '@common/game';
+import { GameMode } from '@common/game-mode';
 import { Observable, of } from 'rxjs';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-const BONUS_POINTS = 1.2;
+
 @Injectable({
     providedIn: 'root',
 })
 export class GameHandlingService {
-    currentGameId: number = 2;
+    currentGame: Game;
+    gameMode: GameMode = GameMode.RealGame;
     currentQuestionId: number = 0;
     scoreSource = new BehaviorSubject<number>(0);
     score$ = this.scoreSource.asObservable();
     currentQuestionSource = new BehaviorSubject<string>('');
     currentQuestion$ = this.currentQuestionSource.asObservable();
-    private readonly baseUrl: string = environment.serverUrl;
+    private readonly baseUrl: string = environment.serverGamesUrl;
+    private players: { socketId: string; name: string }[] = [];
 
     constructor(private http: HttpClient) {}
 
-    getGames(): Observable<Jeu[]> {
-        return this.http.get<Jeu[]>(`${this.baseUrl}/jeux`).pipe(catchError(this.handleError<Jeu[]>('getGames')));
+    getGames(): Observable<Game[]> {
+        return this.http.get<Game[]>(this.baseUrl).pipe(catchError(this.handleError<Game[]>('getGames')));
     }
 
-    modifyGame(game: Jeu, gameName: string): Observable<Jeu[]> {
-        return this.http.patch<Jeu[]>(`${this.baseUrl}/jeux/${game.id}`, [game, gameName]).pipe(catchError(this.handleError<Jeu[]>('modifyGame')));
+    setPlayers(players: { socketId: string; name: string }[]): void {
+        this.players = players;
     }
 
-    addGame(newGame: Jeu): Observable<Jeu[]> {
-        return this.http.post<Jeu[]>(`${this.baseUrl}/jeux`, newGame).pipe(catchError(this.handleError<Jeu[]>('addGame')));
+    getPlayerNameBySocketId(socketId: string): string {
+        const player = this.players.find((plyer) => plyer.socketId === socketId);
+        return player ? player.name : 'Unknown';
     }
 
-    changeVisibility(game: Jeu): Observable<Jeu[]> {
+    modifyGame(game: Game): Observable<Game[]> {
+        return this.http.patch<Game[]>(`${this.baseUrl}/${game.id}`, game).pipe(catchError(this.handleError<Game[]>('modifyGame')));
+    }
+
+    addGame(newGame: Game): Observable<Game[]> {
+        return this.http.post<Game[]>(this.baseUrl, newGame).pipe(catchError(this.handleError<Game[]>('addGame')));
+    }
+
+    changeVisibility(game: Game): Observable<Game[]> {
         return this.http
-            .patch<Jeu[]>(`${this.baseUrl}/jeux/visibility/${game.id}`, { isVisible: game.isVisible })
-            .pipe(catchError(this.handleError<Jeu[]>('changeVisibility')));
+            .patch<Game[]>(`${this.baseUrl}/visibility/${game.id}`, { isVisible: game.isVisible })
+            .pipe(catchError(this.handleError<Game[]>('changeVisibility')));
     }
 
-    export(id: number) {
-        return this.http.get<Jeu>(`${this.baseUrl}/jeux/${id}`, { responseType: 'json' });
+    export(id: string) {
+        return this.http.get<Game>(`${this.baseUrl}/${id}`, { responseType: 'json' });
     }
 
-    setCurrentGameId(id: number) {
-        this.currentGameId = id;
+    deleteGame(id: string): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(catchError(this.handleError<void>('deleteGame')));
     }
 
     setCurrentQuestion(question: string): void {
@@ -59,21 +71,20 @@ export class GameHandlingService {
     }
 
     incrementScore(amount: number): void {
-        const newScore = this.scoreSource.value + amount * BONUS_POINTS;
+        const newScore = this.scoreSource.value + amount;
         this.scoreSource.next(newScore);
-    }
-
-    deleteGame(id: number): Observable<void> {
-        return this.http.delete<void>(`${this.baseUrl}/jeux/${id}`).pipe(catchError(this.handleError<void>('deleteGame')));
     }
 
     verifyAdminPassword(password: string): Observable<boolean> {
         return this.http
-            .post<{ valid: boolean }>(`${this.baseUrl}/admin/verify-admin-password`, { password })
+            .post<{ valid: boolean }>(`${environment.serverAdminUrl}/verify-admin-password`, { password })
             .pipe(map((response) => response.valid));
     }
 
-    private handleError<T>(request: string, result?: T): (error: Error) => Observable<T> {
-        return () => of(result as T);
+    private handleError<T>(request: string, result?: T): (error: { error: Error }) => Observable<T> {
+        return (error) => {
+            window.alert(error.error.message);
+            return of(result as T);
+        };
     }
 }

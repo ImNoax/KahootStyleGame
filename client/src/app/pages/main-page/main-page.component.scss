@@ -1,7 +1,7 @@
 .container {
     min-height: 100vh;
     height: auto;
-    background-image: url(../../../assets/2.jpg);
+    background-image: url(../../../assets/dark-theater-stage.jpg);
     background-size: cover;
 }
 
@@ -10,6 +10,31 @@
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
+}
+
+div#joining {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: relative;
+}
+
+#pin-input {
+    width: 150px;
+    position: absolute;
+    right: -45%;
+    top: 25%;
+}
+
+#joining > button:valid {
+    background-color: #f75c1e;
+}
+
+.error {
+    padding: 0;
+    width: fit-content;
+    color: red;
+    font-size: 10px;
 }
 
 button {
@@ -68,4 +93,12 @@ button:hover {
 .logo {
     margin-top: 5%;
     width: 32%;
+}
+
+#server-error-message {
+    position: fixed;
+    width: 300px;
+    right: 6%;
+    font-size: 14px;
+    background-color: rgb(black, 0.2);
 }
