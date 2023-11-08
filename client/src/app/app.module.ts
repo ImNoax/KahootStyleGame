@@ -16,7 +16,6 @@ import { AdminJeuPageComponent } from '@app/pages/admin-jeu-page/admin-jeu-page.
 import { AppComponent } from '@app/pages/app/app.component';
 import { GameCreationPageComponent } from '@app/pages/game-creation-page/game-creation-page.component';
 import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
-import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { ButtonResponseComponent } from './components/button-response/button-response.component';
 import { ChatBoxComponent } from './components/chat-box/chat-box.component';
 import { EndResultComponent } from './components/end-result/end-result.component';
@@ -43,7 +42,6 @@ import { QuizCreationPageComponent } from './pages/quiz-creation-page/quiz-creat
         AdminJeuPageComponent,
         InGamePageComponent,
         MainMenuPageComponent,
-        MaterialPageComponent,
         ProgressBarComponent,
         ButtonResponseComponent,
         QuizCreationPageComponent,
