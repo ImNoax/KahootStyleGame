@@ -1,5 +1,5 @@
 .container {
-    background-image: url('../../../assets/theater_podium.jpg');
+    background-image: url('../../../assets/theater-podium.jpg');
     background-size: 100% 100%;
     width: 100%;
     height: 100%;
@@ -16,6 +16,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
+    justify-content: center;
 }
 
 h2 {
@@ -30,7 +32,6 @@ form {
     width: 100%;
     position: relative;
 }
-
 
 .field {
     display: block;
@@ -50,7 +51,6 @@ form {
     margin-bottom: 2%;
     display: flex;
     flex-direction: column;
-
 }
 
 .answer-box {
@@ -88,10 +88,10 @@ form {
         0 5px 5px -3px rgba(0, 0, 0, 0.2),
         0 8px 10px 1px rgba(0, 0, 0, 0.14),
         0 3px 14px 2px rgba(0, 0, 0, 0.12);
-    }
-    
-    .cdk-drag-placeholder {
-        opacity: 40%;
+}
+
+.cdk-drag-placeholder {
+    opacity: 40%;
 }
 
 .cdk-drag-animating {
@@ -124,7 +124,7 @@ form {
 
 #choices input:invalid:not(:focus) {
     border: 1px solid red;
-    background-color: #F8BABA;
+    background-color: #f8baba;
 }
 
 button.answer-creation {
@@ -198,14 +198,13 @@ span {
 }
 
 #save-button:disabled {
-    color: #C0C0C0;
+    color: #c0c0c0;
     background-color: #808080;
 }
 
-.good-choice {
+.choice-error {
     position: absolute;
     right: 2%;
-    bottom: 35%;
 }
 
 p#question-length {
@@ -215,4 +214,3 @@ p#question-length {
     margin: 0;
     text-align: right;
 }
-

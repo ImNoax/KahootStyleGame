@@ -12,12 +12,14 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let game of games; let i = index">
+                <tr *ngFor="let game of games">
                     <td class="logo-container">
-                        <a (click)="modifyGame(game)" routerLink="/creation"><img src="https://cdn-icons-png.flaticon.com/512/814/814236.png" /></a>
+                        <a (click)="modifyGame(game)" [routerLink]="quizCreationRoute">
+                            <img src="https://cdn-icons-png.flaticon.com/512/814/814236.png" />
+                        </a>
                     </td>
                     <td class="logo-container">
-                        <a (click)="exportGame(i)">
+                        <a (click)="exportGame(game.id)">
                             <img src="https://www.freeiconspng.com/thumbs/export-icon/data-export-icon-0.png" />
                         </a>
                     </td>
@@ -45,13 +47,10 @@
             </tbody>
         </table>
     </div>
-    <button mat-raised-button color="primary" class="adminbutton" routerLink="/creation">Ajouter un nouveau jeu</button>
- 
+    <button mat-raised-button color="primary" class="adminbutton" [routerLink]="quizCreationRoute">Ajouter un nouveau jeu</button>
+
     <button mat-raised-button (click)="gameImport.click()" color="primary" class="adminbutton">Importer un nouveau jeu</button>
     <p class="error-empty" *ngIf="isFileEmpty">Fichier vide!</p>
     <p class="error-format" *ngIf="isFormInvalid">Le fichier JSON n'est pas bien formaté!</p>
-    <input #gameImport type="file" accept="application/JSON" (change)="importGame($event)" hidden>
-
-    <br />
-    <button (click)="resetForm()" mat-raised-button color="primary" class="navigation" routerLink="/home">Retourner</button>
+    <input #gameImport type="file" accept="application/JSON" (change)="importGame($event)" hidden />
 </div>

@@ -1,14 +1,33 @@
-<div class="buttons-parent" (keydown)="playerEntries($event)" #buttonFocus tabindex="0" autofocus>
-    <div class="buttons-container">
-        <button *ngFor="let button of buttons" [ngClass]="{
-   'btn-default': !button.selected,
-   'btn-selected': button.selected,
-   'highlight-correct': button.showCorrectButtons,
-   'highlight-wrong': button.showWrongButtons
-}" (click)="onButtonClick(button)" class="btn"
-            [ngClass]="{'highlight-correct': button.showCorrectButtons, 'highlight-wrong': button.showWrongButtons}">
-            {{ button.id }} ){{ button.text }}
-        </button>
+<div *ngIf="!isOrganizer">
+    <div class="buttons-parent" (keydown)="playerEntries($event)" #buttonFocus tabindex="0" autofocus>
+        <div class="buttons-container">
+            <button
+                *ngFor="let button of buttons"
+                [ngClass]="{
+                    'btn-default': !button.selected,
+                    'btn-selected': button.selected,
+                    'highlight-correct': button.showCorrectButtons,
+                    'highlight-wrong': button.showWrongButtons
+                }"
+                (click)="onButtonClick(button)"
+                class="btn"
+                [ngClass]="{ 'highlight-correct': button.showCorrectButtons, 'highlight-wrong': button.showWrongButtons }"
+            >
+                <div id="button-id">{{ button.id }}</div>
+                <div id="button-text">{{ button.text }}</div>
+            </button>
+        </div>
     </div>
+    <button class="validate-btn" (click)="verifyResponsesAndCallUpdate()" [disabled]="submitted">Soumettre</button>
 </div>
-<button class="validate-btn" (click)="verifyResponsesAndCallUpdate()">Soumettre</button>
+<div *ngIf="isOrganizer">
+    <ul>
+        <li *ngFor="let item of buttons" [ngClass]="{ correct: item.isCorrect, incorrect: !item.isCorrect }">
+            <div id="item-id">{{ item.id }}</div>
+            <div id="item-text">{{ item.text }}</div>
+        </li>
+    </ul>
+</div>
+<button mat-raised-button (click)="startNextQuestionCountDown()" [disabled]="!canLoadNextQuestion" *ngIf="isOrganizer">
+    Charger la prochaine question
+</button>

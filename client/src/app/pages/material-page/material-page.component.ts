@@ -1,25 +1,6 @@
 import { Component, TemplateRef, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-
-// TODO : Avoir un fichier séparé pour les constantes!
-export const MATERIAL_PREBUILT_THEMES = [
-    {
-        value: 'indigo-pink-theme',
-        label: 'Indigo & Pink',
-    },
-    {
-        value: 'deeppurple-amber-theme',
-        label: 'Deep Purple & Amber',
-    },
-    {
-        value: 'pink-bluegrey-theme',
-        label: 'Pink & Blue-grey',
-    },
-    {
-        value: 'purple-green-theme',
-        label: 'Purple & Green',
-    },
-];
+import { MATERIAL_PREBUILT_THEMES } from '@app/constants/material-prebuilt-themes';
 
 export const MATERIAL_DEFAULT_PREBUILT_THEME = MATERIAL_PREBUILT_THEMES[0];
 

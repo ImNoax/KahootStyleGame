@@ -1,4 +1,5 @@
-export interface Message {
-    title: string;
-    body: string;
+export interface MessageData {
+    sender: string;
+    content: string;
+    time: string; 
 }

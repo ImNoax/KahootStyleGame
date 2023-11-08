@@ -3,11 +3,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule, convertToParamMap } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
+import { Route } from '@app/enums';
 import { FormManagerService } from '@app/services/form-manager.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
-import { Jeu } from '@common/jeu';
+import { Game } from '@common/game';
 import { of } from 'rxjs';
 import { CreationJeuComponent } from './creation-jeu.component';
 
@@ -18,8 +19,22 @@ describe('CreationJeuComponent', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             declarations: [CreationJeuComponent, HeaderComponent],
-            providers: [GameHandlingService, FormManagerService, Router],
-            imports: [HttpClientTestingModule, ReactiveFormsModule, MatIconModule],
+            providers: [
+                GameHandlingService,
+                FormManagerService,
+                Router,
+                {
+                    provide: ActivatedRoute,
+                    useValue: {
+                        queryParams: of(
+                            convertToParamMap({
+                                search: '',
+                            }),
+                        ),
+                    },
+                },
+            ],
+            imports: [HttpClientTestingModule, ReactiveFormsModule, MatIconModule, RouterModule],
         }).compileComponents();
         fixture = TestBed.createComponent(CreationJeuComponent);
         component = fixture.componentInstance;
@@ -27,7 +42,7 @@ describe('CreationJeuComponent', () => {
     });
 
     it('ngOnInit should get the list of games', () => {
-        const games: Jeu[] = [];
+        const games: Game[] = [];
         const mockGetGames = spyOn(TestBed.inject(GameHandlingService), 'getGames').and.returnValue(of(games));
 
         component.ngOnInit();
@@ -44,7 +59,7 @@ describe('CreationJeuComponent', () => {
         const event = new InputEvent('keyup');
         component.games = new Array();
         component.games.push({
-            id: 0,
+            id: '0',
             title: 'Game 1',
             description: '',
             duration: 0,
@@ -64,13 +79,35 @@ describe('CreationJeuComponent', () => {
         expect(component.isNameEmpty).toBeTrue();
     });
 
-    it('verifyName should change isNameDuplicate if the name already exist', () => {
+    it('verifyName should call if the name is different from nameModif', () => {
         const nameInput = fixture.debugElement.nativeElement.querySelector('#nameField');
         const event = new InputEvent('keyup');
+        component.games = new Array();
 
+        nameInput.value = 'Game 1';
+        nameInput.dispatchEvent(event);
+        const mockVerifyDup = spyOn(component, 'verifyNameDuplicate');
+
+        component.verifyName(event);
+        expect(component.isNameEmpty).toBeFalse();
+        expect(mockVerifyDup).toHaveBeenCalled();
+
+        mockVerifyDup.calls.reset();
+        component.nameModif = 'Game 1';
+        component.verifyName(event);
+        expect(component.isNameEmpty).toBeFalse();
+        expect(mockVerifyDup).not.toHaveBeenCalled();
+
+        nameInput.value = 'Game 2';
+        component.verifyName(event);
+        expect(component.isNameEmpty).toBeFalse();
+        expect(mockVerifyDup).toHaveBeenCalled();
+    });
+
+    it('verifyNameDuplicate should change isNameDuplicate if the name is already existing', () => {
         component.games = new Array();
         component.games.push({
-            id: 0,
+            id: '0',
             title: 'Game 1',
             description: '',
             duration: 0,
@@ -78,27 +115,12 @@ describe('CreationJeuComponent', () => {
             isVisible: false,
             questions: [],
         });
-        nameInput.value = 'Game 1';
-        nameInput.dispatchEvent(event);
 
-        component.verifyName(event);
+        component.verifyNameDuplicate('  Game 1');
         expect(component.isNameDuplicate).toBeTrue();
-        expect(component.isNameEmpty).toBeFalse();
 
-        nameInput.value = 'Game 1   ';
-        component.verifyName(event);
-        expect(component.isNameDuplicate).toBeTrue();
-        expect(component.isNameEmpty).toBeFalse();
-
-        component.nameModif = 'Game 1';
-        component.verifyName(event);
+        component.verifyNameDuplicate('Test');
         expect(component.isNameDuplicate).toBeFalse();
-        expect(component.isNameEmpty).toBeFalse();
-
-        nameInput.value = 'Game 2';
-        component.verifyName(event);
-        expect(component.isNameDuplicate).toBeFalse();
-        expect(component.isNameEmpty).toBeFalse();
     });
 
     it('verifyDesc should change isDescEmpty if the description is empty', () => {
@@ -151,16 +173,8 @@ describe('CreationJeuComponent', () => {
         expect(mockSend).toHaveBeenCalled();
     });
 
-    it('resetForm should call resetGameForm from the form Manager', () => {
-        const mockReset = spyOn(TestBed.inject(FormManagerService), 'resetGameForm');
-
-        component.resetForm();
-
-        expect(mockReset).toHaveBeenCalled();
-    });
-
     it('games should be equal to the games from the GameHandlingService', () => {
-        const response: Jeu[] = [];
+        const response: Game[] = [];
         spyOn(TestBed.inject(GameHandlingService), 'getGames').and.returnValue(of(response));
 
         component.ngOnInit();
@@ -173,5 +187,15 @@ describe('CreationJeuComponent', () => {
         const mockHasQuestions = spyOn(TestBed.inject(FormManagerService), 'hasQuestions').and.returnValue(true);
         component.hasQuestions();
         expect(mockHasQuestions).toHaveBeenCalled();
+    });
+
+    it('accessQuestionCreation should set isAccessingQuestionCreation to true and navigate to question creation page', () => {
+        const router: Router = TestBed.inject(Router);
+        spyOn(router, 'navigate');
+        component.isAccessingQuestionCreation = false;
+
+        component.accessQuestionCreation();
+        expect(component.isAccessingQuestionCreation).toBeTrue();
+        expect(router.navigate).toHaveBeenCalledWith([Route.QuestionCreation]);
     });
 });

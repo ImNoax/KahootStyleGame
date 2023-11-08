@@ -1,13 +1,20 @@
 <div class="container justified">
-    <img src="../../../assets/logo.png" alt="Logo Projet" class="logo" />
+    <img src="./assets/logo.png" alt="Logo Projet" class="logo" />
     <section id="server-message" class="justified">
-        <div class="justified">
-            <button mat-raised-button color="primary" class="button" routerLink="/game" disabled>Joindre une partie</button>
-            <button mat-raised-button color="primary" class="button" routerLink="/create-game">Créer une partie</button>
-            <button mat-raised-button color="primary" class="button" (click)="adminLogin()">Administrer les jeux</button>
-        </div>
+        <form [formGroup]="pinForm" (ngSubmit)="onSubmit()" class="justified">
+            <div id="joining">
+                <button type="submit" mat-raised-button color="primary" [disabled]="pinForm.invalid">Joindre une partie</button>
+                <mat-form-field id="pin-input">
+                    <mat-label>PIN de jeu</mat-label>
+                    <input formControlName="pin" matInput maxlength="4" placeholder="1234" autofocus />
+                    <p class="error" *ngIf="pinContainsNonNumeric()">Entrez un PIN à 4 chiffres</p>
+                </mat-form-field>
+                <p id="server-error-message" class="error">{{ serverErrorMessage }}</p>
+            </div>
+            <button type="button" mat-raised-button color="primary" [routerLink]="gameCreationRoute">Créer une partie</button>
+            <button type="button" mat-raised-button color="primary" (click)="adminLogin()">Administrer les jeux</button>
+        </form>
     </section>
-
 
     <footer class="footer-item">
         <h4 class="team-name">Équipe 106</h4>

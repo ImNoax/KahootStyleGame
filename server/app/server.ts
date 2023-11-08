@@ -2,6 +2,7 @@ import { Application } from '@app/app';
 import * as http from 'http';
 import { AddressInfo } from 'net';
 import { Service } from 'typedi';
+import { SocketManager } from './services/socket-manager.service';
 
 @Service()
 export class Server {
@@ -9,6 +10,7 @@ export class Server {
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     private static readonly baseDix: number = 10;
     private server: http.Server;
+    private socketManager: SocketManager;
 
     constructor(private readonly application: Application) {}
 
@@ -20,6 +22,9 @@ export class Server {
         this.application.app.set('port', Server.appPort);
 
         this.server = http.createServer(this.application.app);
+
+        this.socketManager = new SocketManager(this.server);
+        this.socketManager.handleSockets();
 
         this.server.listen(Server.appPort);
         this.server.on('error', (error: NodeJS.ErrnoException) => this.onError(error));

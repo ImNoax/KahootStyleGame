@@ -6,7 +6,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { Choice, Question, QuestionType } from '@common/jeu';
+import { Choice, Question, QuestionType } from '@common/game';
 // eslint-disable-next-line no-restricted-imports
 import { HeaderComponent } from '../header/header.component';
 import { QuestionCreationPopupComponent } from './question-creation-popup.component';
@@ -35,7 +35,9 @@ describe('QuestionCreationPopupComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('ngOnInit should correctly set the question form when index is defined', () => {
+    it('ngOnInit should call the correct method', () => {
+        const mockCreate = spyOn(component, 'createNewForm');
+        const mockLoad = spyOn(component, 'loadForm').and.returnValue(new FormGroup(0));
         const fb = new FormBuilder();
         const questionFormGroup: FormGroup = fb.group({
             text: 'Test',
@@ -49,6 +51,27 @@ describe('QuestionCreationPopupComponent', () => {
         };
 
         component.ngOnInit();
+        expect(mockLoad).toHaveBeenCalled();
+
+        component.data.index = undefined;
+        component.ngOnInit();
+        expect(mockCreate).toHaveBeenCalled();
+    });
+
+    it('loadForm should correctly set the question form', () => {
+        const fb = new FormBuilder();
+        const questionFormGroup: FormGroup = fb.group({
+            text: 'Test',
+            points: 10,
+            type: QuestionType.QCM,
+            choices: fb.array([{ answer: '123', isCorrect: true }]),
+        });
+        component.data = {
+            index: 0,
+            questionsFormArray: fb.array([questionFormGroup]),
+        };
+
+        component.questionForm = component.loadForm(fb, 0);
 
         expect(component.questionForm.get('text')?.value).toBe('Test');
         expect(component.questionForm.get('points')?.value).toBe(DEFAULT_POINTS);
@@ -56,18 +79,18 @@ describe('QuestionCreationPopupComponent', () => {
         expect(component.questionForm.get('choices')?.value).toEqual([{ answer: '123', isCorrect: true }]);
     });
 
-    it('ngOnInit should correctly set the question form when index is undefined', () => {
+    it('createNewForm should correctly set the question form', () => {
         const fb = new FormBuilder();
         component.data = {
             questionsFormArray: fb.array([]) as FormArray,
         };
-        component.ngOnInit();
+        component.createNewForm(fb);
         expect(component.questionForm.get('text')?.value).toBe('');
         expect(component.questionForm.get('points')?.value).toBe(DEFAULT_POINTS);
         expect(component.questionForm.get('type')?.value).toBe(QuestionType.QCM);
         expect(component.questionForm.get('choices')?.value).toEqual([
-            { answer: '', isCorrect: true },
-            { answer: '', isCorrect: false },
+            { text: '', isCorrect: true },
+            { text: '', isCorrect: false },
         ]);
     });
 
@@ -89,6 +112,17 @@ describe('QuestionCreationPopupComponent', () => {
         component.addChoice(false);
         expect(component.choices.length).toEqual(++nbChoices);
         expect(component.choices.at(nbChoices - 1).value.isCorrect).toBeFalse();
+    });
+
+    it('verifyChoice should change choiceDuplicate if the choice already exist', () => {
+        component.verifyChoice();
+        expect(component.choiceDuplicate).toBeTrue();
+
+        component.choices.value[0].text = 'test1';
+        component.choices.value[1].text = 'test2';
+
+        component.verifyChoice();
+        expect(component.choiceDuplicate).toBeFalse();
     });
 
     it('deleteChoice should remove a choice from the list', () => {
@@ -124,7 +158,7 @@ describe('QuestionCreationPopupComponent', () => {
         component.questionForm.controls['text'].setValue('   ');
         expect(component.isQuestionEmpty()).toBeFalse();
 
-        component.questionForm.controls['text'].markAsTouched();
+        component.questionForm.controls['text'].markAsDirty();
         expect(component.isQuestionEmpty()).toBeTrue();
 
         component.questionForm.controls['text'].setValue('a');
@@ -173,15 +207,15 @@ describe('QuestionCreationPopupComponent', () => {
     });
     it('should reorder choices when dropped', () => {
         const initialChoices: Choice[] = [
-            { answer: 'Choice 1', isCorrect: false },
-            { answer: 'Choice 2', isCorrect: true },
-            { answer: 'Choice 3', isCorrect: false },
+            { text: 'Choice 1', isCorrect: false },
+            { text: 'Choice 2', isCorrect: true },
+            { text: 'Choice 3', isCorrect: false },
         ];
         const formArray = new FormArray(
             initialChoices.map(
                 (choice) =>
                     new FormGroup({
-                        answer: new FormControl(choice.answer),
+                        answer: new FormControl(choice.text),
                         isCorrect: new FormControl(choice.isCorrect),
                     }),
             ),
@@ -205,7 +239,11 @@ describe('QuestionCreationPopupComponent', () => {
             event: new MouseEvent('drop'),
         };
 
+        const temp = formArray.at(event.previousIndex);
+        formArray.removeAt(event.previousIndex);
+        formArray.insert(event.currentIndex, temp);
         component.drop(event);
+
         const finalChoices = component.choices.value;
         expect(finalChoices[0].answer).toEqual('Choice 1');
         expect(finalChoices[1].answer).toEqual('Choice 3');

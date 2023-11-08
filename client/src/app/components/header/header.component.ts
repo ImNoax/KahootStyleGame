@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { FormManagerService } from '@app/services/form-manager.service';
+import { Route } from '@app/enums';
 
 @Component({
     selector: 'app-header',
@@ -8,10 +8,5 @@ import { FormManagerService } from '@app/services/form-manager.service';
 })
 export class HeaderComponent {
     @Input() title: string = '';
-
-    constructor(private formManager: FormManagerService) {}
-
-    resetForm() {
-        this.formManager.resetGameForm();
-    }
+    mainMenuRoute: string = '/' + Route.MainMenu;
 }

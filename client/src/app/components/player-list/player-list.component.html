@@ -1,0 +1,19 @@
+<table>
+    <thead>
+        <tr>
+            <th>Nom du Joueur</th>
+            <th>Score</th>
+        </tr>
+    </thead>
+    <tbody>
+        <ng-container *ngFor="let player of players">
+            <tr *ngIf="player.name !== 'Organisateur'">
+                <td>
+                    <span class="strikethrough" *ngIf="!player.isStillInGame">{{ player.name }}</span>
+                    <span *ngIf="player.isStillInGame">{{ player.name }}</span>
+                </td>
+                <td>{{ player.score }}</td>
+            </tr>
+        </ng-container>
+    </tbody>
+</table>

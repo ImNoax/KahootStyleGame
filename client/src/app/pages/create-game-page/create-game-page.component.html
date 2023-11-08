@@ -2,7 +2,7 @@
     <app-header title="Création d'une partie"></app-header>
     <div class="fields">
         <div class="table-container">
-            <table>
+            <table *ngIf="!allGamesAreHiddenOrListIsEmpty(); else emptyList">
                 <thead>
                     <tr>
                         <th>Liste de jeux</th>
@@ -12,6 +12,9 @@
                     <td *ngIf="game.isVisible === true" [class.selected-game]="game.id === selectedGame?.id">{{ game.title }}</td>
                 </tr>
             </table>
+            <ng-template #emptyList>
+                <div class="empty-list">Aucun jeu n'est disponible pour le moment</div>
+            </ng-template>
         </div>
         <div class="game-block">
             <div *ngIf="selectedRowIndex !== null">
@@ -41,13 +44,11 @@
                     </div>
 
                     <div>
-                        <button class="bott" (click)="testerJeu()">Tester le jeu</button>
-                        <button class="bott" routerLink="/waiting">Créer une partie</button>
+                        <button class="bott" (click)="initializeGame(testing)">Tester le jeu</button>
+                        <button class="bott" (click)="initializeGame()">Créer une partie</button>
                     </div>
                 </div>
             </div>
         </div>
-
-        <button class="navigation" mat-raised-button color="primary" routerLink="/home">Retourner</button>
     </div>
 </div>

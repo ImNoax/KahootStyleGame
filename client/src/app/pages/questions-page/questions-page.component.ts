@@ -3,10 +3,14 @@ import { Component } from '@angular/core';
 import { FormArray, FormGroup } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { QuestionCreationPopupComponent } from '@app/components/question-creation-popup/question-creation-popup.component';
-import { Limits } from '@app/enums';
+import { Route } from '@app/enums';
 import { FormManagerService } from '@app/services/form-manager.service';
-import { Question } from '@common/jeu';
+import { Question, QuestionType } from '@common/game';
+import { Limit } from '@common/limit';
 import * as _ from 'lodash';
+
+export const QCM_COLOR = '#3F51B5';
+export const QRL_COLOR = '#F2BB7B';
 
 @Component({
     selector: 'app-questions-page',
@@ -14,6 +18,8 @@ import * as _ from 'lodash';
     styleUrls: ['./questions-page.component.scss'],
 })
 export class QuestionsPageComponent {
+    quizCreationRoute: string = '/' + Route.QuizCreation;
+    isAccessingQuizCreation: boolean = false;
     pageTitle: string = 'Liste des questions';
     gameName: string = this.formManager.gameForm.value.title;
     gameNameUnavailable: string = 'À déterminer';
@@ -25,18 +31,12 @@ export class QuestionsPageComponent {
     ) {}
 
     setQuestionStyle(question: Question) {
-        if (question.type === 'QCM') return { background: '#78B9DE' };
-        return { background: '#F2BB7B' };
+        if (question.type === QuestionType.QCM) return { background: QCM_COLOR };
+        return { background: QRL_COLOR };
     }
 
     drop(event: CdkDragDrop<Question[]>): void {
         moveItemInArray(this.questionsFormArray.controls, event.previousIndex, event.currentIndex);
-        const questions: Question[] = this.questionsFormArray.value;
-
-        // Sources: https://stackoverflow.com/questions/49273499/angular-formarray-contents-order
-        // www.freecodecamp.org/news/swap-two-array-elements-in-javascript/
-        [questions[event.previousIndex], questions[event.currentIndex]] = [questions[event.currentIndex], questions[event.previousIndex]];
-        this.questionsFormArray.setValue(questions);
     }
 
     openQuestionCreator(index?: number): void {
@@ -64,11 +64,11 @@ export class QuestionsPageComponent {
         this.questionsFormArray.removeAt(index);
     }
 
-    saveQuestions() {
+    saveQuestions(): void {
         this.formManager.saveQuestions(this.questionsFormArray);
     }
 
-    isEmpty() {
-        return this.questionsFormArray.length < Limits.MinQuestionsNumber;
+    isEmpty(): boolean {
+        return this.questionsFormArray.length < Limit.MinQuestionsNumber;
     }
 }

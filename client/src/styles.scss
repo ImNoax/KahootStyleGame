@@ -25,10 +25,6 @@ $indigo-pink-theme: mat.define-light-theme(
 @include mat.all-component-themes($indigo-pink-theme);
 @include material-page.theme($indigo-pink-theme);
 
-.indigo-pink-theme {
-    // Nothing to do. This is the default theme
-}
-
 .deeppurple-amber-theme {
     $deeppurple-amber-theme: mat.define-light-theme(
         (
@@ -84,7 +80,21 @@ body {
     opacity: 0.8 !important;
 }
 
-.backdropBackground {
-    background-color: black;
-    opacity: 0.8 !important;
+// En commentaire au cas où on décide de les changer plus tard
+// .mat-mdc-snack-bar-container {
+//     &.snack-bar-normal {
+//         // --mdc-snackbar-container-color: ;
+//         // --mdc-snackbar-supporting-text-color:  !important;
+//     }
+// }
+
+.mat-mdc-snack-bar-container {
+    &.snack-bar-error {
+        --mdc-snackbar-container-color: rgb(222, 44, 44);
+        // --mdc-snackbar-supporting-text-color:  !important;
+        button {
+            background: white;
+            // color: blue !important;
+        }
+    }
 }

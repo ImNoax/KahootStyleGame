@@ -1,0 +1,36 @@
+.table-container {
+    justify-content: center;
+    align-items: center;
+}
+
+table {
+    border-collapse: collapse;
+    background-color: #f9c2e3;
+    margin: auto;
+}
+
+th,
+td {
+    border: 1px solid #8d3987;
+    padding: 8px;
+    text-align: left;
+    font-size: 0.9em;
+    word-break: break-word;
+}
+
+th {
+    background-color: #8d3987;
+    color: #fff;
+}
+
+tr:nth-child(even) {
+    background-color: #390523;
+}
+
+tr:nth-child(odd) {
+    background-color: #4c0852;
+}
+
+h1 {
+    color: solid white;
+}
