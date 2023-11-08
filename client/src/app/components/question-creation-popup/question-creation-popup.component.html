@@ -6,7 +6,15 @@
             <div>
                 <mat-form-field class="field question-field">
                     <mat-label>Texte de la question</mat-label>
-                    <textarea (keydown.enter)="$event.preventDefault()" matInput [maxlength]="maxQuestionLength" formControlName="text" placeholder="Question..." autofocus rows="5">
+                    <textarea
+                        (keydown.enter)="$event.preventDefault()"
+                        matInput
+                        [maxlength]="maxQuestionLength"
+                        formControlName="text"
+                        placeholder="Question..."
+                        autofocus
+                        rows="5"
+                    >
                     </textarea>
                     <span class="error" *ngIf="isQuestionEmpty()">Le texte est vide.</span>
                 </mat-form-field>

@@ -4,6 +4,10 @@
     position: relative;
 }
 
+.container {
+    position: relative;
+}
+
 .fields {
     background-color: transparent;
     margin-top: 3%;
@@ -69,9 +73,11 @@ td {
 td {
     border-bottom: 1px solid black;
     background-color: #ffffff;
+    background-color: #ffffff;
 }
 
 th {
+    border: 2px solid black;
     border: 2px solid black;
     background-color: #534e4e;
     text-align: center;
