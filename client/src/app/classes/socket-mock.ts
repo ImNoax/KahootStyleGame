@@ -1,10 +1,10 @@
 type CallbackSignature = (...params: (string | number | object | boolean)[]) => void;
 type Event = string;
-type Payload = string | number | object | boolean | undefined;
+type Param = string | number | object | boolean;
 
 export class SocketMock {
     serverEvents = new Map<Event, CallbackSignature[]>();
-    clientUniqueEvents = new Map<Event, Payload>();
+    clientUniqueEvents = new Map<Event, Param>();
 
     get nEmittedEvents() {
         return this.clientUniqueEvents.size;
@@ -15,16 +15,20 @@ export class SocketMock {
         this.serverEvents.get(event)?.push(callback);
     }
 
-    emit(event: string, payload?: Payload): void {
-        if (!this.clientUniqueEvents.has(event)) this.clientUniqueEvents.set(event, payload);
+    emit(event: string, ...params: Param[]): void {
+        if (!this.clientUniqueEvents.has(event)) this.clientUniqueEvents.set(event, params);
     }
 
-    simulateServerEmit(event: string, ...params: (string | number | object | boolean)[]) {
+    simulateServerEmit(event: string, ...params: Param[]): void {
         const eventCallbacks = this.serverEvents.get(event);
         if (eventCallbacks) {
             for (const callback of eventCallbacks) {
                 callback(...params);
             }
         }
+    }
+
+    removeAllListeners(event: string): void {
+        this.serverEvents.delete(event);
     }
 }

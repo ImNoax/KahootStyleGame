@@ -1,50 +1,37 @@
-// import { TestBed } from '@angular/core/testing';
-// import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
+import { TestBed } from '@angular/core/testing';
+import { ActivatedRouteSnapshot, CanActivateFn, RouterStateSnapshot } from '@angular/router';
+import { Route } from '@app/enums';
+import { RouteControllerService } from '@app/services/route-controller.service';
+import { lobbyGuard } from './lobby.guard';
 
-// import { Route } from '@app/enums';
-// import { ClientSocketService } from '@app/services/client-socket.service';
-// import { lobbyGuard } from './lobby.guard';
+describe('lobbyGuard', () => {
+    const executeGuard: CanActivateFn = async (...guardParameters) =>
+        TestBed.runInInjectionContext(async () => lobbyGuard(...guardParameters) as Promise<boolean>);
+    let routerControllerServiceMock: jasmine.SpyObj<RouteControllerService>;
+    let route: ActivatedRouteSnapshot;
+    let state: RouterStateSnapshot;
 
-// class ClientSocketServiceMock {
-//     canAccessLobby = false;
-// }
+    beforeEach(() => {
+        routerControllerServiceMock = jasmine.createSpyObj('RouteControllerService', ['isRouteAccessible']);
 
-// describe('lobbyGuard', () => {
-//     const executeGuard: CanActivateFn = async (...guardParameters) =>
-//         TestBed.runInInjectionContext(async () => lobbyGuard(...guardParameters) as Promise<boolean>);
-//     let routerMock: jasmine.SpyObj<Router>;
-//     let clientSocketServiceMock: ClientSocketServiceMock;
-//     let route: ActivatedRouteSnapshot;
-//     let state: RouterStateSnapshot;
+        TestBed.configureTestingModule({
+            providers: [
+                { provide: RouteControllerService, useValue: routerControllerServiceMock },
+                { provide: ActivatedRouteSnapshot, useValue: {} },
+                { provide: RouterStateSnapshot, useValue: {} },
+            ],
+        });
+    });
 
-//     beforeEach(() => {
-//         routerMock = jasmine.createSpyObj('Router', ['navigate']);
-//         clientSocketServiceMock = new ClientSocketServiceMock();
+    it('should return true if isRouteAccessible(Route.Lobby) returns true', async () => {
+        routerControllerServiceMock.isRouteAccessible.and.returnValue(true);
 
-//         TestBed.configureTestingModule({
-//             providers: [
-//                 { provide: Router, useValue: routerMock },
-//                 { provide: ClientSocketService, useValue: clientSocketServiceMock },
-//                 { provide: ActivatedRouteSnapshot, useValue: {} },
-//                 { provide: RouterStateSnapshot, useValue: {} },
-//             ],
-//         });
-//     });
+        expect(await executeGuard(route, state)).toBeTrue();
+        expect(routerControllerServiceMock.isRouteAccessible).toHaveBeenCalledWith(Route.Lobby);
+    });
 
-//     it('should be created', () => {
-//         expect(executeGuard).toBeTruthy();
-//     });
-
-//     it('should prevent access to the waiting view if canAccessLobby is false', async () => {
-//         const isAccessGranted = await executeGuard(route, state);
-//         clientSocketServiceMock.canAccessLobby = false;
-//         expect(isAccessGranted).toBeFalse();
-//         expect(routerMock.navigate).toHaveBeenCalledWith([Route.MainMenu]);
-//     });
-
-//     it('should allow access to the waiting view if canAccessLobby is true', async () => {
-//         clientSocketServiceMock.canAccessLobby = true;
-//         const isAccessGranted = await executeGuard(route, state);
-//         expect(isAccessGranted).toBeTrue();
-//     });
-// });
+    it('should return false if isRouteAccessible(Route.Lobby) returns false', async () => {
+        routerControllerServiceMock.isRouteAccessible.and.returnValue(false);
+        expect(await executeGuard(route, state)).toBeFalse();
+    });
+});

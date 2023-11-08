@@ -35,7 +35,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         private router: Router,
     ) {}
 
-    get isOrganiser() {
+    get isOrganizer() {
         return this.clientSocket.isOrganizer;
     }
 
@@ -96,15 +96,15 @@ export class GamePageComponent implements OnInit, OnDestroy {
         this.routeController.setRouteAccess(Route.InGame, false);
     }
 
+    onUpdateQuestionScore(score: number) {
+        this.currentQuestionScore = score;
+    }
+
     leaveGame(): void {
         if (this.gameService.gameMode === GameMode.Testing) {
             this.router.navigate([Route.GameCreation]);
             return;
         }
         this.router.navigate([Route.MainMenu]);
-    }
-
-    onUpdateQuestionScore(score: number) {
-        this.currentQuestionScore = score;
     }
 }

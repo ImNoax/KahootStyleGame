@@ -1,4 +1,4 @@
-<div *ngIf="!isOrganiser">
+<div *ngIf="!isOrganizer">
     <div class="buttons-parent" (keydown)="playerEntries($event)" #buttonFocus tabindex="0" autofocus>
         <div class="buttons-container">
             <button
@@ -20,7 +20,7 @@
     </div>
     <button class="validate-btn" (click)="verifyResponsesAndCallUpdate()" [disabled]="submitted">Soumettre</button>
 </div>
-<div *ngIf="isOrganiser">
+<div *ngIf="isOrganizer">
     <ul>
         <li *ngFor="let item of buttons" [ngClass]="{ correct: item.isCorrect, incorrect: !item.isCorrect }">
             <div id="item-id">{{ item.id }}</div>
@@ -28,6 +28,6 @@
         </li>
     </ul>
 </div>
-<button mat-raised-button (click)="startNextQuestionCountDown()" [disabled]="!canLoadNextQuestion" *ngIf="isOrganiser">
+<button mat-raised-button (click)="startNextQuestionCountDown()" [disabled]="!canLoadNextQuestion" *ngIf="isOrganizer">
     Charger la prochaine question
 </button>

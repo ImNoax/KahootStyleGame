@@ -3,8 +3,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule, convertToParamMap } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
+import { Route } from '@app/enums';
 import { FormManagerService } from '@app/services/form-manager.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { Game } from '@common/game';
@@ -18,8 +19,22 @@ describe('CreationJeuComponent', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             declarations: [CreationJeuComponent, HeaderComponent],
-            providers: [GameHandlingService, FormManagerService, Router],
-            imports: [HttpClientTestingModule, ReactiveFormsModule, MatIconModule],
+            providers: [
+                GameHandlingService,
+                FormManagerService,
+                Router,
+                {
+                    provide: ActivatedRoute,
+                    useValue: {
+                        queryParams: of(
+                            convertToParamMap({
+                                search: '',
+                            }),
+                        ),
+                    },
+                },
+            ],
+            imports: [HttpClientTestingModule, ReactiveFormsModule, MatIconModule, RouterModule],
         }).compileComponents();
         fixture = TestBed.createComponent(CreationJeuComponent);
         component = fixture.componentInstance;
@@ -172,5 +187,15 @@ describe('CreationJeuComponent', () => {
         const mockHasQuestions = spyOn(TestBed.inject(FormManagerService), 'hasQuestions').and.returnValue(true);
         component.hasQuestions();
         expect(mockHasQuestions).toHaveBeenCalled();
+    });
+
+    it('accessQuestionCreation should set isAccessingQuestionCreation to true and navigate to question creation page', () => {
+        const router: Router = TestBed.inject(Router);
+        spyOn(router, 'navigate');
+        component.isAccessingQuestionCreation = false;
+
+        component.accessQuestionCreation();
+        expect(component.isAccessingQuestionCreation).toBeTrue();
+        expect(router.navigate).toHaveBeenCalledWith([Route.QuestionCreation]);
     });
 });

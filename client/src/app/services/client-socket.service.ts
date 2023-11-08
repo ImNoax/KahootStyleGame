@@ -1,7 +1,7 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { serverErrorMessage, snackBarErrorConfiguration } from '@app/constants/snack-bar-configuration';
+import { snackBarErrorConfiguration } from '@app/constants/snack-bar-configuration';
 import { Route } from '@app/enums';
 import { Pin } from '@common/lobby';
 import { MessageData } from '@common/message';
@@ -19,9 +19,11 @@ export class ClientSocketService {
     pin: Pin = '';
     histogramData: BehaviorSubject<{ [key: string]: number }> = new BehaviorSubject({});
     histogramData$: Observable<{ [key: string]: number }> = this.histogramData.asObservable();
-    private snackBar: MatSnackBar = inject(MatSnackBar);
 
-    constructor(private router: Router) {}
+    constructor(
+        private router: Router,
+        private snackBar: MatSnackBar,
+    ) {}
 
     isSocketAlive(): boolean {
         return this.socket && this.socket.connected;
@@ -30,12 +32,6 @@ export class ClientSocketService {
     connect(): void {
         if (!this.isSocketAlive()) {
             this.socket = io(environment.serverBaseUrl, { transports: ['websocket'], upgrade: false });
-
-            this.socket.on('disconnect', () => {
-                this.snackBar.open(serverErrorMessage, '', snackBarErrorConfiguration);
-                this.router.navigate([Route.MainMenu]);
-            });
-
             this.listenForGameClosureByOrganiser();
         }
     }

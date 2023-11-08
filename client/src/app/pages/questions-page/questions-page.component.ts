@@ -1,14 +1,16 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormArray, FormGroup } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { QuestionCreationPopupComponent } from '@app/components/question-creation-popup/question-creation-popup.component';
 import { Route } from '@app/enums';
 import { FormManagerService } from '@app/services/form-manager.service';
-import { RouteControllerService } from '@app/services/route-controller.service';
-import { Question } from '@common/game';
+import { Question, QuestionType } from '@common/game';
 import { Limit } from '@common/limit';
 import * as _ from 'lodash';
+
+export const QCM_COLOR = '#3F51B5';
+export const QRL_COLOR = '#F2BB7B';
 
 @Component({
     selector: 'app-questions-page',
@@ -22,7 +24,6 @@ export class QuestionsPageComponent {
     gameName: string = this.formManager.gameForm.value.title;
     gameNameUnavailable: string = 'À déterminer';
     questionsFormArray: FormArray = _.cloneDeep(this.formManager.questions) as FormArray;
-    routeController: RouteControllerService = inject(RouteControllerService);
 
     constructor(
         private dialog: MatDialog,
@@ -30,8 +31,8 @@ export class QuestionsPageComponent {
     ) {}
 
     setQuestionStyle(question: Question) {
-        if (question.type === 'QCM') return { background: '#3F51B5' };
-        return { background: '#F2BB7B' };
+        if (question.type === QuestionType.QCM) return { background: QCM_COLOR };
+        return { background: QRL_COLOR };
     }
 
     drop(event: CdkDragDrop<Question[]>): void {

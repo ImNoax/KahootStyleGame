@@ -5,5 +5,5 @@ import { RouteControllerService } from '@app/services/route-controller.service';
 
 export const adminGuard: CanActivateFn = () => {
     const routeController: RouteControllerService = inject(RouteControllerService);
-    return routeController.guardRoute(Route.Admin);
+    return routeController.isRouteAccessible(Route.Admin);
 };

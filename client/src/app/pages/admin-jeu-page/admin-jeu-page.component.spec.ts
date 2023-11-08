@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule, convertToParamMap } from '@angular/router';
 import { GameImportPopupComponent } from '@app/components/game-import-popup/game-import-popup.component';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { FormManagerService } from '@app/services/form-manager.service';
@@ -38,9 +38,24 @@ describe('AdminJeuPageComponent', () => {
     beforeEach(async () => {
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
         await TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule, MatIconModule, MatDialogModule],
+            imports: [HttpClientTestingModule, MatIconModule, MatDialogModule, RouterModule],
             declarations: [AdminJeuPageComponent, HeaderComponent],
-            providers: [GameHandlingService, FormManagerService, { provide: Router, useValue: mockRouter }, FormBuilder],
+            providers: [
+                GameHandlingService,
+                FormManagerService,
+                { provide: Router, useValue: mockRouter },
+                FormBuilder,
+                {
+                    provide: ActivatedRoute,
+                    useValue: {
+                        queryParams: of(
+                            convertToParamMap({
+                                search: '',
+                            }),
+                        ),
+                    },
+                },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(AdminJeuPageComponent);

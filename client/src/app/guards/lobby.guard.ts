@@ -5,5 +5,5 @@ import { RouteControllerService } from '@app/services/route-controller.service';
 
 export const lobbyGuard: CanActivateFn = () => {
     const routeController: RouteControllerService = inject(RouteControllerService);
-    return routeController.guardRoute(Route.Lobby);
+    return routeController.isRouteAccessible(Route.Lobby);
 };

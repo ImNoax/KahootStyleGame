@@ -54,6 +54,10 @@ export class GameHandlingService {
         return this.http.get<Game>(`${this.baseUrl}/${id}`, { responseType: 'json' });
     }
 
+    deleteGame(id: string): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(catchError(this.handleError<void>('deleteGame')));
+    }
+
     setCurrentQuestion(question: string): void {
         this.currentQuestionSource.next(question);
     }
@@ -69,10 +73,6 @@ export class GameHandlingService {
     incrementScore(amount: number): void {
         const newScore = this.scoreSource.value + amount;
         this.scoreSource.next(newScore);
-    }
-
-    deleteGame(id: string): Observable<void> {
-        return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(catchError(this.handleError<void>('deleteGame')));
     }
 
     verifyAdminPassword(password: string): Observable<boolean> {

@@ -17,7 +17,7 @@ describe('NameDefinitionComponent', () => {
     let nEmittedEvents: number;
 
     beforeEach(() => {
-        clientSocketServiceMock = new ClientSocketServiceMock(jasmine.createSpyObj('Router', ['']));
+        clientSocketServiceMock = new ClientSocketServiceMock();
 
         TestBed.configureTestingModule({
             declarations: [NameDefinitionComponent],
@@ -30,6 +30,7 @@ describe('NameDefinitionComponent', () => {
         fixture.detectChanges();
         socketMock = clientSocketServiceMock.socket as unknown as SocketMock;
         spyOn(socketMock, 'emit').and.callThrough();
+        spyOn(socketMock, 'removeAllListeners');
         socketMock.clientUniqueEvents.clear();
         nEmittedEvents = 0;
     });
@@ -38,18 +39,24 @@ describe('NameDefinitionComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    // it('should handle validName event by receiving the player name', () => {
-    //     const event = 'validName';
-    //     const name = 'player1';
+    it('ngOnDestroy should call removeAllListeners', () => {
+        component.ngOnDestroy();
 
-    //     expect(clientSocketServiceMock.isNameDefined).toBeFalse();
-    //     expect(clientSocketServiceMock.playerName).toBe('');
+        expect(socketMock.removeAllListeners).toHaveBeenCalledTimes(2);
+        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('validName');
+        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('invalidName');
+    });
 
-    //     socketMock.simulateServerEmit(event, name);
+    it('should handle validName event by receiving the player name', () => {
+        const event = 'validName';
+        const name = 'player1';
 
-    //     expect(clientSocketServiceMock.isNameDefined).toBeTrue();
-    //     expect(clientSocketServiceMock.playerName).toBe(name);
-    // });
+        expect(clientSocketServiceMock.playerName).toBe('');
+
+        socketMock.simulateServerEmit(event, name);
+
+        expect(clientSocketServiceMock.playerName).toBe(name);
+    });
 
     it('should handle invalidName event by receiving an error message from the server', () => {
         const event = 'invalidName';
