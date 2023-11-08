@@ -89,7 +89,7 @@ describe('MainPageComponent', () => {
         expect(window.alert).toHaveBeenCalledWith('Une erreur est survenue');
     }));
 
-    it("should handle 'successfulLobbyConnection' event by navigating to the waiting view", () => {
+    it("should handle 'successfulLobbyConnection' event by navigating to the lobby", () => {
         const game: Game = {
             id: '123',
             title: 'testGame',

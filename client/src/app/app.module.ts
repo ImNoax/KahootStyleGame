@@ -16,9 +16,9 @@ import { AdminJeuPageComponent } from '@app/pages/admin-jeu-page/admin-jeu-page.
 import { AppComponent } from '@app/pages/app/app.component';
 import { CreateGamePageComponent } from '@app/pages/create-game-page/create-game-page.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
+import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
-import { WaitingViewPageComponent } from '@app/pages/waiting-view-page/waiting-view-page.component';
 import { ButtonResponseComponent } from './components/button-response/button-response.component';
 import { ChatBoxComponent } from './components/chat-box/chat-box.component';
 import { EndResultComponent } from './components/end-result/end-result.component';
@@ -52,7 +52,7 @@ import { QuestionsPageComponent } from './pages/questions-page/questions-page.co
         CreateGamePageComponent,
         QuestionCreationPopupComponent,
         GameImportPopupComponent,
-        WaitingViewPageComponent,
+        LobbyPageComponent,
         NameDefinitionComponent,
         ChatBoxComponent,
         EndResultComponent,

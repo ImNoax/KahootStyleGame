@@ -12,11 +12,11 @@ import { LobbyDetails, Pin, SocketId } from '@common/lobby';
 const GAME_START_INITIAL_COUNT = 5;
 
 @Component({
-    selector: 'app-waiting-view-page',
-    templateUrl: './waiting-view-page.component.html',
-    styleUrls: ['./waiting-view-page.component.scss'],
+    selector: 'app-lobby-page',
+    templateUrl: './lobby-page.component.html',
+    styleUrls: ['./lobby-page.component.scss'],
 })
-export class WaitingViewPageComponent implements OnInit, OnDestroy {
+export class LobbyPageComponent implements OnInit, OnDestroy {
     players: { socketId: SocketId; name: string }[] = [];
     isLocked: boolean = false;
     gameStarted: boolean = false;
