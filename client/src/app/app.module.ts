@@ -27,9 +27,9 @@ import { HistogramComponent } from './components/histogram/histogram.component';
 import { NameDefinitionComponent } from './components/name-definition/name-definition.component';
 import { PlayerListComponent } from './components/player-list/player-list.component';
 import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
-import { CreationJeuComponent } from './pages/creation-jeu/creation-jeu.component';
 import { MainMenuPageComponent } from './pages/main-menu-page/main-menu-page.component';
 import { QuestionsPageComponent } from './pages/questions-page/questions-page.component';
+import { QuizCreationPageComponent } from './pages/quiz-creation-page/quiz-creation-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -46,7 +46,7 @@ import { QuestionsPageComponent } from './pages/questions-page/questions-page.co
         MaterialPageComponent,
         ProgressBarComponent,
         ButtonResponseComponent,
-        CreationJeuComponent,
+        QuizCreationPageComponent,
         HeaderComponent,
         QuestionsPageComponent,
         CreateGamePageComponent,

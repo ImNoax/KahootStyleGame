@@ -6,11 +6,11 @@ import { inGameGuard } from '@app/guards/in-game.guard';
 import { lobbyGuard } from '@app/guards/lobby.guard';
 import { AdminJeuPageComponent } from '@app/pages/admin-jeu-page/admin-jeu-page.component';
 import { CreateGamePageComponent } from '@app/pages/create-game-page/create-game-page.component';
-import { CreationJeuComponent } from '@app/pages/creation-jeu/creation-jeu.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
 import { MainMenuPageComponent } from '@app/pages/main-menu-page/main-menu-page.component';
 import { QuestionsPageComponent } from '@app/pages/questions-page/questions-page.component';
+import { QuizCreationPageComponent } from '@app/pages/quiz-creation-page/quiz-creation-page.component';
 
 const routes: Routes = [
     { path: '', redirectTo: Route.MainMenu, pathMatch: 'full' },
@@ -19,7 +19,7 @@ const routes: Routes = [
     { path: Route.GameCreation, component: CreateGamePageComponent },
     { path: Route.InGame, component: GamePageComponent, canActivate: [inGameGuard] },
     { path: Route.Admin, component: AdminJeuPageComponent, canActivate: [adminGuard] },
-    { path: Route.QuizCreation, component: CreationJeuComponent, canActivate: [adminGuard] },
+    { path: Route.QuizCreation, component: QuizCreationPageComponent, canActivate: [adminGuard] },
     { path: Route.QuestionCreation, component: QuestionsPageComponent, canActivate: [adminGuard] },
     { path: '**', redirectTo: Route.MainMenu },
 ];
