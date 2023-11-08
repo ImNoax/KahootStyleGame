@@ -8,7 +8,6 @@ import { GameHandlingService } from '@app/services/game-handling.service';
 import { RouteControllerService } from '@app/services/route-controller.service';
 import { TimerService } from '@app/services/timer.service';
 import { LobbyDetails, Pin, SocketId } from '@common/lobby';
-import { Subscription } from 'rxjs/internal/Subscription';
 
 const GAME_START_INITIAL_COUNT = 5;
 
@@ -25,7 +24,6 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
     private snackBar: MatSnackBar = inject(MatSnackBar);
     private routeController: RouteControllerService = inject(RouteControllerService);
     private timer: TimerService = inject(TimerService);
-    private startGameSubscription: Subscription;
 
     constructor(
         private router: Router,
@@ -55,10 +53,6 @@ export class WaitingViewPageComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        if (this.startGameSubscription) {
-            this.startGameSubscription.unsubscribe();
-        }
-
         this.clientSocket.socket.removeAllListeners('latestPlayerList');
         this.clientSocket.socket.removeAllListeners('lockToggled');
         this.clientSocket.socket.removeAllListeners('countDownEnd');

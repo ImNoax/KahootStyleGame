@@ -20,10 +20,6 @@ export class ProgressBarComponent implements OnInit {
         return this.timer.count;
     }
 
-    get totalTime() {
-        return this.currentGame.duration;
-    }
-
     ngOnInit() {
         this.currentGame = this.gameService.currentGame;
         this.timer.startCountDown(this.currentGame.duration);

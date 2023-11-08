@@ -1,50 +1,36 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { TimerService } from '@app/services/timer.service';
-import { Game, QuestionType } from '@common/game';
-import { of } from 'rxjs';
+import { Game } from '@common/game';
 import { ProgressBarComponent } from './progress-bar.component';
 
-const MOCK_QUESTIONS = [
-    {
-        text: 'What is the capital of France?',
-        points: 10,
-        type: QuestionType.QCM,
-        choices: [
-            { text: 'Paris', isCorrect: true },
-            { text: 'London', isCorrect: false },
-            { text: 'Berlin', isCorrect: false },
-            { text: 'Madrid', isCorrect: false },
-        ],
-    },
-];
+describe('ProgressBarComponent', () => {
+    const gameMock: Game = {
+        id: '',
+        title: '',
+        description: '',
+        duration: 0,
+        lastModification: '',
+        questions: [],
+    };
 
-const MOCK_GAME: Game[] = [
-    {
-        id: '1',
-        title: 'Game 1',
-        description: 'Test ',
-        duration: 5,
-        lastModification: '2018-11-13',
-        questions: [MOCK_QUESTIONS[0], MOCK_QUESTIONS[0]],
-    },
-];
-
-describe('TimerComponent', () => {
+    const gameHandlingServiceMock: {
+        currentGame: {
+            duration: number;
+        };
+    } = { currentGame: gameMock };
     let component: ProgressBarComponent;
     let fixture: ComponentFixture<ProgressBarComponent>;
-    let timeServiceSpy: jasmine.SpyObj<TimerService>;
-    let gameServiceSpy: jasmine.SpyObj<GameHandlingService>;
+    let timeServiceMock: jasmine.SpyObj<TimerService>;
 
     beforeEach(() => {
-        timeServiceSpy = jasmine.createSpyObj('TimeService', ['startTimer', 'stopTimer']);
-        gameServiceSpy = jasmine.createSpyObj('GameHandlingService', ['getGames']);
+        timeServiceMock = jasmine.createSpyObj('TimeService', ['startCountDown']);
 
         TestBed.configureTestingModule({
             declarations: [ProgressBarComponent],
             providers: [
-                { provide: TimerService, useValue: timeServiceSpy },
-                { provide: GameHandlingService, useValue: gameServiceSpy },
+                { provide: GameHandlingService, useValue: gameHandlingServiceMock },
+                { provide: TimerService, useValue: timeServiceMock },
             ],
         });
 
@@ -56,29 +42,19 @@ describe('TimerComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should get games and start initialization', () => {
-        gameServiceSpy.getGames.and.returnValue(of(MOCK_GAME));
-        gameServiceSpy.currentGameId = '1';
+    it('should assign currentGame from GameHandlingService to currentGame member on component initialization', () => {
         component.ngOnInit();
-        expect(gameServiceSpy.getGames).toHaveBeenCalled();
+        expect(component.currentGame).toEqual(gameMock);
     });
 
-    it('should stop timer on ngOnDestroy', () => {
-        component.ngOnDestroy();
-        expect(timeServiceSpy.stopTimer).toHaveBeenCalled();
+    it('should start countDown on component initialization', () => {
+        component.ngOnInit();
+        expect(timeServiceMock.startCountDown).toHaveBeenCalledWith(gameMock.duration);
     });
 
-    it('should return currentTime', () => {
-        const durationGame = 10;
-        Object.defineProperty(timeServiceSpy, 'time', { value: durationGame });
-        const time = component.currentTime;
-        expect(time).toEqual(durationGame);
-    });
-
-    it('should return total time for right gameId', () => {
-        const durationGame0 = 5;
-        gameServiceSpy.currentGameId = '1';
-        component.games = MOCK_GAME;
-        expect(component.totalTime).toEqual(durationGame0);
+    it('count getter should return count from TimerService', () => {
+        const currentCount = 0;
+        timeServiceMock.count = currentCount;
+        expect(component.count).toEqual(currentCount);
     });
 });

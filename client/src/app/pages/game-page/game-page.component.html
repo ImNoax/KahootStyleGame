@@ -7,16 +7,18 @@
         <app-progress-bar *ngIf="!showResults"></app-progress-bar>
         <div class="question-container" *ngIf="!showResults">
             <div id="question">{{ currentQuestion }} (+{{ currentQuestionScore }} points)</div>
-            <div id="pointage" *ngIf="!isOrganiser">Score: {{ score }}</div>
+            <div id="pointage" *ngIf="!isOrganizer">Score: {{ score }}</div>
         </div>
         <div id="buttons">
             <app-button-response *ngIf="!showResults" (updateQuestionScore)="onUpdateQuestionScore($event)"></app-button-response>
         </div>
+    </div>
+    <div>
         <div>
-            <app-histogram *ngIf="isOrganiser && !showResults" [data]="histogramData"></app-histogram>
+            <app-histogram *ngIf="isOrganizer && !showResults" [data]="histogramData"></app-histogram>
         </div>
         <div>
-            <app-player-list *ngIf="isOrganiser && !showResults"></app-player-list>
+            <app-player-list *ngIf="isOrganizer && !showResults"></app-player-list>
         </div>
         <div>
             <app-chat-box></app-chat-box>

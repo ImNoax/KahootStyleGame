@@ -1,73 +1,157 @@
-import { TestBed, discardPeriodicTasks, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
+import { SocketMock } from '@app/classes/socket-mock';
+import { ClientSocketService } from './client-socket.service';
+import { GameHandlingService } from './game-handling.service';
 import { TimerService } from './timer.service';
 
 describe('TimerService', () => {
+    const initialCount = 10;
+    const gameHandlingServiceMock = { currentQuestionId: 0, currentGame: { questions: ['', ''] }, gameMode: '' };
     let service: TimerService;
-    const TIMEOUT = 5;
-    const MS_SECOND = 1000;
+    let socketMock: SocketMock;
+    let clientSocketServiceMock: ClientSocketServiceMock;
+    let nEmittedEvents: number;
+    let isQuestionTransition: boolean;
 
     beforeEach(() => {
-        TestBed.configureTestingModule({});
+        clientSocketServiceMock = new ClientSocketServiceMock();
+        isQuestionTransition = true;
+
+        TestBed.configureTestingModule({
+            imports: [MatSnackBarModule, HttpClientTestingModule],
+            providers: [
+                { provide: ClientSocketService, useValue: clientSocketServiceMock },
+                { provide: GameHandlingService, useValue: gameHandlingServiceMock },
+            ],
+        });
+
         service = TestBed.inject(TimerService);
+        socketMock = clientSocketServiceMock.socket as unknown as SocketMock;
+        spyOn(socketMock, 'emit').and.callThrough();
+        socketMock.clientUniqueEvents.clear();
+        nEmittedEvents = 0;
     });
 
     it('should be created', () => {
         expect(service).toBeTruthy();
     });
 
-    it('startTimer should start an interval', fakeAsync(() => {
-        service.startTimer(TIMEOUT);
-        const interval = service['interval'];
-        expect(interval).toBeTruthy();
-        expect(service.time).toEqual(TIMEOUT);
-        discardPeriodicTasks();
-    }));
+    it('should handle countDown event by assigning newCount argument to transitionCount if isQuestionTransition is true', () => {
+        const event = 'countDown';
+        const newCount = 10;
+        service.isQuestionTransition = true;
+        service.transitionCount = 0;
+        service.count = 0;
 
-    it('startTimer should call setInterval', fakeAsync(() => {
-        const spy = spyOn(window, 'setInterval');
-        service.startTimer(TIMEOUT);
-        expect(spy).toHaveBeenCalled();
-        discardPeriodicTasks();
-    }));
+        socketMock.simulateServerEmit(event, newCount);
+        expect(service.transitionCount).toEqual(newCount);
+        expect(service.count).toEqual(0);
+    });
 
-    it('interval should reduce time by 1 every second ', fakeAsync(() => {
-        service.startTimer(TIMEOUT);
-        tick(MS_SECOND);
-        expect(service.time).toEqual(TIMEOUT - 1);
-        tick(MS_SECOND);
-        expect(service.time).toEqual(TIMEOUT - 2);
-        discardPeriodicTasks();
-    }));
+    it('should handle countDown event by assigning newCount argument to count if isQuestionTransition is false', () => {
+        const event = 'countDown';
+        const newCount = 10;
+        service.isQuestionTransition = false;
+        service.transitionCount = 0;
+        service.count = 0;
 
-    it('interval should stop after TIMEOUT seconds ', fakeAsync(() => {
-        service.startTimer(TIMEOUT);
-        tick((TIMEOUT + 2) * MS_SECOND);
-        expect(service.time).toEqual(0);
-        discardPeriodicTasks();
-    }));
+        socketMock.simulateServerEmit(event, newCount);
+        expect(service.transitionCount).toEqual(0);
+        expect(service.count).toEqual(newCount);
+    });
 
-    it('startTimer should not start a new interval if one exists', fakeAsync(() => {
-        service.startTimer(TIMEOUT);
-        const spy = spyOn(window, 'setInterval');
-        service.startTimer(TIMEOUT);
-        expect(spy).not.toHaveBeenCalled();
-        discardPeriodicTasks();
-    }));
+    it('should handle isQuestionTransition event by assigning isQuestionTransition argument to isQuestionTransition member', () => {
+        const event = 'isQuestionTransition';
+        service.isQuestionTransition = false;
 
-    it('startTimer should call stopTimer at the end of timer', fakeAsync(() => {
-        const spy = spyOn(service, 'stopTimer').and.callThrough();
-        service.startTimer(TIMEOUT);
-        tick((TIMEOUT + 1) * MS_SECOND); // un tick de plus que la limite
-        expect(spy).toHaveBeenCalled();
-        discardPeriodicTasks();
-    }));
+        socketMock.simulateServerEmit(event, isQuestionTransition);
+        expect(service.isQuestionTransition).toBeTrue();
 
-    it('stopTimer should call clearInterval and setInterval to undefined', fakeAsync(() => {
-        const spy = spyOn(window, 'clearInterval');
-        service.stopTimer();
-        expect(spy).toHaveBeenCalled();
-        expect(service['interval']).toBeFalsy();
-        discardPeriodicTasks();
-    }));
+        service.isQuestionTransition = false;
+        isQuestionTransition = false;
+
+        socketMock.simulateServerEmit(event, isQuestionTransition);
+        expect(service.isQuestionTransition).toBeFalse();
+    });
+
+    it('should handle isQuestionTransition event by assigning result message to transitionMessage member if there is no question left', () => {
+        const event = 'isQuestionTransition';
+        const resultMessage = 'Résultats';
+        const lastQuestionId = 1;
+        service.transitionMessage = '';
+        gameHandlingServiceMock.currentQuestionId = lastQuestionId;
+
+        socketMock.simulateServerEmit(event, isQuestionTransition);
+        expect(service.transitionMessage).toEqual(resultMessage);
+    });
+
+    it('should handle isQuestionTransition event by assigning next question message to transitionMessage member if there are questions left', () => {
+        const event = 'isQuestionTransition';
+        const nextQuestionMessage = 'Prochaine question';
+        const notLastQuestionId = 0;
+        service.transitionMessage = '';
+        gameHandlingServiceMock.currentQuestionId = notLastQuestionId;
+
+        socketMock.simulateServerEmit(event, isQuestionTransition);
+        expect(service.transitionMessage).toEqual(nextQuestionMessage);
+    });
+
+    it('startCountDown should assign initialCount argument to transitionCount member if argument isQuestionTransition is true', () => {
+        service.transitionCount = 0;
+        service.count = 0;
+
+        service.startCountDown(initialCount, isQuestionTransition);
+        expect(service.transitionCount).toEqual(initialCount);
+        expect(service.count).toEqual(0);
+    });
+
+    it('startCountDown should assign initialCount argument to count member if argument isQuestionTransition is false or undefined', () => {
+        isQuestionTransition = false;
+        service.transitionCount = 0;
+        service.count = 0;
+
+        service.startCountDown(initialCount, isQuestionTransition);
+        expect(service.transitionCount).toEqual(0);
+        expect(service.count).toEqual(initialCount);
+
+        service.transitionCount = 0;
+        service.count = 0;
+
+        service.startCountDown(initialCount);
+        expect(service.transitionCount).toEqual(0);
+        expect(service.count).toEqual(initialCount);
+    });
+
+    it('startCountDown should emit startCountDown event', () => {
+        const event = 'startCountDown';
+
+        service.startCountDown(initialCount, isQuestionTransition);
+        expect(socketMock.emit).toHaveBeenCalledWith(event, initialCount, isQuestionTransition, gameHandlingServiceMock.gameMode);
+        expect(socketMock.nEmittedEvents).toEqual(++nEmittedEvents);
+    });
+
+    it('stopCountDown should emit stopCountDown event', () => {
+        const event = 'stopCountDown';
+        service.stopCountDown();
+        expect(socketMock.emit).toHaveBeenCalledWith(event);
+        expect(socketMock.nEmittedEvents).toEqual(++nEmittedEvents);
+    });
+
+    it('reset should call stopCountDown and reinitialize every property', () => {
+        const currentCount = 10;
+        service.count = currentCount;
+        service.transitionCount = currentCount;
+        service.isQuestionTransition = true;
+
+        spyOn(service, 'stopCountDown');
+        service.reset();
+        expect(service.stopCountDown).toHaveBeenCalled();
+        expect(service.count).toEqual(0);
+        expect(service.transitionCount).toEqual(0);
+        expect(service.isQuestionTransition).toBeFalse();
+    });
 });

@@ -2,7 +2,7 @@ import { CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormArray, FormBuilder, FormControl, FormGroup, FormGroupName, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -239,7 +239,11 @@ describe('QuestionCreationPopupComponent', () => {
             event: new MouseEvent('drop'),
         };
 
+        const temp = formArray.at(event.previousIndex);
+        formArray.removeAt(event.previousIndex);
+        formArray.insert(event.currentIndex, temp);
         component.drop(event);
+
         const finalChoices = component.choices.value;
         expect(finalChoices[0].answer).toEqual('Choice 1');
         expect(finalChoices[1].answer).toEqual('Choice 3');

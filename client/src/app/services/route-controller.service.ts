@@ -1,41 +1,34 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { accessDeniedMessage, snackBarErrorConfiguration } from '@app/constants/snack-bar-configuration';
 import { Route } from '@app/enums';
 
+export type IsRouteAccessible = boolean;
+
 @Injectable({
     providedIn: 'root',
 })
 export class RouteControllerService {
-    private routes: Map<Route, boolean> = new Map<Route, boolean>([
+    routes: Map<Route, IsRouteAccessible> = new Map<Route, boolean>([
         [Route.Admin, false],
         [Route.InGame, false],
         [Route.Lobby, false],
     ]);
 
+    constructor(
+        private snackBar: MatSnackBar,
+        private router: Router,
+    ) {}
+
     setRouteAccess(route: Route, isRouteAccessible: boolean): void {
         this.routes.set(route, isRouteAccessible);
     }
 
-    isRouteAccessible(route: Route): boolean | undefined {
-        return this.routes.get(route);
-    }
-
-    // clearAllAccesses() {
-    //     this.routes.forEach((isRouteAccessible: boolean) => {
-    //         isRouteAccessible = false;
-    //     });
-    // }
-
-    guardRoute(route: Route) {
-        const snackBar: MatSnackBar = inject(MatSnackBar);
-        const router: Router = inject(Router);
-        const routeController: RouteControllerService = inject(RouteControllerService);
-
-        if (routeController.isRouteAccessible(route)) return true;
-        snackBar.open(accessDeniedMessage, '', snackBarErrorConfiguration);
-        router.navigate([Route.MainMenu]);
+    isRouteAccessible(route: Route): boolean {
+        if (this.routes.get(route)) return true;
+        this.snackBar.open(accessDeniedMessage, '', snackBarErrorConfiguration);
+        this.router.navigate([Route.MainMenu]);
         return false;
     }
 }

@@ -44,7 +44,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
         private router: Router,
     ) {}
 
-    get isOrganiser() {
+    get isOrganizer() {
         return this.clientSocket.isOrganizer;
     }
 

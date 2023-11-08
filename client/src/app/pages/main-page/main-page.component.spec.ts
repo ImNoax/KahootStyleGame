@@ -4,13 +4,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { Router } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, Router, RouterModule } from '@angular/router';
 import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
 import { SocketMock } from '@app/classes/socket-mock';
 import { Route } from '@app/enums';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
+import { Game } from '@common/game';
 import { of, throwError } from 'rxjs';
 
 describe('MainPageComponent', () => {
@@ -25,21 +26,30 @@ describe('MainPageComponent', () => {
     beforeEach(async () => {
         gameHandlingServiceMock = jasmine.createSpyObj('GameHandlingService', ['verifyAdminPassword', 'setCurrentGameId']);
         routerMock = jasmine.createSpyObj('Router', ['navigate']);
-        clientSocketServiceMock = new ClientSocketServiceMock(routerMock);
+        clientSocketServiceMock = new ClientSocketServiceMock();
 
         TestBed.configureTestingModule({
             declarations: [MainPageComponent],
-            imports: [MatSnackBarModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, BrowserAnimationsModule],
+            imports: [MatSnackBarModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, BrowserAnimationsModule, RouterModule],
             providers: [
                 { provide: GameHandlingService, useValue: gameHandlingServiceMock },
                 { provide: Router, useValue: routerMock },
                 { provide: ClientSocketService, useValue: clientSocketServiceMock },
+                {
+                    provide: ActivatedRoute,
+                    useValue: {
+                        queryParams: of(
+                            convertToParamMap({
+                                search: '',
+                            }),
+                        ),
+                    },
+                },
             ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(MainPageComponent);
         component = fixture.componentInstance;
-        socketMock = clientSocketServiceMock.socket as unknown as SocketMock;
         socketMock = clientSocketServiceMock.socket as unknown as SocketMock;
         spyOn(socketMock, 'emit').and.callThrough();
         socketMock.clientUniqueEvents.clear();
@@ -79,15 +89,24 @@ describe('MainPageComponent', () => {
         expect(window.alert).toHaveBeenCalledWith('Une erreur est survenue');
     }));
 
-    // it("should handle 'successfulLobbyConnection' event by navigating to the waiting view", () => {
-    //     const gameId = '0';
-    //     expect(clientSocketServiceMock.canAccessLobby).toBeFalse();
+    it("should handle 'successfulLobbyConnection' event by navigating to the waiting view", () => {
+        const game: Game = {
+            id: '123',
+            title: 'testGame',
+            description: 'test Game',
+            duration: 20,
+            lastModification: 'today',
+            questions: [],
+        };
+        const pin = 'test';
+        expect(component['routeController'].isRouteAccessible(Route.Lobby)).toBeFalse();
 
-    //     socketMock.simulateServerEmit('successfulLobbyConnection', gameId);
-    //     expect(gameHandlingServiceMock.setCurrentGameId).toHaveBeenCalledWith(gameId);
-    //     expect(clientSocketServiceMock.canAccessLobby).toBeTrue();
-    //     expect(routerMock.navigate).toHaveBeenCalledWith([Route.Lobby]);
-    // });
+        socketMock.simulateServerEmit('successfulLobbyConnection', game, pin);
+        expect(gameHandlingServiceMock.currentGame).toEqual(game);
+        expect(clientSocketServiceMock.pin).toEqual(pin);
+        expect(component['routeController'].isRouteAccessible(Route.Lobby)).toBeTrue();
+        expect(routerMock.navigate).toHaveBeenCalledWith([Route.Lobby]);
+    });
 
     it("should handle 'failedLobbyConnection' event by receiving an error from the server", () => {
         const serverMessage = 'erreur';

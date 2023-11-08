@@ -5,5 +5,5 @@ import { RouteControllerService } from '@app/services/route-controller.service';
 
 export const inGameGuard: CanActivateFn = () => {
     const routeController: RouteControllerService = inject(RouteControllerService);
-    return routeController.guardRoute(Route.InGame);
+    return routeController.isRouteAccessible(Route.InGame);
 };
