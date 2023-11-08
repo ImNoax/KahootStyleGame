@@ -14,7 +14,7 @@ import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AdminJeuPageComponent } from '@app/pages/admin-jeu-page/admin-jeu-page.component';
 import { AppComponent } from '@app/pages/app/app.component';
-import { CreateGamePageComponent } from '@app/pages/create-game-page/create-game-page.component';
+import { GameCreationPageComponent } from '@app/pages/game-creation-page/game-creation-page.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
@@ -49,7 +49,7 @@ import { QuizCreationPageComponent } from './pages/quiz-creation-page/quiz-creat
         QuizCreationPageComponent,
         HeaderComponent,
         QuestionCreationPageComponent,
-        CreateGamePageComponent,
+        GameCreationPageComponent,
         QuestionCreationPopupComponent,
         GameImportPopupComponent,
         LobbyPageComponent,

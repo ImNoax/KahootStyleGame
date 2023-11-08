@@ -15,11 +15,11 @@ import { RouteControllerService } from '@app/services/route-controller.service';
 import { Game } from '@common/game';
 import { GameMode } from '@common/game-mode';
 import { of } from 'rxjs';
-import { CreateGamePageComponent } from './create-game-page.component';
+import { GameCreationPageComponent } from './game-creation-page.component';
 
-describe('CreateGamePageComponent', () => {
-    let component: CreateGamePageComponent;
-    let fixture: ComponentFixture<CreateGamePageComponent>;
+describe('GameCreationPageComponent', () => {
+    let component: GameCreationPageComponent;
+    let fixture: ComponentFixture<GameCreationPageComponent>;
     let gameHandler: GameHandlingService;
     let routerMock: jasmine.SpyObj<Router>;
     let routeControllerServiceMock: jasmine.SpyObj<RouteControllerService>;
@@ -41,7 +41,7 @@ describe('CreateGamePageComponent', () => {
         clientSocketServiceMock = new ClientSocketServiceMock();
 
         TestBed.configureTestingModule({
-            declarations: [CreateGamePageComponent, HeaderComponent],
+            declarations: [GameCreationPageComponent, HeaderComponent],
             imports: [HttpClientTestingModule, MatIconModule, MatSnackBarModule, BrowserAnimationsModule, RouterModule],
             providers: [
                 { provide: Router, useValue: routerMock },
@@ -60,7 +60,7 @@ describe('CreateGamePageComponent', () => {
             ],
         }).compileComponents();
 
-        fixture = TestBed.createComponent(CreateGamePageComponent);
+        fixture = TestBed.createComponent(GameCreationPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
         gameHandler = TestBed.inject(GameHandlingService);
