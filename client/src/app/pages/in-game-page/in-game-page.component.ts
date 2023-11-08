@@ -11,11 +11,11 @@ import { GameMode } from '@common/game-mode';
 import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
-    selector: 'app-game-page',
-    templateUrl: './game-page.component.html',
-    styleUrls: ['./game-page.component.scss'],
+    selector: 'app-in-game-page',
+    templateUrl: './in-game-page.component.html',
+    styleUrls: ['./in-game-page.component.scss'],
 })
-export class GamePageComponent implements OnInit, OnDestroy {
+export class InGamePageComponent implements OnInit, OnDestroy {
     currentGame: Game;
     currentQuestion: string = '';
     currentQuestionScore: number;

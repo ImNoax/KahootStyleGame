@@ -15,7 +15,6 @@ import { AppMaterialModule } from '@app/modules/material.module';
 import { AdminJeuPageComponent } from '@app/pages/admin-jeu-page/admin-jeu-page.component';
 import { AppComponent } from '@app/pages/app/app.component';
 import { GameCreationPageComponent } from '@app/pages/game-creation-page/game-creation-page.component';
-import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { ButtonResponseComponent } from './components/button-response/button-response.component';
@@ -27,6 +26,7 @@ import { HistogramComponent } from './components/histogram/histogram.component';
 import { NameDefinitionComponent } from './components/name-definition/name-definition.component';
 import { PlayerListComponent } from './components/player-list/player-list.component';
 import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
+import { InGamePageComponent } from './pages/in-game-page/in-game-page.component';
 import { MainMenuPageComponent } from './pages/main-menu-page/main-menu-page.component';
 import { QuestionCreationPageComponent } from './pages/question-creation-page/question-creation-page.component';
 import { QuizCreationPageComponent } from './pages/quiz-creation-page/quiz-creation-page.component';
@@ -41,7 +41,7 @@ import { QuizCreationPageComponent } from './pages/quiz-creation-page/quiz-creat
     declarations: [
         AppComponent,
         AdminJeuPageComponent,
-        GamePageComponent,
+        InGamePageComponent,
         MainMenuPageComponent,
         MaterialPageComponent,
         ProgressBarComponent,
