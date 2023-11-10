@@ -10,15 +10,15 @@ import { FormManagerService } from '@app/services/form-manager.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { Game } from '@common/game';
 import { of } from 'rxjs';
-import { CreationJeuComponent } from './creation-jeu.component';
+import { QuizCreationPageComponent } from './quiz-creation-page.component';
 
-describe('CreationJeuComponent', () => {
-    let component: CreationJeuComponent;
-    let fixture: ComponentFixture<CreationJeuComponent>;
+describe('QuizCreationPageComponent', () => {
+    let component: QuizCreationPageComponent;
+    let fixture: ComponentFixture<QuizCreationPageComponent>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [CreationJeuComponent, HeaderComponent],
+            declarations: [QuizCreationPageComponent, HeaderComponent],
             providers: [
                 GameHandlingService,
                 FormManagerService,
@@ -36,7 +36,7 @@ describe('CreationJeuComponent', () => {
             ],
             imports: [HttpClientTestingModule, ReactiveFormsModule, MatIconModule, RouterModule],
         }).compileComponents();
-        fixture = TestBed.createComponent(CreationJeuComponent);
+        fixture = TestBed.createComponent(QuizCreationPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

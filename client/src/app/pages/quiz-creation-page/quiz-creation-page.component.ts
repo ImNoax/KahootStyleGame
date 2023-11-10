@@ -8,11 +8,11 @@ import { Game } from '@common/game';
 import { Limit } from '@common/limit';
 
 @Component({
-    selector: 'app-creation-jeu',
-    templateUrl: './creation-jeu.component.html',
-    styleUrls: ['./creation-jeu.component.scss'],
+    selector: 'app-quiz-creation-page',
+    templateUrl: './quiz-creation-page.component.html',
+    styleUrls: ['./quiz-creation-page.component.scss'],
 })
-export class CreationJeuComponent implements OnInit, OnDestroy {
+export class QuizCreationPageComponent implements OnInit, OnDestroy {
     adminRoute: string = '/' + Route.Admin;
     pageTitle: string = "Création d'un jeu";
     maxTitleLength: number;

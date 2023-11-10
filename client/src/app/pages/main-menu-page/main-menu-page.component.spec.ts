@@ -8,15 +8,15 @@ import { ActivatedRoute, convertToParamMap, Router, RouterModule } from '@angula
 import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
 import { SocketMock } from '@app/classes/socket-mock';
 import { Route } from '@app/enums';
-import { MainPageComponent } from '@app/pages/main-page/main-page.component';
+import { MainMenuPageComponent } from '@app/pages/main-menu-page/main-menu-page.component';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { Game } from '@common/game';
 import { of, throwError } from 'rxjs';
 
-describe('MainPageComponent', () => {
-    let component: MainPageComponent;
-    let fixture: ComponentFixture<MainPageComponent>;
+describe('MainMenuPageComponent', () => {
+    let component: MainMenuPageComponent;
+    let fixture: ComponentFixture<MainMenuPageComponent>;
     let gameHandlingServiceMock: jasmine.SpyObj<GameHandlingService>;
     let routerMock: jasmine.SpyObj<Router>;
     let socketMock: SocketMock;
@@ -29,7 +29,7 @@ describe('MainPageComponent', () => {
         clientSocketServiceMock = new ClientSocketServiceMock();
 
         TestBed.configureTestingModule({
-            declarations: [MainPageComponent],
+            declarations: [MainMenuPageComponent],
             imports: [MatSnackBarModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, BrowserAnimationsModule, RouterModule],
             providers: [
                 { provide: GameHandlingService, useValue: gameHandlingServiceMock },
@@ -48,7 +48,7 @@ describe('MainPageComponent', () => {
             ],
         }).compileComponents();
 
-        fixture = TestBed.createComponent(MainPageComponent);
+        fixture = TestBed.createComponent(MainMenuPageComponent);
         component = fixture.componentInstance;
         socketMock = clientSocketServiceMock.socket as unknown as SocketMock;
         spyOn(socketMock, 'emit').and.callThrough();
@@ -59,7 +59,7 @@ describe('MainPageComponent', () => {
     beforeEach(() => {
         spyOn(window, 'prompt').and.returnValue('testPassword');
         spyOn(window, 'alert').and.stub();
-        fixture = TestBed.createComponent(MainPageComponent);
+        fixture = TestBed.createComponent(MainMenuPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
@@ -89,7 +89,7 @@ describe('MainPageComponent', () => {
         expect(window.alert).toHaveBeenCalledWith('Une erreur est survenue');
     }));
 
-    it("should handle 'successfulLobbyConnection' event by navigating to the waiting view", () => {
+    it("should handle 'successfulLobbyConnection' event by navigating to the lobby", () => {
         const game: Game = {
             id: '123',
             title: 'testGame',

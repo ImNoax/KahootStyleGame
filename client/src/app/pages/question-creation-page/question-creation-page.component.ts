@@ -13,11 +13,11 @@ export const QCM_COLOR = '#3F51B5';
 export const QRL_COLOR = '#F2BB7B';
 
 @Component({
-    selector: 'app-questions-page',
-    templateUrl: './questions-page.component.html',
-    styleUrls: ['./questions-page.component.scss'],
+    selector: 'app-question-creation-page',
+    templateUrl: './question-creation-page.component.html',
+    styleUrls: ['./question-creation-page.component.scss'],
 })
-export class QuestionsPageComponent {
+export class QuestionCreationPageComponent {
     quizCreationRoute: string = '/' + Route.QuizCreation;
     isAccessingQuizCreation: boolean = false;
     pageTitle: string = 'Liste des questions';

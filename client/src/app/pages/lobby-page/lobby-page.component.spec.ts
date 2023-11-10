@@ -18,11 +18,11 @@ import { GameHandlingService } from '@app/services/game-handling.service';
 import { RouteControllerService } from '@app/services/route-controller.service';
 import { TimerService } from '@app/services/timer.service';
 import { of } from 'rxjs';
-import { WaitingViewPageComponent } from './waiting-view-page.component';
+import { LobbyPageComponent } from './lobby-page.component';
 
-describe('WaitingViewPageComponent', () => {
-    let component: WaitingViewPageComponent;
-    let fixture: ComponentFixture<WaitingViewPageComponent>;
+describe('LobbyPageComponent', () => {
+    let component: LobbyPageComponent;
+    let fixture: ComponentFixture<LobbyPageComponent>;
     let routerMock: jasmine.SpyObj<Router>;
     let snackBarMock: jasmine.SpyObj<MatSnackBar>;
     let socketMock: SocketMock;
@@ -41,7 +41,7 @@ describe('WaitingViewPageComponent', () => {
         clientSocketServiceMock = new ClientSocketServiceMock();
 
         TestBed.configureTestingModule({
-            declarations: [WaitingViewPageComponent, HeaderComponent, NameDefinitionComponent],
+            declarations: [LobbyPageComponent, HeaderComponent, NameDefinitionComponent],
             imports: [
                 HttpClientTestingModule,
                 MatIconModule,
@@ -71,7 +71,7 @@ describe('WaitingViewPageComponent', () => {
             ],
         });
 
-        fixture = TestBed.createComponent(WaitingViewPageComponent);
+        fixture = TestBed.createComponent(LobbyPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
 

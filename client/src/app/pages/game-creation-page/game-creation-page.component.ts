@@ -11,11 +11,11 @@ import { GameMode } from '@common/game-mode';
 import { Pin } from '@common/lobby';
 
 @Component({
-    selector: 'app-create-game-page',
-    templateUrl: './create-game-page.component.html',
-    styleUrls: ['./create-game-page.component.scss'],
+    selector: 'app-game-creation-page',
+    templateUrl: './game-creation-page.component.html',
+    styleUrls: ['./game-creation-page.component.scss'],
 })
-export class CreateGamePageComponent implements OnInit, OnDestroy {
+export class GameCreationPageComponent implements OnInit, OnDestroy {
     games: Game[];
     selectedRowIndex: number | null = null;
     selectedGame: Game | null = null;

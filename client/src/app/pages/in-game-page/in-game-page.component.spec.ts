@@ -15,7 +15,7 @@ import { TimerService } from '@app/services/timer.service';
 import { Game, QuestionType } from '@common/game';
 import { GameMode } from '@common/game-mode';
 import { Observable, Subject } from 'rxjs';
-import { GamePageComponent } from './game-page.component';
+import { InGamePageComponent } from './in-game-page.component';
 
 const QUESTIONS_MOCK = [
     {
@@ -40,9 +40,9 @@ const GAME_MOCK: Game = {
     questions: [QUESTIONS_MOCK[0], QUESTIONS_MOCK[0]],
 };
 
-describe('GamePageComponent', () => {
-    let component: GamePageComponent;
-    let fixture: ComponentFixture<GamePageComponent>;
+describe('InGamePageComponent', () => {
+    let component: InGamePageComponent;
+    let fixture: ComponentFixture<InGamePageComponent>;
     let gameServiceSpy: jasmine.SpyObj<GameHandlingService>;
     let currentQuestionObservableSpy: Subject<string>;
     let scoreObservableSpy: Subject<number>;
@@ -64,7 +64,7 @@ describe('GamePageComponent', () => {
         gameServiceSpy.currentQuestionId = 0;
 
         TestBed.configureTestingModule({
-            declarations: [GamePageComponent, ButtonResponseComponent, ProgressBarComponent, MatIcon, ChatBoxComponent],
+            declarations: [InGamePageComponent, ButtonResponseComponent, ProgressBarComponent, MatIcon, ChatBoxComponent],
             providers: [
                 { provide: ClientSocketService, useValue: clientSocketServiceMock },
                 { provide: GameHandlingService, useValue: gameServiceSpy },
@@ -74,7 +74,7 @@ describe('GamePageComponent', () => {
             imports: [MatSnackBarModule],
         });
 
-        fixture = TestBed.createComponent(GamePageComponent);
+        fixture = TestBed.createComponent(InGamePageComponent);
         component = fixture.componentInstance;
         socketMock = clientSocketServiceMock.socket as unknown as SocketMock;
         spyOn(socketMock, 'emit').and.callThrough();

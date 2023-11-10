@@ -5,22 +5,22 @@ import { adminGuard } from '@app/guards/admin.guard';
 import { inGameGuard } from '@app/guards/in-game.guard';
 import { lobbyGuard } from '@app/guards/lobby.guard';
 import { AdminJeuPageComponent } from '@app/pages/admin-jeu-page/admin-jeu-page.component';
-import { CreateGamePageComponent } from '@app/pages/create-game-page/create-game-page.component';
-import { CreationJeuComponent } from '@app/pages/creation-jeu/creation-jeu.component';
-import { GamePageComponent } from '@app/pages/game-page/game-page.component';
-import { MainPageComponent } from '@app/pages/main-page/main-page.component';
-import { QuestionsPageComponent } from '@app/pages/questions-page/questions-page.component';
-import { WaitingViewPageComponent } from '@app/pages/waiting-view-page/waiting-view-page.component';
+import { GameCreationPageComponent } from '@app/pages/game-creation-page/game-creation-page.component';
+import { InGamePageComponent } from '@app/pages/in-game-page/in-game-page.component';
+import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
+import { MainMenuPageComponent } from '@app/pages/main-menu-page/main-menu-page.component';
+import { QuestionCreationPageComponent } from '@app/pages/question-creation-page/question-creation-page.component';
+import { QuizCreationPageComponent } from '@app/pages/quiz-creation-page/quiz-creation-page.component';
 
 const routes: Routes = [
     { path: '', redirectTo: Route.MainMenu, pathMatch: 'full' },
-    { path: Route.MainMenu, component: MainPageComponent },
-    { path: Route.Lobby, component: WaitingViewPageComponent, canActivate: [lobbyGuard] },
-    { path: Route.GameCreation, component: CreateGamePageComponent },
-    { path: Route.InGame, component: GamePageComponent, canActivate: [inGameGuard] },
+    { path: Route.MainMenu, component: MainMenuPageComponent },
+    { path: Route.Lobby, component: LobbyPageComponent, canActivate: [lobbyGuard] },
+    { path: Route.GameCreation, component: GameCreationPageComponent },
+    { path: Route.InGame, component: InGamePageComponent, canActivate: [inGameGuard] },
     { path: Route.Admin, component: AdminJeuPageComponent, canActivate: [adminGuard] },
-    { path: Route.QuizCreation, component: CreationJeuComponent, canActivate: [adminGuard] },
-    { path: Route.QuestionCreation, component: QuestionsPageComponent, canActivate: [adminGuard] },
+    { path: Route.QuizCreation, component: QuizCreationPageComponent, canActivate: [adminGuard] },
+    { path: Route.QuestionCreation, component: QuestionCreationPageComponent, canActivate: [adminGuard] },
     { path: '**', redirectTo: Route.MainMenu },
 ];
 

@@ -13,11 +13,11 @@ import { BehaviorSubject } from 'rxjs';
 const ERROR401 = 401;
 
 @Component({
-    selector: 'app-main-page',
-    templateUrl: './main-page.component.html',
-    styleUrls: ['./main-page.component.scss'],
+    selector: 'app-main-menu-page',
+    templateUrl: './main-menu-page.component.html',
+    styleUrls: ['./main-menu-page.component.scss'],
 })
-export class MainPageComponent implements OnInit, OnDestroy {
+export class MainMenuPageComponent implements OnInit, OnDestroy {
     gameCreationRoute: string = '/' + Route.GameCreation;
     title: string = 'Survey Genius';
     message: BehaviorSubject<string> = new BehaviorSubject<string>('');
