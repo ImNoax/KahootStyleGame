@@ -65,13 +65,16 @@ export class SocketManager {
 
             const startCountDown = (initialCount: number, gameMode: GameMode): void => {
                 if (gameMode === GameMode.Testing) pin = socket.id;
+
+                this.sio.to(pin).emit('countDown', initialCount);
                 counter = setInterval(() => {
                     initialCount--;
 
                     if (initialCount > 0) {
                         this.sio.to(pin).emit('countDown', initialCount);
                     } else {
-                        this.sio.to(pin).emit('countDownEnd', initialCount);
+                        this.sio.to(pin).emit('countDown', initialCount);
+                        this.sio.to(pin).emit('countDownEnd');
                         clearInterval(counter);
                     }
                 }, COUNTDOWN_PERIOD);
@@ -169,7 +172,7 @@ export class SocketManager {
             });
 
             socket.on('startCountDown', (initialCount: number, isQuestionTransition: boolean, gameMode: GameMode) => {
-                if (isQuestionTransition) this.sio.emit('isQuestionTransition', isQuestionTransition);
+                if (isQuestionTransition) this.sio.emit('questionTransition', isQuestionTransition);
                 startCountDown(initialCount, gameMode);
             });
 

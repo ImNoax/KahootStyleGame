@@ -162,13 +162,10 @@ describe('LobbyPageComponent', () => {
         expect(component.isLocked).toBeTrue();
     });
 
-    it('should handle countDownEnd event by assigning lastCount argument to count property of TimerService and call startGame', () => {
-        const lastCount = 0;
-        timerServiceMock.count = 1;
+    it('should handle countDownEnd event by calling startGame', () => {
         spyOn(component, 'startGame');
 
-        socketMock.simulateServerEmit('countDownEnd', lastCount);
-        expect(timerServiceMock.count).toEqual(lastCount);
+        socketMock.simulateServerEmit('countDownEnd');
         expect(component.startGame).toHaveBeenCalled();
     });
 

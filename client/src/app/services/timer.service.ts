@@ -27,7 +27,7 @@ export class TimerService {
             this.count = newCount;
         });
 
-        this.clientSocket.socket.on('isQuestionTransition', (isQuestionTransition: boolean) => {
+        this.clientSocket.socket.on('questionTransition', (isQuestionTransition: boolean) => {
             this.isQuestionTransition = isQuestionTransition;
 
             if (isQuestionTransition) {
@@ -40,9 +40,6 @@ export class TimerService {
     }
 
     startCountDown(initialCount: number, isQuestionTransition?: boolean) {
-        if (isQuestionTransition) this.transitionCount = initialCount;
-        else this.count = initialCount;
-
         this.clientSocket.socket.emit('startCountDown', initialCount, isQuestionTransition, this.gameHandler.gameMode);
     }
 

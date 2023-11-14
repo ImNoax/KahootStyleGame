@@ -64,8 +64,8 @@ describe('TimerService', () => {
         expect(service.count).toEqual(newCount);
     });
 
-    it('should handle isQuestionTransition event by assigning isQuestionTransition argument to isQuestionTransition member', () => {
-        const event = 'isQuestionTransition';
+    it('should handle questionTransition event by assigning isQuestionTransition argument to isQuestionTransition member', () => {
+        const event = 'questionTransition';
         service.isQuestionTransition = false;
 
         socketMock.simulateServerEmit(event, isQuestionTransition);
@@ -78,8 +78,8 @@ describe('TimerService', () => {
         expect(service.isQuestionTransition).toBeFalse();
     });
 
-    it('should handle isQuestionTransition event by assigning result message to transitionMessage member if there is no question left', () => {
-        const event = 'isQuestionTransition';
+    it('should handle questionTransition event by assigning result message to transitionMessage member if there is no question left', () => {
+        const event = 'questionTransition';
         const resultMessage = 'Résultats';
         const lastQuestionId = 1;
         service.transitionMessage = '';
@@ -89,8 +89,8 @@ describe('TimerService', () => {
         expect(service.transitionMessage).toEqual(resultMessage);
     });
 
-    it('should handle isQuestionTransition event by assigning next question message to transitionMessage member if there are questions left', () => {
-        const event = 'isQuestionTransition';
+    it('should handle questionTransition event by assigning next question message to transitionMessage member if there are questions left', () => {
+        const event = 'questionTransition';
         const nextQuestionMessage = 'Prochaine question';
         const notLastQuestionId = 0;
         service.transitionMessage = '';
@@ -98,32 +98,6 @@ describe('TimerService', () => {
 
         socketMock.simulateServerEmit(event, isQuestionTransition);
         expect(service.transitionMessage).toEqual(nextQuestionMessage);
-    });
-
-    it('startCountDown should assign initialCount argument to transitionCount member if argument isQuestionTransition is true', () => {
-        service.transitionCount = 0;
-        service.count = 0;
-
-        service.startCountDown(initialCount, isQuestionTransition);
-        expect(service.transitionCount).toEqual(initialCount);
-        expect(service.count).toEqual(0);
-    });
-
-    it('startCountDown should assign initialCount argument to count member if argument isQuestionTransition is false or undefined', () => {
-        isQuestionTransition = false;
-        service.transitionCount = 0;
-        service.count = 0;
-
-        service.startCountDown(initialCount, isQuestionTransition);
-        expect(service.transitionCount).toEqual(0);
-        expect(service.count).toEqual(initialCount);
-
-        service.transitionCount = 0;
-        service.count = 0;
-
-        service.startCountDown(initialCount);
-        expect(service.transitionCount).toEqual(0);
-        expect(service.count).toEqual(initialCount);
     });
 
     it('startCountDown should emit startCountDown event', () => {
