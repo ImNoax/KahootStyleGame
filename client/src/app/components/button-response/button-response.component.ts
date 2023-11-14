@@ -71,8 +71,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
             this.processAnswer();
         });
 
-        this.clientSocket.socket.on('countDownEnd', (lastCount: number) => {
-            this.timer.count = lastCount;
+        this.clientSocket.socket.on('countDownEnd', () => {
             if (this.timer.isQuestionTransition) {
                 this.loadNextQuestion();
                 return;

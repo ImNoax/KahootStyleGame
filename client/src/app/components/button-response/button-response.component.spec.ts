@@ -106,21 +106,16 @@ describe('ButtonResponseComponent', () => {
         expect(component.hasBonus).toBeFalse();
     });
     it('should handle countDownEnd event by loading the next question if isQuestionTransition from TimerService is true', () => {
-        const lastCount = 0;
-        timerMock.count = 10;
         timerMock.isQuestionTransition = true;
         spyOn(component, 'loadNextQuestion');
-        socketMock.simulateServerEmit('countDownEnd', lastCount);
-        expect(timerMock.count).toEqual(lastCount);
+        socketMock.simulateServerEmit('countDownEnd');
         expect(component.loadNextQuestion).toHaveBeenCalled();
     });
 
     it('should handle countDownEnd event by calling onTimerEnded if isQuestionTransition from TimerService is false', () => {
-        const lastCount = 0;
-        timerMock.count = 10;
         timerMock.isQuestionTransition = false;
         spyOn(component, 'onTimerEnded');
-        socketMock.simulateServerEmit('countDownEnd', lastCount);
+        socketMock.simulateServerEmit('countDownEnd');
         expect(component.onTimerEnded).toHaveBeenCalled();
     });
 

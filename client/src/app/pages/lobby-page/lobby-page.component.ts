@@ -75,8 +75,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
             this.isLocked = isLocked;
         });
 
-        this.clientSocket.socket.on('countDownEnd', (lastCount: number) => {
-            this.timer.count = lastCount;
+        this.clientSocket.socket.on('countDownEnd', () => {
             this.startGame();
         });
 
