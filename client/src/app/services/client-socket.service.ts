@@ -57,7 +57,7 @@ export class ClientSocketService {
                     .open(message, 'Rentrer', snackBarErrorConfiguration)
                     .onAction()
                     .subscribe(() => {
-                        this.socket.emit('joinLobby', this.pin);
+                        this.socket.emit('validatePin', this.pin);
                     });
             }
         });

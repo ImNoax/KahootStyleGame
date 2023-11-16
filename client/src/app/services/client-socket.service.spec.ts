@@ -115,7 +115,7 @@ describe('ClientSocketService', () => {
         service.listenForGameClosureByOrganiser();
         socketMock.simulateServerEmit(event, reason, message);
         expect(snackBarMock.open).toHaveBeenCalledWith(message, 'Rentrer', snackBarErrorConfiguration);
-        expect(socketMock.emit).toHaveBeenCalledWith('joinLobby', service.pin);
+        expect(socketMock.emit).toHaveBeenCalledWith('validatePin', service.pin);
         expect(socketMock.nEmittedEvents).toEqual(++nEmittedEvents);
     });
 

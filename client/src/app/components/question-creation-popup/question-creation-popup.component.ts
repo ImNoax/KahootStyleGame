@@ -19,8 +19,8 @@ export class QuestionCreationPopupComponent implements OnInit {
     nGoodChoices: number = 0;
     maxQuestionLength: number = Limit.MaxQuestionLength;
     maxAnswerLength: number = Limit.MaxAnswerLength;
-    questionForm: FormGroup;
     choiceDuplicate = false;
+    questionForm: FormGroup;
 
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: { questionsFormArray: FormArray; index?: number },
@@ -35,18 +35,27 @@ export class QuestionCreationPopupComponent implements OnInit {
     ngOnInit() {
         const fb: FormBuilder = new FormBuilder();
         if (this.data.index === undefined) this.createNewForm(fb);
-        else this.questionForm = _.cloneDeep(this.loadForm(fb, this.data.index)) as FormGroup;
+        else this.loadForm(fb, this.data.index);
     }
 
-    loadForm(fb: FormBuilder, index: number): FormGroup {
-        const question: AbstractControl = this.data.questionsFormArray.controls[index];
-        const choices: FormArray = question.get('choices') as FormArray;
-        return fb.group({
-            text: [question.value.text, [Validators.required, this.formManager.preventEmptyInput]],
-            points: [question.value.points, [Validators.required, Validators.pattern('^[1-9][0-9]*0$'), Validators.max(Limit.MaxPoints)]],
-            type: question.value.type,
-            choices: fb.array(choices.controls),
+    loadForm(fb: FormBuilder, index: number): void {
+        const questionToModify: AbstractControl = this.data.questionsFormArray.controls[index];
+        const choicesToModify: FormArray = _.cloneDeep(questionToModify.get('choices')) as FormArray;
+
+        this.createNewForm(fb);
+        this.questionForm.patchValue({
+            text: questionToModify.value.text,
+            points: questionToModify.value.points,
+            type: questionToModify.value.type,
         });
+
+        if (this.questionForm.value.type === QuestionType.QCM) this.questionForm.setControl('choices', choicesToModify);
+        else this.toggleQuestionType();
+    }
+
+    isQrl() {
+        if (this.questionType === QuestionType.QRL) return true;
+        return false;
     }
 
     createNewForm(fb: FormBuilder): void {
@@ -61,6 +70,19 @@ export class QuestionCreationPopupComponent implements OnInit {
         this.addChoice(false);
     }
 
+    toggleQuestionType() {
+        this.questionType = this.questionType === QuestionType.QCM ? QuestionType.QRL : QuestionType.QCM;
+        this.questionForm.patchValue({ type: this.questionType });
+
+        if (this.questionType === QuestionType.QRL) {
+            this.choices.disable();
+            this.choiceDuplicate = false;
+            return;
+        }
+        this.choices.enable();
+        this.verifyChoice();
+    }
+
     setAnswerStyle(isCorrect: boolean): { background: string } {
         return isCorrect ? { background: '#98FF7F' } : { background: '#FF967F' };
     }
@@ -71,12 +93,13 @@ export class QuestionCreationPopupComponent implements OnInit {
 
     addChoice(isChoiceCorrect: boolean) {
         const fb: FormBuilder = new FormBuilder();
-        this.choices.push(
-            fb.group({
-                text: ['', [Validators.required, this.formManager.preventEmptyInput]],
-                isCorrect: isChoiceCorrect,
-            }),
-        );
+        const newChoice = fb.group({
+            text: ['', [Validators.required, this.formManager.preventEmptyInput]],
+            isCorrect: isChoiceCorrect,
+        });
+        if (this.choices.disabled) newChoice.disable();
+
+        this.choices.push(newChoice);
     }
 
     verifyChoice(): void {
@@ -121,6 +144,7 @@ export class QuestionCreationPopupComponent implements OnInit {
     }
 
     hasMinimumGoodChoices(): boolean {
+        if (this.choices.disabled) return true;
         this.nGoodChoices = this.choices.value.reduce((counter: number, choice: Choice) => (choice.isCorrect ? counter + 1 : counter), 0);
         return Limit.MinGoodChoices <= this.nGoodChoices && this.nGoodChoices < this.choices.length;
     }

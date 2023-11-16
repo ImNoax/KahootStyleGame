@@ -110,11 +110,12 @@ export class GameManagerService {
                 this.error = new Error(`Points de la question: "${question.text}" invalides`);
                 return false;
             }
-            if (question.choices.length < Limit.MinChoicesNumber || question.choices.length > Limit.MaxChoicesNumber) {
+            if (question.choices && (question.choices.length < Limit.MinChoicesNumber || question.choices.length > Limit.MaxChoicesNumber)) {
                 this.error = new Error(`Choix de la question: "${question.text}" invalides`);
                 return false;
             }
-            choicesValid = choicesValid && this.validateChoices(question.choices);
+
+            if (question.choices) choicesValid = this.validateChoices(question.choices);
         }
         return choicesValid;
     }

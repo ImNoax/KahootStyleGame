@@ -12,7 +12,7 @@ export interface Question {
     text: string;
     points: number;
     type: QuestionType;
-    choices: Choice[];
+    choices?: Choice[];
 }
 
 export interface Game {

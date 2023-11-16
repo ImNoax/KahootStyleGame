@@ -43,8 +43,8 @@ export class MainMenuPageComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.clientSocket.socket.removeAllListeners('successfulLobbyConnection');
-        this.clientSocket.socket.removeAllListeners('failedLobbyConnection');
+        this.clientSocket.socket.removeAllListeners('validPin');
+        this.clientSocket.socket.removeAllListeners('invalidPin');
     }
 
     adminLogin(): void {
@@ -69,14 +69,14 @@ export class MainMenuPageComponent implements OnInit, OnDestroy {
     }
 
     configureBaseSocketFeatures() {
-        this.clientSocket.socket.on('successfulLobbyConnection', (game: Game, pin: Pin) => {
+        this.clientSocket.socket.on('validPin', (game: Game, pin: Pin) => {
             this.routeController.setRouteAccess(Route.Lobby, true);
             this.clientSocket.pin = pin;
             this.gameHandler.currentGame = game;
             this.router.navigate([Route.Lobby]);
         });
 
-        this.clientSocket.socket.on('failedLobbyConnection', (message: string) => {
+        this.clientSocket.socket.on('invalidPin', (message: string) => {
             this.serverErrorMessage = message;
         });
     }
@@ -90,6 +90,6 @@ export class MainMenuPageComponent implements OnInit, OnDestroy {
     }
 
     onSubmit(): void {
-        this.clientSocket.socket.emit('joinLobby', this.pinForm.value.pin);
+        this.clientSocket.socket.emit('validatePin', this.pinForm.value.pin);
     }
 }

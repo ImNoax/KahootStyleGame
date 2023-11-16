@@ -138,7 +138,7 @@ describe('FormManagerService', () => {
             title: gameMock.title,
             description: gameMock.description,
             duration: gameMock.duration,
-            lastModification: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+            lastModification: formatDate(new Date(), 'yyyy-MM-dd   h:mm:ss a', 'en'),
             isVisible: false,
             questions: fb.array(gameMock.questions),
         });

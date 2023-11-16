@@ -9,8 +9,8 @@ import { Question, QuestionType } from '@common/game';
 import { Limit } from '@common/limit';
 import * as _ from 'lodash';
 
-export const QCM_COLOR = '#3F51B5';
-export const QRL_COLOR = '#F2BB7B';
+export const QCM_COLOR = '#1F7DF1';
+export const QRL_COLOR = '#FF6400';
 
 @Component({
     selector: 'app-question-creation-page',
