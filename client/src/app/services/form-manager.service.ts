@@ -32,7 +32,7 @@ export class FormManagerService {
             title: gameData.title,
             description: gameData.description,
             duration: gameData.duration,
-            lastModification: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+            lastModification: formatDate(new Date(), 'yyyy-MM-dd   h:mm:ss a', 'en'),
             isVisible: false,
             questions: this.fb.array(gameData.questions),
         }));

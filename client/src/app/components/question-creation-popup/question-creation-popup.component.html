@@ -39,7 +39,7 @@
                 <span class="error" *ngIf="questionForm.controls['points'].invalid">{{ showPointsError() }}</span>
             </div>
 
-            <mat-slide-toggle disabled>
+            <mat-slide-toggle [checked]="isQrl()" color="primary" (click)="toggleQuestionType()">
                 <span class="text-color">{{ questionType }}</span>
             </mat-slide-toggle>
         </div>
@@ -74,7 +74,7 @@
 
                     <div class="right-section">
                         <div class="toggle-icon">
-                            <mat-slide-toggle color="primary" formControlName="isCorrect">{{
+                            <mat-slide-toggle class="choice-correctness" color="primary" formControlName="isCorrect">{{
                                 choice.value.isCorrect ? 'Bon' : 'Mauvais'
                             }}</mat-slide-toggle>
                         </div>
@@ -91,13 +91,13 @@
                 </button>
             </div>
             <div class="error choice-error">
-                <p *ngIf="!hasMinimumGoodChoices()">{{ showCorrectnessError() }}</p>
-                <p *ngIf="choiceDuplicate">Choix doivent être uniques</p>
+                <p *ngIf="!hasMinimumGoodChoices() && choices.enabled">{{ showCorrectnessError() }}</p>
+                <p *ngIf="choiceDuplicate && choices.enabled">Choix doivent être uniques</p>
             </div>
         </div>
 
         <div id="nav">
-            <button type="reset" (click)="closeQuestionCreator()" mat-raised-button color="primary">Annuler</button>
+            <button type="button" (click)="closeQuestionCreator()" mat-raised-button color="primary">Annuler</button>
             <button
                 type="submit"
                 id="save-button"
