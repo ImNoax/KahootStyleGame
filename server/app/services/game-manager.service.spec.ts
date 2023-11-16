@@ -175,7 +175,7 @@ describe('GameManagerService', () => {
         const wrongPoints = 150;
         const wrongPoints2 = 54;
 
-        const question: Question = {
+        const qcmQuestion: Question = {
             text: 'test',
             points: 10,
             type: QuestionType.QCM,
@@ -184,56 +184,65 @@ describe('GameManagerService', () => {
                 { text: '', isCorrect: false },
             ],
         };
+
+        const qrlQuestion: Question = {
+            text: 'test',
+            points: 10,
+            type: QuestionType.QRL,
+        };
+
         const mockValidateChoices = Sinon.stub(gameManager, 'validateChoices').returns(true);
 
         expect(gameManager.validateQuestions([])).to.equal(true);
 
-        expect(gameManager.validateQuestions([question])).to.equal(true);
+        expect(gameManager.validateQuestions([qcmQuestion])).to.equal(true);
         expect(mockValidateChoices.called).to.equal(true);
 
+        expect(gameManager.validateQuestions([qrlQuestion])).to.equal(true);
+
         mockValidateChoices.returns(false);
-        expect(gameManager.validateQuestions([question])).to.equal(false);
+        expect(gameManager.validateQuestions([qcmQuestion])).to.equal(false);
         mockValidateChoices.returns(true);
 
-        question.text = '';
-        expect(gameManager.validateQuestions([question])).to.equal(false);
-        expect(gameManager.error.message).to.equal(`Question: "${question.text}" invalide`);
+        qcmQuestion.text = '';
+        expect(gameManager.validateQuestions([qcmQuestion])).to.equal(false);
+        expect(gameManager.error.message).to.equal(`Question: "${qcmQuestion.text}" invalide`);
 
-        for (let i = 0; i < nbChar; i++) question.text += 't';
-        expect(gameManager.validateQuestions([question])).to.equal(false);
-        expect(gameManager.error.message).to.equal(`Question: "${question.text}" invalide`);
+        for (let i = 0; i < nbChar; i++) qcmQuestion.text += 't';
+        expect(gameManager.validateQuestions([qcmQuestion])).to.equal(false);
+        expect(gameManager.error.message).to.equal(`Question: "${qcmQuestion.text}" invalide`);
 
-        question.text = 'test';
-        question.points = 0;
+        qcmQuestion.text = 'test';
+        qcmQuestion.points = 0;
 
-        expect(gameManager.validateQuestions([question])).to.equal(false);
-        expect(gameManager.error.message).to.equal(`Points de la question: "${question.text}" invalides`);
+        expect(gameManager.validateQuestions([qcmQuestion])).to.equal(false);
+        expect(gameManager.error.message).to.equal(`Points de la question: "${qcmQuestion.text}" invalides`);
 
-        question.points = wrongPoints;
+        qcmQuestion.points = wrongPoints;
 
-        expect(gameManager.validateQuestions([question])).to.equal(false);
-        expect(gameManager.error.message).to.equal(`Points de la question: "${question.text}" invalides`);
+        expect(gameManager.validateQuestions([qcmQuestion])).to.equal(false);
+        expect(gameManager.error.message).to.equal(`Points de la question: "${qcmQuestion.text}" invalides`);
 
-        question.points = wrongPoints2;
+        qcmQuestion.points = wrongPoints2;
 
-        expect(gameManager.validateQuestions([question])).to.equal(false);
-        expect(gameManager.error.message).to.equal(`Points de la question: "${question.text}" invalides`);
+        expect(gameManager.validateQuestions([qcmQuestion])).to.equal(false);
+        expect(gameManager.error.message).to.equal(`Points de la question: "${qcmQuestion.text}" invalides`);
 
-        question.points = 10;
-        question.choices.push({ text: '', isCorrect: true });
-        question.choices.push({ text: '', isCorrect: true });
-        question.choices.push({ text: '', isCorrect: true });
+        qcmQuestion.points = 10;
+        qcmQuestion.choices.push({ text: '', isCorrect: true });
+        qcmQuestion.choices.push({ text: '', isCorrect: true });
+        qcmQuestion.choices.push({ text: '', isCorrect: true });
 
-        expect(gameManager.validateQuestions([question])).to.equal(false);
-        expect(gameManager.error.message).to.equal(`Choix de la question: "${question.text}" invalides`);
+        expect(gameManager.validateQuestions([qcmQuestion])).to.equal(false);
+        expect(gameManager.error.message).to.equal(`Choix de la question: "${qcmQuestion.text}" invalides`);
 
-        question.choices.pop();
-        question.choices.pop();
-        question.choices.pop();
-        question.choices.pop();
+        qcmQuestion.choices.pop();
+        qcmQuestion.choices.pop();
+        qcmQuestion.choices.pop();
+        qcmQuestion.choices.pop();
 
-        expect(gameManager.validateQuestions([question])).to.equal(false);
-        expect(gameManager.error.message).to.equal(`Choix de la question: "${question.text}" invalides`);
+        expect(gameManager.validateQuestions([qcmQuestion])).to.equal(false);
+        expect(gameManager.error.message).to.equal(`Choix de la question: "${qcmQuestion.text}" invalides`);
     });
 
     it('validateChoices should return false if one of the elements is invalid and true otherwise', async () => {
