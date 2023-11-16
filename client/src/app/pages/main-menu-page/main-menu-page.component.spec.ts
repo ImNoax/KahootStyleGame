@@ -89,7 +89,7 @@ describe('MainMenuPageComponent', () => {
         expect(window.alert).toHaveBeenCalledWith('Une erreur est survenue');
     }));
 
-    it("should handle 'successfulLobbyConnection' event by navigating to the lobby", () => {
+    it('should handle validPin event by navigating to the lobby', () => {
         const game: Game = {
             id: '123',
             title: 'testGame',
@@ -98,19 +98,19 @@ describe('MainMenuPageComponent', () => {
             lastModification: 'today',
             questions: [],
         };
-        const pin = 'test';
+        const pin = '1234';
         expect(component['routeController'].isRouteAccessible(Route.Lobby)).toBeFalse();
 
-        socketMock.simulateServerEmit('successfulLobbyConnection', game, pin);
+        socketMock.simulateServerEmit('validPin', game, pin);
         expect(gameHandlingServiceMock.currentGame).toEqual(game);
         expect(clientSocketServiceMock.pin).toEqual(pin);
         expect(component['routeController'].isRouteAccessible(Route.Lobby)).toBeTrue();
         expect(routerMock.navigate).toHaveBeenCalledWith([Route.Lobby]);
     });
 
-    it("should handle 'failedLobbyConnection' event by receiving an error from the server", () => {
+    it('should handle invalidPin event by receiving an error from the server', () => {
         const serverMessage = 'erreur';
-        socketMock.simulateServerEmit('failedLobbyConnection', serverMessage);
+        socketMock.simulateServerEmit('invalidPin', serverMessage);
         expect(component.serverErrorMessage).toEqual(serverMessage);
     });
 
@@ -155,8 +155,8 @@ describe('MainMenuPageComponent', () => {
         expect(component.pinForm.valid).toBeFalse();
     });
 
-    it('onSubmit should send joinLobby event through the ClientSocketService', () => {
-        const event = 'joinLobby';
+    it('onSubmit should emit validatePin event through the ClientSocketService', () => {
+        const event = 'validatePin';
         const pin = '1234';
         component.pinForm.value.pin = pin;
 

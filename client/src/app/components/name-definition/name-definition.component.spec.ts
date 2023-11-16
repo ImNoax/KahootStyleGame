@@ -43,12 +43,12 @@ describe('NameDefinitionComponent', () => {
         component.ngOnDestroy();
 
         expect(socketMock.removeAllListeners).toHaveBeenCalledTimes(2);
-        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('validName');
-        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('invalidName');
+        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('successfulLobbyConnection');
+        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('failedLobbyConnection');
     });
 
-    it('should handle validName event by receiving the player name', () => {
-        const event = 'validName';
+    it('should handle successfulLobbyConnection event by receiving the player name', () => {
+        const event = 'successfulLobbyConnection';
         const name = 'player1';
 
         expect(clientSocketServiceMock.playerName).toBe('');
@@ -58,8 +58,8 @@ describe('NameDefinitionComponent', () => {
         expect(clientSocketServiceMock.playerName).toBe(name);
     });
 
-    it('should handle invalidName event by receiving an error message from the server', () => {
-        const event = 'invalidName';
+    it('should handle failedLobbyConnection event by receiving an error message from the server', () => {
+        const event = 'failedLobbyConnection';
         const message = 'server error message';
 
         expect(component.serverMessage).toBe('');
@@ -71,8 +71,8 @@ describe('NameDefinitionComponent', () => {
         expect(component.nameIsInvalid).toBeTrue();
     });
 
-    it('onSubmit should send validateName event through the clientSocketService', () => {
-        const event = 'validateName';
+    it('onSubmit should send joinLobby event through the clientSocketService', () => {
+        const event = 'joinLobby';
         const name = ' Player ';
         component.nameForm.controls['name'].setValue(name);
 

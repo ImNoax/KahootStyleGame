@@ -80,34 +80,30 @@ export class SocketManager {
                 }, COUNTDOWN_PERIOD);
             };
 
-            socket.on('joinLobby', (pinToJoin: Pin) => {
+            socket.on('validatePin', (pinToJoin: Pin) => {
                 if (this.lobbies.has(pinToJoin)) {
                     const lobbyToJoin = this.lobbies.get(pinToJoin);
                     if (lobbyToJoin.isLocked)
-                        socket.emit(
-                            'failedLobbyConnection',
-                            `La partie de PIN ${pinToJoin} a été verrouillée par l'organisateur. Attendez et réessayez.`,
-                        );
+                        socket.emit('invalidPin', `La partie de PIN ${pinToJoin} a été verrouillée par l'organisateur. Attendez et réessayez.`);
                     else {
                         socket.join(pinToJoin);
                         pin = pinToJoin;
-                        socket.emit('successfulLobbyConnection', lobbyToJoin.game, pin);
+                        socket.emit('validPin', lobbyToJoin.game, pin);
                     }
-                } else
-                    socket.emit(
-                        'failedLobbyConnection',
-                        `La partie de PIN ${pinToJoin} n'a pas été trouvée. Elle a soit commencé ou le PIN n'existe pas.`,
-                    );
+                } else socket.emit('invalidPin', `La partie de PIN ${pinToJoin} n'a pas été trouvée. Êtes-vous sûr du PIN?`);
             });
 
-            socket.on('validateName', (nameToValidate: string) => {
+            socket.on('joinLobby', (nameToValidate: string) => {
                 const lowerCaseNameToValide = nameToValidate.toLowerCase();
                 const currentLobby = this.lobbies.get(pin);
 
+                // Message d'erreurs à ajuster selon les cas
                 if (currentLobby.players.find((player) => player.name.toLowerCase() === lowerCaseNameToValide))
-                    socket.emit('invalidName', 'Nom réservé par un autre joueur');
+                    socket.emit('failedLobbyConnection', 'Nom réservé par un autre joueur');
                 else if (currentLobby.bannedNames.find((bannedName) => bannedName.toLowerCase() === lowerCaseNameToValide))
-                    socket.emit('invalidName', 'Nom Banni');
+                    socket.emit('failedLobbyConnection', 'Nom Banni');
+                else if (currentLobby.isLocked)
+                    socket.emit('failedLobbyConnection', `La partie de PIN ${pin} a été verrouillée par l'organisateur. Attendez et réessayez.`);
                 else {
                     currentLobby.players.push({
                         socketId: socket.id,
@@ -119,7 +115,7 @@ export class SocketManager {
                         bonusTimes: 0,
                     });
                     sendLatestPlayersList();
-                    socket.emit('validName', nameToValidate);
+                    socket.emit('successfulLobbyConnection', nameToValidate);
                 }
             });
 

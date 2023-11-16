@@ -28,16 +28,16 @@ export class NameDefinitionComponent implements OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.clientSocket.socket.removeAllListeners('validName');
-        this.clientSocket.socket.removeAllListeners('invalidName');
+        this.clientSocket.socket.removeAllListeners('successfulLobbyConnection');
+        this.clientSocket.socket.removeAllListeners('failedLobbyConnection');
     }
 
     configureBaseSocketFeatures() {
-        this.clientSocket.socket.on('validName', (name) => {
+        this.clientSocket.socket.on('successfulLobbyConnection', (name) => {
             this.clientSocket.playerName = name;
         });
 
-        this.clientSocket.socket.on('invalidName', (message: string) => {
+        this.clientSocket.socket.on('failedLobbyConnection', (message: string) => {
             this.serverMessage = message;
             this.nameIsInvalid = true;
         });
@@ -45,6 +45,6 @@ export class NameDefinitionComponent implements OnDestroy {
 
     onSubmit() {
         const nameToValidate: string = this.nameForm.value.name.trim();
-        this.clientSocket.socket.emit('validateName', nameToValidate);
+        this.clientSocket.socket.emit('joinLobby', nameToValidate);
     }
 }

@@ -40,38 +40,38 @@ describe('SocketManager service tests', () => {
         sinon.restore();
     });
 
-    it('joinLobby should return failedLobbyConnection if the pin is invalid', (done) => {
-        const invalidPin = 'invalid';
+    it('should handle validatePin event by emitting invalidPin event if the pin is invalid', (done) => {
+        const invalidPin = '0000';
 
-        clientSocket.emit('joinLobby', invalidPin);
+        clientSocket.emit('validatePin', invalidPin);
 
-        clientSocket.on('failedLobbyConnection', (reason: string) => {
-            expect(reason).to.equal(`La partie de PIN ${invalidPin} n'a pas été trouvée. Elle a soit commencé ou le PIN n'existe pas.`);
+        clientSocket.on('invalidPin', (reason: string) => {
+            expect(reason).to.equal(`La partie de PIN ${invalidPin} n'a pas été trouvée. Êtes-vous sûr du PIN?`);
             done();
         });
     });
 
-    it('joinLobby should return failedLobbyConnection if the lobby is locked', (done) => {
+    it('should handle validatePin event by emitting invalidPin event if the lobby is locked', (done) => {
         createGame();
 
         setTimeout(() => {
             clientSocket.emit('toggleLock');
-            clientSocket.emit('joinLobby', roomPin);
+            clientSocket.emit('validatePin', roomPin);
 
-            clientSocket.on('failedLobbyConnection', (reason: string) => {
+            clientSocket.on('invalidPin', (reason: string) => {
                 expect(reason).to.equal(`La partie de PIN ${roomPin} a été verrouillée par l'organisateur. Attendez et réessayez.`);
                 done();
             });
         }, RESPONSE_DELAY);
     });
 
-    it('joinLobby should return successfulLobbyConnection in case of success', (done) => {
+    it('should handle validatePin event by emitting validPin event in case of success', (done) => {
         createGame();
 
         setTimeout(() => {
-            clientSocket.emit('joinLobby', roomPin);
+            clientSocket.emit('validatePin', roomPin);
 
-            clientSocket.on('successfulLobbyConnection', (gameId: string, pin: Pin) => {
+            clientSocket.on('validPin', (gameId: string, pin: Pin) => {
                 expect(pin).to.equal(roomPin);
                 expect(gameId).to.equal('');
                 done();
@@ -79,41 +79,57 @@ describe('SocketManager service tests', () => {
         }, RESPONSE_DELAY);
     });
 
-    it('validateName should return invalidName if the name is already taken', (done) => {
-        const name = 'test';
+    it('should handle joinLobby event by emitting failedLobbyConnection event if the name is already taken', (done) => {
+        const name = 'Organisateur';
         createGame();
 
-        clientSocket.emit('validateName', name);
-        clientSocket.emit('validateName', name);
+        setTimeout(() => {
+            clientSocket.emit('joinLobby', name);
 
-        clientSocket.on('invalidName', (reason: string) => {
-            expect(reason).to.equal('Nom réservé par un autre joueur');
-            done();
-        });
+            clientSocket.on('failedLobbyConnection', (reason: string) => {
+                expect(reason).to.equal('Nom réservé par un autre joueur');
+                done();
+            });
+        }, RESPONSE_DELAY);
     });
 
-    it('validateName should return invalidName if the name is banned', (done) => {
+    it('should handle joinLobby event by emitting failedLobbyConnection event if the name is banned', (done) => {
         const name = 'test';
         createGame();
 
         setTimeout(() => {
             service['lobbies'].get(roomPin).bannedNames.push(name);
-            clientSocket.emit('validateName', name);
+            clientSocket.emit('joinLobby', name);
 
-            clientSocket.on('invalidName', (reason: string) => {
+            clientSocket.on('failedLobbyConnection', (reason: string) => {
                 expect(reason).to.equal('Nom Banni');
                 done();
             });
         }, RESPONSE_DELAY);
     });
 
-    it('validateName should return validName if the name is correct', (done) => {
+    it('should handle joinLobby event by emitting failedLobbyConnection event if the lobby is locked', (done) => {
         const name = 'test';
         createGame();
 
-        clientSocket.emit('validateName', name);
+        setTimeout(() => {
+            clientSocket.emit('toggleLock');
+            clientSocket.emit('joinLobby', name);
 
-        clientSocket.on('validName', (validName: string) => {
+            clientSocket.on('failedLobbyConnection', (message: string) => {
+                expect(message).to.equal(`La partie de PIN ${roomPin} a été verrouillée par l'organisateur. Attendez et réessayez.`);
+                done();
+            });
+        }, RESPONSE_DELAY);
+    });
+
+    it('should handle joinLobby event by emitting successfulLobbyConnection event if the name is correct', (done) => {
+        const name = 'test';
+        createGame();
+
+        clientSocket.emit('joinLobby', name);
+
+        clientSocket.on('successfulLobbyConnection', (validName: string) => {
             expect(validName).to.equal(name);
             done();
         });
@@ -169,8 +185,8 @@ describe('SocketManager service tests', () => {
 
         setTimeout(() => {
             const pin = roomPin;
-            clientSocket2.emit('joinLobby', pin);
-            clientSocket2.emit('validateName', nameClient2);
+            clientSocket2.emit('validatePin', pin);
+            clientSocket2.emit('joinLobby', nameClient2);
 
             setTimeout(() => {
                 clientSocket.emit('banPlayer', { socketId: clientSocket2.id, name: nameClient2 });
@@ -224,8 +240,8 @@ describe('SocketManager service tests', () => {
         createGame();
 
         setTimeout(() => {
-            clientSocket2.emit('joinLobby', roomPin);
-            clientSocket2.emit('validateName', '');
+            clientSocket2.emit('validatePin', roomPin);
+            clientSocket2.emit('joinLobby', '');
 
             setTimeout(() => {
                 clientSocket.emit('leaveLobby');
@@ -261,8 +277,8 @@ describe('SocketManager service tests', () => {
         createGame();
 
         setTimeout(() => {
-            clientSocket2.emit('joinLobby', roomPin);
-            clientSocket2.emit('validateName', '');
+            clientSocket2.emit('validatePin', roomPin);
+            clientSocket2.emit('joinLobby', '');
 
             setTimeout(() => {
                 expect(service['lobbies'].get(roomPin).players.length).to.equal(2);
@@ -304,19 +320,19 @@ describe('SocketManager service tests', () => {
         }, RESPONSE_DELAY);
     });
 
-    // it('startCountDown should emit countDownEnd if the timer is less or equal than 1', (done) => {
-    //     createGame();
-    //     const spy = sinon.spy(service['sio'].to(roomPin), 'emit');
+    it('startCountDown should emit countDownEnd if the timer is less or equal than 1', (done) => {
+        createGame();
+        const spy = sinon.spy(service['sio'], 'to');
 
-    //     setTimeout(() => {
-    //         clientSocket.emit('startCountDown', 1, false, GameMode.RealGame);
+        setTimeout(() => {
+            clientSocket.emit('startCountDown', 1, false, GameMode.RealGame);
 
-    //         clientSocket.on('countDownEnd', () => {
-    //             sinon.assert.calledWith(spy, 'countDownEnd');
-    //             done();
-    //         });
-    //     }, RESPONSE_DELAY);
-    // });
+            clientSocket.on('countDownEnd', () => {
+                sinon.assert.called(spy);
+                done();
+            });
+        }, RESPONSE_DELAY);
+    });
 
     it('stopCountDown should stop the timer', (done) => {
         let countDownEnded = false;
@@ -375,10 +391,10 @@ describe('SocketManager service tests', () => {
         createGame();
 
         setTimeout(() => {
-            clientSocket2.emit('joinLobby', roomPin);
-            clientSocket2.emit('validateName', 'test1');
-            clientSocket3.emit('joinLobby', roomPin);
-            clientSocket3.emit('validateName', 'test2');
+            clientSocket2.emit('validatePin', roomPin);
+            clientSocket2.emit('joinLobby', 'test1');
+            clientSocket3.emit('validatePin', roomPin);
+            clientSocket3.emit('joinLobby', 'test2');
 
             setTimeout(() => {
                 clientSocket2.emit('answerSubmitted', true, false);
