@@ -31,7 +31,7 @@ describe('SocketManager service tests', () => {
         server.init();
         service = server['socketManager'];
         clientSocket = ioClient(urlString);
-        sinon.stub(console, 'log'); // stop console.log
+        sinon.stub(console, 'log');
     });
 
     afterEach(() => {
@@ -296,25 +296,31 @@ describe('SocketManager service tests', () => {
         });
     });
 
-    it('startCountDown should emit questionTransition if the next question is loading', (done) => {
+    it('startCountDown should emit questionTransition event if the next question is loading', (done) => {
         createGame();
 
-        clientSocket.emit('startCountDown', 0, true);
+        setTimeout(() => {
+            clientSocket.emit('startCountDown', 0, { isQuestionTransition: true });
 
-        clientSocket.on('questionTransition', (isQuestionTransition: boolean) => {
-            expect(isQuestionTransition).to.equal(true);
-            done();
-        });
+            clientSocket.on('questionTransition', (isQuestionTransition: boolean) => {
+                expect(isQuestionTransition).to.equal(true);
+                done();
+            });
+        }, RESPONSE_DELAY);
     });
 
     it('startCountDown should emit countDown if the timer is greater than 0', (done) => {
-        const time = 4;
+        let time = 4;
 
         setTimeout(() => {
-            clientSocket.emit('startCountDown', time, false, GameMode.Testing);
+            clientSocket.emit('startCountDown', time, { isPanicModeEnabled: true }, GameMode.Testing);
 
-            clientSocket.on('countDown', (timer: number) => {
-                expect(timer).to.equal(time); // à revoir
+            clientSocket.on('countDown', (count: number) => {
+                expect(count).to.equal(time);
+                clientSocket.on('countDown', (newCount: number) => {
+                    expect(newCount).to.equal(--time);
+                    done();
+                });
                 done();
             });
         }, RESPONSE_DELAY);
@@ -325,7 +331,7 @@ describe('SocketManager service tests', () => {
         const spy = sinon.spy(service['sio'], 'to');
 
         setTimeout(() => {
-            clientSocket.emit('startCountDown', 1, false, GameMode.RealGame);
+            clientSocket.emit('startCountDown', 1, { isQuestionTransition: false, isPanicModeEnabled: false }, GameMode.RealGame);
 
             clientSocket.on('countDownEnd', () => {
                 sinon.assert.called(spy);
@@ -337,7 +343,7 @@ describe('SocketManager service tests', () => {
     it('stopCountDown should stop the timer', (done) => {
         let countDownEnded = false;
         const waitTime = 2500;
-        clientSocket.emit('startCountDown', 2, false, GameMode.Testing);
+        clientSocket.emit('startCountDown', 2, { isQuestionTransition: false, isPanicModeEnabled: false }, GameMode.Testing);
 
         clientSocket.emit('stopCountDown');
 
@@ -386,7 +392,6 @@ describe('SocketManager service tests', () => {
     it('answerSubmitted should return canLoadNextQuestion to the host and all submitted to the others', (done) => {
         const clientSocket2 = ioClient(urlString);
         const clientSocket3 = ioClient(urlString);
-        let canLoadQuestion = false;
         let nbSubmitted = 0;
         createGame();
 
@@ -399,9 +404,6 @@ describe('SocketManager service tests', () => {
             setTimeout(() => {
                 clientSocket2.emit('answerSubmitted', true, false);
                 clientSocket3.emit('answerSubmitted', true, true);
-                clientSocket.on('canLoadNextQuestion', () => {
-                    canLoadQuestion = true;
-                });
                 clientSocket2.on('allSubmitted', (bonusRecipient: string) => {
                     expect(bonusRecipient).to.equal(clientSocket2.id);
                     nbSubmitted++;
@@ -413,10 +415,22 @@ describe('SocketManager service tests', () => {
 
                 setTimeout(() => {
                     expect(nbSubmitted).to.equal(2);
-                    expect(canLoadQuestion).to.equal(true);
                     done();
                 }, RESPONSE_DELAY);
             }, RESPONSE_DELAY);
+        }, RESPONSE_DELAY);
+    });
+
+    it('should handle enablePanicMode by emitting panicMode event to everyone in the room', (done) => {
+        createGame();
+        const spy = sinon.spy(service['sio'], 'to');
+
+        setTimeout(() => {
+            clientSocket.emit('enablePanicMode');
+            clientSocket.on('panicMode', () => {
+                sinon.assert.called(spy);
+                done();
+            });
         }, RESPONSE_DELAY);
     });
 
@@ -436,14 +450,14 @@ describe('SocketManager service tests', () => {
     });
 
     it('histogramUpdate should update the histogram and send updateHistogram', (done) => {
-        const data = { ['1']: 2 };
+        const data = { answer: 2 };
         createGame();
 
         setTimeout(() => {
             service['lobbies'].get(roomPin).histogram = {};
-            service['lobbies'].get(roomPin).histogram['1'] = 1;
+            service['lobbies'].get(roomPin).histogram['answer'] = 1;
 
-            clientSocket.emit('histogramUpdate', { ['1']: 1 });
+            clientSocket.emit('histogramUpdate', { answer: 1 });
 
             clientSocket.on('updateHistogram', (updateData: { [key: string]: number }) => {
                 expect(updateData).to.deep.equal(data);
@@ -453,7 +467,8 @@ describe('SocketManager service tests', () => {
     });
 
     it('histogramUpdate should create an histogram if one does not already exist', (done) => {
-        const data = { ['1']: 1 };
+        const data = { answer: 1 };
+        Object.getPrototypeOf(data).unwantedKey = 0;
         createGame();
 
         clientSocket.emit('histogramUpdate', data);

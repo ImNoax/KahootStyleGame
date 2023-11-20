@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -5,15 +6,76 @@ import { Router } from '@angular/router';
 import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
 import { SocketMock } from '@app/classes/socket-mock';
 import { ButtonResponseComponent } from '@app/components/button-response/button-response.component';
-import { MOCK_BUTTONS, MOCK_GAME, TIME_OUT } from '@app/constants';
-import { snackBarErrorConfiguration, snackBarNormalConfiguration } from '@app/constants/snack-bar-configuration';
+import { PAUSE_MESSAGE, TIME_OUT, UNPAUSE_MESSAGE } from '@app/constants/in-game';
+import { SNACK_BAR_ERROR_CONFIGURATION, SNACK_BAR_NORMAL_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { Route } from '@app/enums';
+import { Button } from '@app/interfaces/button-model';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { TimerService } from '@app/services/timer.service';
+import { Game, Question, QuestionType } from '@common/game';
 import { GameMode } from '@common/game-mode';
+import { Limit } from '@common/limit';
 
 describe('ButtonResponseComponent', () => {
+    const MOCK_BUTTONS: Button[] = [
+        {
+            color: 'white',
+            selected: false,
+            text: 'Test1',
+            isCorrect: true,
+            id: 1,
+        },
+        {
+            color: 'white',
+            selected: false,
+            text: 'Test2',
+            isCorrect: false,
+            id: 2,
+        },
+        {
+            color: 'white',
+            selected: true,
+            text: 'Test3',
+            isCorrect: true,
+            id: 3,
+        },
+        {
+            color: 'white',
+            selected: true,
+            text: 'Test4',
+            isCorrect: false,
+            id: 4,
+        },
+    ];
+
+    const MOCK_QUESTIONS: Question[] = [
+        {
+            text: 'What is the capital of France?',
+            points: 10,
+            type: QuestionType.QCM,
+            choices: [
+                { text: 'Paris', isCorrect: true },
+                { text: 'London', isCorrect: false },
+                { text: 'Berlin', isCorrect: false },
+                { text: 'Madrid', isCorrect: false },
+            ],
+        },
+        {
+            text: 'Question 2',
+            points: 10,
+            type: QuestionType.QRL,
+        },
+    ];
+
+    const MOCK_GAME: Game = {
+        id: '1',
+        title: 'Game 1',
+        description: 'Test ',
+        duration: 5,
+        lastModification: '2018-11-13',
+        questions: MOCK_QUESTIONS,
+    };
     let component: ButtonResponseComponent;
     let fixture: ComponentFixture<ButtonResponseComponent>;
     let routerMock: jasmine.SpyObj<Router>;
@@ -59,6 +121,73 @@ describe('ButtonResponseComponent', () => {
         expect(component.isOrganizer).toEqual(clientSocketServiceMock.isOrganizer);
     });
 
+    it('pauseMessage getter should return unpause message if game is paused', () => {
+        component.isGamePaused = true;
+        expect(component.pauseMessage).toEqual(UNPAUSE_MESSAGE);
+    });
+
+    it('pauseMessage getter should return pause message if game is not paused', () => {
+        component.isGamePaused = false;
+        expect(component.pauseMessage).toEqual(PAUSE_MESSAGE);
+    });
+
+    it('questionType getter should return current question type', () => {
+        gameHandlingServiceMock.currentQuestionId = 0;
+        expect(component.questionType).toEqual(MOCK_GAME.questions[0].type);
+    });
+
+    it('isPanicModeEnabled getter should get isPanicModeEnabled from the TimerService', () => {
+        timerMock.isPanicModeEnabled = true;
+        expect(component.isPanicModeEnabled).toBeTrue();
+
+        timerMock.isPanicModeEnabled = false;
+        expect(component.isPanicModeEnabled).toBeFalse();
+    });
+
+    it('isPanicModeAvailable getter should return true if the current count is lower or equal than the required count for panic mode', () => {
+        const count = 10;
+        timerMock.count = count;
+        gameHandlingServiceMock.currentQuestionId = 0;
+        expect(component.isPanicModeAvailable).toBeTrue();
+
+        gameHandlingServiceMock.currentQuestionId = 1;
+        expect(component.isPanicModeAvailable).toBeTrue();
+    });
+
+    it('isPanicModeAvailable getter should return false if the current count is greater than the required count for panic mode', () => {
+        const count = 30;
+        timerMock.count = count;
+        gameHandlingServiceMock.currentQuestionId = 0;
+        expect(component.isPanicModeAvailable).toBeFalse();
+
+        gameHandlingServiceMock.currentQuestionId = 1;
+        expect(component.isPanicModeAvailable).toBeFalse();
+    });
+
+    it('remainingCountForPanic should return remaining count for panic mode to be available for a QCM', () => {
+        const count = 5;
+        component.currentGame = MOCK_GAME;
+        timerMock.count = count;
+        gameHandlingServiceMock.currentQuestionId = 0;
+        expect(component.remainingCountForPanic).toEqual(count - Limit.QcmRequiredPanicCount);
+    });
+
+    it('remainingCountForPanic should return remaining count for panic mode to be available for a QRL', () => {
+        const count = 5;
+        component.currentGame = MOCK_GAME;
+        timerMock.count = count;
+        gameHandlingServiceMock.currentQuestionId = 1;
+        expect(component.remainingCountForPanic).toEqual(count - Limit.QrlRequiredPanicCount);
+    });
+
+    it('isQuestionTransition getter should get isQuestionTransition from the TimerService', () => {
+        timerMock.isQuestionTransition = true;
+        expect(component.isQuestionTransition).toBeTrue();
+
+        timerMock.isQuestionTransition = false;
+        expect(component.isQuestionTransition).toBeFalse();
+    });
+
     it('should get currentGame from GameHandlingService, call updateButtons and configureBaseSocketFeatures on component initialization', () => {
         spyOn(component, 'updateButtons');
         spyOn(component, 'configureBaseSocketFeatures');
@@ -79,8 +208,8 @@ describe('ButtonResponseComponent', () => {
         spyOn(socketMock, 'removeAllListeners');
         component.ngOnDestroy();
         expect(socketMock.removeAllListeners).toHaveBeenCalledWith('allSubmitted');
+        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('panicMode');
         expect(socketMock.removeAllListeners).toHaveBeenCalledWith('countDownEnd');
-        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('canLoadNextQuestion');
         expect(socketMock.removeAllListeners).toHaveBeenCalledWith('noPlayers');
     });
 
@@ -90,7 +219,7 @@ describe('ButtonResponseComponent', () => {
         expect(component.processAnswer).toHaveBeenCalled();
     });
 
-    it("should handle allSubmitted event by giving a bonus if the player's socket.id matches bonusRecipient", () => {
+    it("should handle allSubmitted event by giving a bonus if the player's socket id matches bonusRecipient", () => {
         const bonusRecipientSocketId = '1';
         component.hasBonus = false;
         clientSocketServiceMock.socket.id = bonusRecipientSocketId;
@@ -98,13 +227,33 @@ describe('ButtonResponseComponent', () => {
         expect(component.hasBonus).toBeTrue();
     });
 
-    it("should handle allSubmitted event by not giving a bonus if the player's socket.id doesn't match bonusRecipient", () => {
+    it('should handle allSubmitted event by stopping the countdown and setting canLoadNextQuestion and hasQuestionEnded to true\
+        if player is the organizer', () => {
         const bonusRecipientSocketId = '1';
-        component.hasBonus = false;
         clientSocketServiceMock.socket.id = '0';
+        clientSocketServiceMock.isOrganizer = true;
+        component.canLoadNextQuestion = false;
+        component.hasQuestionEnded = false;
+        spyOn(component, 'processAnswer');
+
         socketMock.simulateServerEmit('allSubmitted', bonusRecipientSocketId);
-        expect(component.hasBonus).toBeFalse();
+        expect(timerMock.stopCountDown).toHaveBeenCalled();
+        expect(component.canLoadNextQuestion).toBeTrue();
+        expect(component.hasQuestionEnded).toBeTrue();
+        expect(component.processAnswer).not.toHaveBeenCalled();
     });
+
+    it('should handle panicMode event by setting isPanicModeEnabled to true and playing the audio', () => {
+        spyOn(component.audio, 'load');
+        spyOn(component.audio, 'play');
+
+        timerMock.isPanicModeEnabled = false;
+        socketMock.simulateServerEmit('panicMode');
+        expect(timerMock.isPanicModeEnabled).toBeTrue();
+        expect(component.audio.load).toHaveBeenCalled();
+        expect(component.audio.play).toHaveBeenCalled();
+    });
+
     it('should handle countDownEnd event by loading the next question if isQuestionTransition from TimerService is true', () => {
         timerMock.isQuestionTransition = true;
         spyOn(component, 'loadNextQuestion');
@@ -119,18 +268,13 @@ describe('ButtonResponseComponent', () => {
         expect(component.onTimerEnded).toHaveBeenCalled();
     });
 
-    it('should handle canLoadNextQuestion event by calling stopCountDown and setting canLoadNextQuestion to true', () => {
-        component.canLoadNextQuestion = false;
-        socketMock.simulateServerEmit('canLoadNextQuestion');
-        expect(timerMock.stopCountDown).toHaveBeenCalled();
-        expect(component.canLoadNextQuestion).toBeTrue();
-    });
-
-    it('should handle noPlayers event by opening a snack bar, stop  the timer and setting canLoadNextQuestion to false', () => {
+    it('should handle noPlayers event by opening a snack bar, stopping the timer and setting canLoadNextQuestion to false', () => {
+        component.hasQuestionEnded = false;
         component.canLoadNextQuestion = true;
         socketMock.simulateServerEmit('noPlayers');
-        expect(snackBarMock.open).toHaveBeenCalledWith('Tous les joueurs ont quitté la partie.', '', snackBarErrorConfiguration);
+        expect(snackBarMock.open).toHaveBeenCalledWith('Tous les joueurs ont quitté la partie.', '', SNACK_BAR_ERROR_CONFIGURATION);
         expect(timerMock.stopCountDown).toHaveBeenCalled();
+        expect(component.hasQuestionEnded).toBeTrue();
         expect(component.canLoadNextQuestion).toBeFalse();
     });
 
@@ -255,18 +399,21 @@ describe('ButtonResponseComponent', () => {
         expect(verifyResponsesAndCallUpdateSpy).toHaveBeenCalled();
     });
 
-    it('updateGameQuestions should navigate to create if currentQuestionId equals last question', () => {
+    it('updateGameQuestions should navigate to game creation page if currentQuestionId equals last question and game mode is Testing', () => {
         gameHandlingServiceMock.currentQuestionId = component.currentGame.questions.length - 1;
         gameHandlingServiceMock.gameMode = GameMode.Testing;
         component.updateGameQuestions();
-        expect(timerMock.stopCountDown).toHaveBeenCalled();
         expect(routerMock.navigate).toHaveBeenCalledWith([Route.GameCreation]);
+    });
+
+    it('updateGameQuestions should emit gameEnded event if currentQuestionId equals last question and game mode is RealGame', () => {
+        gameHandlingServiceMock.currentQuestionId = component.currentGame.questions.length - 1;
         gameHandlingServiceMock.gameMode = GameMode.RealGame;
         component.updateGameQuestions();
         expect(socketMock.emit).toHaveBeenCalledWith('gameEnded');
     });
 
-    it('updateGameQuestions should set the current question to the next one, update the buttons and start the countdown if not last question', () => {
+    it('updateGameQuestions should set the current question to the next one, update the buttons if there is another question', () => {
         gameHandlingServiceMock.currentQuestionId = component.currentGame.questions.length - 2;
         spyOn(component, 'updateButtons');
         spyOn(component.updateQuestionScore, 'emit');
@@ -276,30 +423,71 @@ describe('ButtonResponseComponent', () => {
         expect(component.updateButtons).toHaveBeenCalled();
         expect(component.updateQuestionScore.emit).toHaveBeenCalled();
         expect(gameHandlingServiceMock.setCurrentQuestion).toHaveBeenCalled();
-        expect(timerMock.startCountDown).toHaveBeenCalled();
         expect(component.buttonFocus.nativeElement.focus).toHaveBeenCalled();
     });
 
-    it('processAnswer should stop the countdown, open a snack bar and increase or not score based on isAnswerCorrect', () => {
+    it('updateGameQuestions should start countdown if there is another question and the player is the organizer', () => {
+        gameHandlingServiceMock.currentQuestionId = component.currentGame.questions.length - 2;
+        clientSocketServiceMock.isOrganizer = true;
+        gameHandlingServiceMock.gameMode = GameMode.RealGame;
+        component.updateGameQuestions();
+        expect(timerMock.startCountDown).toHaveBeenCalledWith(MOCK_GAME.duration);
+    });
+
+    it('updateGameQuestions should start countdown if there is another question and the player is a tester', () => {
+        gameHandlingServiceMock.currentQuestionId = component.currentGame.questions.length - 2;
+        clientSocketServiceMock.isOrganizer = false;
+        gameHandlingServiceMock.gameMode = GameMode.Testing;
+        component.updateGameQuestions();
+        expect(timerMock.startCountDown).toHaveBeenCalledWith(MOCK_GAME.duration);
+    });
+
+    it('processAnswer should open a snack bar and give points with bonus if answer is correct and the player has the bonus', () => {
         const bonusFactor = 1.2;
+        let bonusTimes = 0;
         component.buttons = MOCK_BUTTONS;
         component.isAnswerCorrect = true;
         component.hasBonus = true;
+        gameHandlingServiceMock.gameMode = GameMode.RealGame;
         component.bonusTimes = 0;
         component.processAnswer();
-        expect(timerMock.stopCountDown).toHaveBeenCalled();
-        expect(socketMock.emit).toHaveBeenCalledWith('updateBonusTimes', 1);
+        expect(component.bonusTimes).toEqual(++bonusTimes);
+        expect(socketMock.emit).toHaveBeenCalledWith('updateBonusTimes', bonusTimes);
         expect(gameHandlingServiceMock.incrementScore).toHaveBeenCalledWith(MOCK_GAME.questions[0].points * bonusFactor);
         expect(snackBarMock.open).toHaveBeenCalled();
     });
 
-    it('processAnswer should restart countdown if the game mode is Testing', () => {
+    it('processAnswer should always give bonus if the player is a tester', () => {
+        const bonusFactor = 1.2;
         component.buttons = MOCK_BUTTONS;
-        component.isAnswerCorrect = false;
+        component.isAnswerCorrect = true;
+        component.hasBonus = false;
         gameHandlingServiceMock.gameMode = GameMode.Testing;
         component.processAnswer();
-        expect(timerMock.startCountDown).toHaveBeenCalledWith(TIME_OUT, true);
-        expect(snackBarMock.open).toHaveBeenCalledWith('+0 points ❌', '', snackBarNormalConfiguration);
+        expect(gameHandlingServiceMock.incrementScore).toHaveBeenCalledWith(MOCK_GAME.questions[0].points * bonusFactor);
+    });
+
+    it('processAnswer should open a snack bar indicating that 0 points was rewarded', () => {
+        component.buttons = MOCK_BUTTONS;
+        component.isAnswerCorrect = false;
+        component.processAnswer();
+        expect(snackBarMock.open).toHaveBeenCalledWith('+0 points ❌', '', SNACK_BAR_NORMAL_CONFIGURATION);
+    });
+
+    it('processAnswer should restart countdown if the game mode is Testing', () => {
+        component.buttons = MOCK_BUTTONS;
+        gameHandlingServiceMock.gameMode = GameMode.Testing;
+        component.processAnswer();
+        expect(timerMock.startCountDown).toHaveBeenCalledWith(TIME_OUT, { isQuestionTransition: true });
+    });
+
+    it('processAnswer should not give a bonus if has bonus is false and the game mode is RealGame', () => {
+        component.buttons = MOCK_BUTTONS;
+        component.isAnswerCorrect = true;
+        component.hasBonus = false;
+        gameHandlingServiceMock.gameMode = GameMode.RealGame;
+        component.processAnswer();
+        expect(gameHandlingServiceMock.incrementScore).toHaveBeenCalledWith(MOCK_GAME.questions[0].points);
     });
 
     it('loadNextQuestion should call updateGameQuestions and reset every member', () => {
@@ -310,6 +498,8 @@ describe('ButtonResponseComponent', () => {
         component.isAnswerCorrect = false;
         component.submittedFromTimer = true;
         timerMock.isQuestionTransition = true;
+        component.isGamePaused = true;
+        component.hasQuestionEnded = true;
         component.buttons = MOCK_BUTTONS;
         component.loadNextQuestion();
         for (const button of component.buttons) {
@@ -322,6 +512,8 @@ describe('ButtonResponseComponent', () => {
         expect(component.isAnswerCorrect).toBeTrue();
         expect(component.submittedFromTimer).toBeFalse();
         expect(timerMock.isQuestionTransition).toBeFalse();
+        expect(component.isGamePaused).toBeFalse();
+        expect(component.hasQuestionEnded).toBeFalse();
         expect(component.updateGameQuestions).toHaveBeenCalled();
     });
 
@@ -333,12 +525,57 @@ describe('ButtonResponseComponent', () => {
         for (const button of component.buttons) expect(clientSocketServiceMock.sendUpdateHistogram).toHaveBeenCalledWith({ [button.text]: 0 });
     });
 
-    it('startNextQuestionCountDown should resetHstogram, start countdown and set canLoadNextQuestion to false', () => {
+    it('startNextQuestionCountDown should reset histogram, start countdown and set canLoadNextQuestion as well as isGamePause to false', () => {
         spyOn(clientSocketServiceMock, 'sendResetHistogram');
         component.canLoadNextQuestion = true;
+        component.isGamePaused = true;
+
         component.startNextQuestionCountDown();
         expect(clientSocketServiceMock.sendResetHistogram).toHaveBeenCalled();
-        expect(timerMock.startCountDown).toHaveBeenCalledWith(TIME_OUT, true);
         expect(component.canLoadNextQuestion).toBeFalse();
+        expect(component.isGamePaused).toBeFalse();
+        expect(timerMock.startCountDown).toHaveBeenCalledWith(TIME_OUT, { isQuestionTransition: true });
+    });
+
+    it('pause should restart transition countdown if game was paused during a question transition', () => {
+        const transitionCount = 20;
+
+        component.isGamePaused = true;
+        timerMock.isQuestionTransition = true;
+        timerMock.transitionCount = transitionCount;
+
+        component.pause();
+        expect(timerMock.startCountDown).toHaveBeenCalledWith(transitionCount);
+        expect(component.isGamePaused).toBeFalse();
+    });
+
+    it('pause should restart countdown if game was paused during an ongoing question', () => {
+        const count = 10;
+        timerMock.isPanicModeEnabled = true;
+
+        component.isGamePaused = true;
+        timerMock.isQuestionTransition = false;
+        timerMock.count = count;
+
+        component.pause();
+        expect(timerMock.startCountDown).toHaveBeenCalledWith(count, { isPanicModeEnabled: true });
+        expect(component.isGamePaused).toBeFalse();
+    });
+
+    it('pause should stop countdown if game was not paused', () => {
+        component.isGamePaused = false;
+
+        component.pause();
+        expect(timerMock.stopCountDown).toHaveBeenCalled();
+        expect(component.isGamePaused).toBeTrue();
+    });
+
+    it('panic should emit enablePanicMode event and start countdown with configuration isPanicModeEnabled to true', () => {
+        const currentCount = 10;
+        timerMock.count = currentCount;
+        component.panic();
+        expect(socketMock.emit).toHaveBeenCalledWith('enablePanicMode');
+        expect(timerMock.stopCountDown).toHaveBeenCalled();
+        expect(timerMock.startCountDown).toHaveBeenCalledWith(currentCount, { isPanicModeEnabled: true });
     });
 });

@@ -10,8 +10,7 @@ import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock
 import { SocketMock } from '@app/classes/socket-mock';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { NameDefinitionComponent } from '@app/components/name-definition/name-definition.component';
-import { snackBarConfiguration } from '@app/constants';
-import { snackBarErrorConfiguration } from '@app/constants/snack-bar-configuration';
+import { SNACK_BAR_ERROR_CONFIGURATION, SNACK_BAR_NORMAL_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { Route } from '@app/enums';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
@@ -184,7 +183,7 @@ describe('LobbyPageComponent', () => {
 
         socketMock.simulateServerEmit('noPlayers');
         expect(component.toggleLobbyLock).toHaveBeenCalled();
-        expect(snackBarMock.open).toHaveBeenCalledWith("Tous les joueurs ont quitté la salle d'attente.", '', snackBarErrorConfiguration);
+        expect(snackBarMock.open).toHaveBeenCalledWith("Tous les joueurs ont quitté la salle d'attente.", '', SNACK_BAR_ERROR_CONFIGURATION);
     });
 
     it('should handle noPlayers event by doing nothing if countDownStarted is false', () => {
@@ -239,12 +238,12 @@ describe('LobbyPageComponent', () => {
         expect(snackBarMock.open).toHaveBeenCalledWith(
             "Votre nom de joueur n'a pas été défini avant le début de la partie",
             '',
-            snackBarErrorConfiguration,
+            SNACK_BAR_ERROR_CONFIGURATION,
         );
     });
 
     it('notifyClipboardCopy should open a snackbar', () => {
         component.notifyClipboardCopy();
-        expect(snackBarMock.open).toHaveBeenCalledWith('PIN copié!', '', snackBarConfiguration);
+        expect(snackBarMock.open).toHaveBeenCalledWith('PIN copié!', '', SNACK_BAR_NORMAL_CONFIGURATION);
     });
 });

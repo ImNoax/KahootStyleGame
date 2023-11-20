@@ -2,19 +2,17 @@ import { GameHandlingService } from '@angular/../../client/src/app/services/game
 import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, inject, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { snackBarErrorConfiguration, snackBarNormalConfiguration } from '@app/constants/snack-bar-configuration';
+import { RAMDOM_AUDIO_URL, SIMS4_SOUNDS } from '@app/constants/audio-url';
+import { BONUS_POINTS, BUTTON_SELECTED, BUTTON_UNSELECTED, PAUSE_MESSAGE, TIME_OUT, UNPAUSE_MESSAGE } from '@app/constants/in-game';
+import { SNACK_BAR_ERROR_CONFIGURATION, SNACK_BAR_NORMAL_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { Route } from '@app/enums';
 import { Button } from '@app/interfaces/button-model';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { TimerService } from '@app/services/timer.service';
-import { Choice, Game } from '@common/game';
+import { Choice, Game, QuestionType } from '@common/game';
 import { GameMode } from '@common/game-mode';
+import { Limit } from '@common/limit';
 import { Subscription } from 'rxjs/internal/Subscription';
-
-const TIME_OUT = 3;
-const BONUS_POINTS = 0.2;
-const BUTTON_SELECTED = 1;
-const BUTTON_UNSELECTED = -1;
 
 @Component({
     selector: 'app-button-response',
@@ -35,6 +33,9 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
     hasBonus: boolean = false;
     isAnswerCorrect: boolean = true;
     loadingMessage: string = '';
+    isGamePaused = false;
+    hasQuestionEnded = false;
+    audio: HTMLAudioElement = new Audio();
     private clientSocket: ClientSocketService = inject(ClientSocketService);
     private snackBar: MatSnackBar = inject(MatSnackBar);
 
@@ -46,6 +47,33 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
 
     get isOrganizer() {
         return this.clientSocket.isOrganizer;
+    }
+
+    get pauseMessage() {
+        if (this.isGamePaused) return UNPAUSE_MESSAGE;
+        return PAUSE_MESSAGE;
+    }
+
+    get questionType() {
+        return this.currentGame.questions[this.gameService.currentQuestionId].type;
+    }
+
+    get isPanicModeEnabled() {
+        return this.timer.isPanicModeEnabled;
+    }
+
+    get isPanicModeAvailable() {
+        if (this.questionType === QuestionType.QCM) return this.timer.count <= Limit.QcmRequiredPanicCount;
+        return this.timer.count <= Limit.QrlRequiredPanicCount;
+    }
+
+    get remainingCountForPanic() {
+        if (this.questionType === QuestionType.QCM) return this.timer.count - Limit.QcmRequiredPanicCount;
+        return this.timer.count - Limit.QrlRequiredPanicCount;
+    }
+
+    get isQuestionTransition() {
+        return this.timer.isQuestionTransition;
     }
 
     @HostListener('document:click', ['$event'])
@@ -60,6 +88,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
         this.currentGame = this.gameService.currentGame;
         this.updateButtons();
         this.configureBaseSocketFeatures();
+        this.audio.volume = 1;
     }
 
     ngOnDestroy(): void {
@@ -67,34 +96,46 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
             this.timerSubscription.unsubscribe();
         }
 
+        this.audio.pause();
+
         this.clientSocket.socket.removeAllListeners('allSubmitted');
+        this.clientSocket.socket.removeAllListeners('panicMode');
         this.clientSocket.socket.removeAllListeners('countDownEnd');
-        this.clientSocket.socket.removeAllListeners('canLoadNextQuestion');
         this.clientSocket.socket.removeAllListeners('noPlayers');
     }
 
     configureBaseSocketFeatures() {
         this.clientSocket.socket.on('allSubmitted', (bonusRecipient: string) => {
             if (this.clientSocket.socket.id === bonusRecipient) this.hasBonus = true;
+
+            if (this.clientSocket.isOrganizer) {
+                this.timer.stopCountDown();
+                this.canLoadNextQuestion = true;
+                this.hasQuestionEnded = true;
+                return;
+            }
             this.processAnswer();
         });
 
+        this.clientSocket.socket.on('panicMode', () => {
+            this.timer.isPanicModeEnabled = true;
+            this.audio.src = RAMDOM_AUDIO_URL(SIMS4_SOUNDS);
+            this.audio.load();
+            this.audio.play();
+        });
+
         this.clientSocket.socket.on('countDownEnd', () => {
-            if (this.timer.isQuestionTransition) {
+            if (this.isQuestionTransition) {
                 this.loadNextQuestion();
                 return;
             }
             this.onTimerEnded();
         });
 
-        this.clientSocket.socket.on('canLoadNextQuestion', () => {
-            this.timer.stopCountDown();
-            this.canLoadNextQuestion = true;
-        });
-
         this.clientSocket.socket.on('noPlayers', () => {
-            this.snackBar.open('Tous les joueurs ont quitté la partie.', '', snackBarErrorConfiguration);
+            this.snackBar.open('Tous les joueurs ont quitté la partie.', '', SNACK_BAR_ERROR_CONFIGURATION);
             this.timer.stopCountDown();
+            this.hasQuestionEnded = true;
             this.canLoadNextQuestion = false;
         });
     }
@@ -166,6 +207,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
         this.isProcessing = true;
 
         if (this.gameService.gameMode === GameMode.Testing) {
+            this.timer.stopCountDown();
             this.processAnswer();
             return;
         }
@@ -187,7 +229,6 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
 
     updateGameQuestions() {
         if (this.gameService.currentQuestionId === this.currentGame.questions.length - 1) {
-            this.timer.stopCountDown();
             if (this.gameService.gameMode === GameMode.Testing) {
                 this.router.navigate([Route.GameCreation]);
                 return;
@@ -198,7 +239,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
             this.updateButtons();
             this.gameService.setCurrentQuestion(this.currentGame.questions[this.gameService.currentQuestionId].text);
             this.updateQuestionScore.emit(this.currentGame.questions[this.gameService.currentQuestionId].points);
-            this.timer.startCountDown(this.currentGame.duration);
+            if (this.clientSocket.isOrganizer || this.gameService.gameMode === GameMode.Testing) this.timer.startCountDown(this.currentGame.duration);
             if (this.buttonFocus) {
                 this.buttonFocus.nativeElement.focus();
             }
@@ -206,7 +247,6 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
     }
 
     processAnswer() {
-        this.timer.stopCountDown();
         if (this.isAnswerCorrect) {
             let rewardedPoints = this.currentGame.questions[this.gameService.currentQuestionId].points;
             let message = `+${rewardedPoints} points ✅`;
@@ -218,9 +258,9 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
                 this.clientSocket.socket.emit('updateBonusTimes', this.bonusTimes);
             }
             this.gameService.incrementScore(rewardedPoints);
-            this.snackBar.open(message, '', snackBarNormalConfiguration);
+            this.snackBar.open(message, '', SNACK_BAR_NORMAL_CONFIGURATION);
         } else {
-            this.snackBar.open('+0 points ❌', '', snackBarNormalConfiguration);
+            this.snackBar.open('+0 points ❌', '', SNACK_BAR_NORMAL_CONFIGURATION);
         }
 
         this.buttons.forEach((button) => {
@@ -230,7 +270,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
             }
         });
 
-        if (this.gameService.gameMode === GameMode.Testing) this.timer.startCountDown(TIME_OUT, true);
+        if (this.gameService.gameMode === GameMode.Testing) this.timer.startCountDown(TIME_OUT, { isQuestionTransition: true });
     }
 
     loadNextQuestion(): void {
@@ -244,6 +284,8 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
         this.isAnswerCorrect = true;
         this.submittedFromTimer = false;
         this.timer.isQuestionTransition = false;
+        this.isGamePaused = false;
+        this.hasQuestionEnded = false;
         this.updateGameQuestions();
     }
 
@@ -257,7 +299,25 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
 
     startNextQuestionCountDown() {
         this.clientSocket.sendResetHistogram();
-        this.timer.startCountDown(TIME_OUT, true);
         this.canLoadNextQuestion = false;
+        this.isGamePaused = false;
+        this.timer.startCountDown(TIME_OUT, { isQuestionTransition: true });
+    }
+
+    pause() {
+        if (this.isGamePaused) {
+            if (this.timer.isQuestionTransition) this.timer.startCountDown(this.timer.transitionCount);
+            else this.timer.startCountDown(this.timer.count, { isPanicModeEnabled: this.isPanicModeEnabled });
+            this.isGamePaused = !this.isGamePaused;
+            return;
+        }
+        this.timer.stopCountDown();
+        this.isGamePaused = !this.isGamePaused;
+    }
+
+    panic() {
+        this.clientSocket.socket.emit('enablePanicMode');
+        this.timer.stopCountDown();
+        this.timer.startCountDown(this.timer.count, { isPanicModeEnabled: true });
     }
 }

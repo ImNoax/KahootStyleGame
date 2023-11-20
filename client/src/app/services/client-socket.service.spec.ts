@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { MatSnackBar, MatSnackBarRef, TextOnlySnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { SocketMock } from '@app/classes/socket-mock';
-import { snackBarErrorConfiguration } from '@app/constants/snack-bar-configuration';
+import { SNACK_BAR_ERROR_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { Route } from '@app/enums';
 import { Observable } from 'rxjs';
 import { Socket } from 'socket.io-client';
@@ -98,7 +98,7 @@ describe('ClientSocketService', () => {
         service.listenForGameClosureByOrganiser();
         socketMock.simulateServerEmit(event, reason, message);
         expect(routerMock.navigate).toHaveBeenCalledWith([Route.MainMenu]);
-        expect(snackBarMock.open).toHaveBeenCalledWith(message, '', snackBarErrorConfiguration);
+        expect(snackBarMock.open).toHaveBeenCalledWith(message, '', SNACK_BAR_ERROR_CONFIGURATION);
     });
 
     it("should handle lobbyClosed event by opening a snackBar with a clickable action if reason other than 'NO HOST'", () => {
@@ -114,7 +114,7 @@ describe('ClientSocketService', () => {
 
         service.listenForGameClosureByOrganiser();
         socketMock.simulateServerEmit(event, reason, message);
-        expect(snackBarMock.open).toHaveBeenCalledWith(message, 'Rentrer', snackBarErrorConfiguration);
+        expect(snackBarMock.open).toHaveBeenCalledWith(message, 'Rentrer', SNACK_BAR_ERROR_CONFIGURATION);
         expect(socketMock.emit).toHaveBeenCalledWith('validatePin', service.pin);
         expect(socketMock.nEmittedEvents).toEqual(++nEmittedEvents);
     });

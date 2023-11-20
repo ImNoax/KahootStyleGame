@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { accessDeniedMessage, snackBarErrorConfiguration } from '@app/constants/snack-bar-configuration';
+import { ACCESS_DENIED_MESSAGE, SNACK_BAR_ERROR_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { Route } from '@app/enums';
 
 export type IsRouteAccessible = boolean;
@@ -27,7 +27,7 @@ export class RouteControllerService {
 
     isRouteAccessible(route: Route): boolean {
         if (this.routes.get(route)) return true;
-        this.snackBar.open(accessDeniedMessage, '', snackBarErrorConfiguration);
+        this.snackBar.open(ACCESS_DENIED_MESSAGE, '', SNACK_BAR_ERROR_CONFIGURATION);
         this.router.navigate([Route.MainMenu]);
         return false;
     }

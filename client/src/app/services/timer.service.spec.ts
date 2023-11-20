@@ -10,7 +10,13 @@ import { TimerService } from './timer.service';
 
 describe('TimerService', () => {
     const initialCount = 10;
-    const gameHandlingServiceMock = { currentQuestionId: 0, currentGame: { questions: ['', ''] }, gameMode: '' };
+    const gameHandlingServiceMock: {
+        currentQuestionId: number;
+        currentGame: {
+            questions: string[];
+        };
+        gameMode: string;
+    } = { currentQuestionId: 0, currentGame: { questions: ['', ''] }, gameMode: '' };
     let service: TimerService;
     let socketMock: SocketMock;
     let clientSocketServiceMock: ClientSocketServiceMock;
@@ -64,18 +70,14 @@ describe('TimerService', () => {
         expect(service.count).toEqual(newCount);
     });
 
-    it('should handle questionTransition event by assigning isQuestionTransition argument to isQuestionTransition member', () => {
+    it('should handle questionTransition event by updating isQuestionTransition and isPanicModeEnabled members', () => {
         const event = 'questionTransition';
         service.isQuestionTransition = false;
+        service.isPanicModeEnabled = true;
 
         socketMock.simulateServerEmit(event, isQuestionTransition);
         expect(service.isQuestionTransition).toBeTrue();
-
-        service.isQuestionTransition = false;
-        isQuestionTransition = false;
-
-        socketMock.simulateServerEmit(event, isQuestionTransition);
-        expect(service.isQuestionTransition).toBeFalse();
+        expect(service.isPanicModeEnabled).toBeFalse();
     });
 
     it('should handle questionTransition event by assigning result message to transitionMessage member if there is no question left', () => {
@@ -103,8 +105,13 @@ describe('TimerService', () => {
     it('startCountDown should emit startCountDown event', () => {
         const event = 'startCountDown';
 
-        service.startCountDown(initialCount, isQuestionTransition);
-        expect(socketMock.emit).toHaveBeenCalledWith(event, initialCount, isQuestionTransition, gameHandlingServiceMock.gameMode);
+        service.startCountDown(initialCount, { isQuestionTransition: true });
+        expect(socketMock.emit).toHaveBeenCalledWith(
+            event,
+            initialCount,
+            { isQuestionTransition: true, isPanicModeEnabled: false },
+            gameHandlingServiceMock.gameMode,
+        );
         expect(socketMock.nEmittedEvents).toEqual(++nEmittedEvents);
     });
 

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { TimerConfiguration } from '@common/timer';
 import { ClientSocketService } from './client-socket.service';
 import { GameHandlingService } from './game-handling.service';
 
@@ -10,6 +11,7 @@ export class TimerService {
     transitionCount: number = 0;
     transitionMessage: string = '';
     isQuestionTransition: boolean = false;
+    isPanicModeEnabled: boolean = false;
 
     constructor(
         private clientSocket: ClientSocketService,
@@ -29,18 +31,18 @@ export class TimerService {
 
         this.clientSocket.socket.on('questionTransition', (isQuestionTransition: boolean) => {
             this.isQuestionTransition = isQuestionTransition;
+            this.isPanicModeEnabled = false;
 
-            if (isQuestionTransition) {
-                let nextQuestionMessage = '';
-                if (this.gameHandler.currentQuestionId === this.gameHandler.currentGame.questions.length - 1) nextQuestionMessage = 'Résultats';
-                else nextQuestionMessage = 'Prochaine question';
-                this.transitionMessage = nextQuestionMessage;
-            }
+            let nextQuestionMessage = '';
+            if (this.gameHandler.currentQuestionId === this.gameHandler.currentGame.questions.length - 1) nextQuestionMessage = 'Résultats';
+            else nextQuestionMessage = 'Prochaine question';
+            this.transitionMessage = nextQuestionMessage;
         });
     }
 
-    startCountDown(initialCount: number, isQuestionTransition?: boolean) {
-        this.clientSocket.socket.emit('startCountDown', initialCount, isQuestionTransition, this.gameHandler.gameMode);
+    startCountDown(initialCount: number, configuration?: TimerConfiguration) {
+        configuration = { isQuestionTransition: false, isPanicModeEnabled: false, ...configuration };
+        this.clientSocket.socket.emit('startCountDown', initialCount, configuration, this.gameHandler.gameMode);
     }
 
     stopCountDown() {
@@ -52,5 +54,6 @@ export class TimerService {
         this.count = 0;
         this.transitionCount = 0;
         this.isQuestionTransition = false;
+        this.isPanicModeEnabled = false;
     }
 }

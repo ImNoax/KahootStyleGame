@@ -1,12 +1,14 @@
 import { Game } from '@common/game';
 import { GameMode } from '@common/game-mode';
+import { TimerConfiguration } from '@common/timer';
 
 import { LobbyDetails, Pin, REQUIRED_PIN_LENGTH, SocketId } from '@common/lobby';
 import * as http from 'http';
 import * as io from 'socket.io';
 
 const MAX_LOBBY_QUANTITY = 10000;
-const COUNTDOWN_PERIOD = 1000;
+const DEFAULT_COUNTDOWN_PERIOD = 1000;
+const PANIC_COUNTDOWN_PERIOD = 250;
 const ORGANISER = 'Organisateur';
 
 export class SocketManager {
@@ -63,8 +65,9 @@ export class SocketManager {
                 return newPin;
             };
 
-            const startCountDown = (initialCount: number, gameMode: GameMode): void => {
-                if (gameMode === GameMode.Testing) pin = socket.id;
+            const startCountDown = (initialCount: number, isPanicModeEnabled: boolean | undefined): void => {
+                let countDownPeriod = DEFAULT_COUNTDOWN_PERIOD;
+                if (isPanicModeEnabled) countDownPeriod = PANIC_COUNTDOWN_PERIOD;
 
                 this.sio.to(pin).emit('countDown', initialCount);
                 counter = setInterval(() => {
@@ -77,7 +80,7 @@ export class SocketManager {
                         this.sio.to(pin).emit('countDownEnd');
                         clearInterval(counter);
                     }
-                }, COUNTDOWN_PERIOD);
+                }, countDownPeriod);
             };
 
             socket.on('validatePin', (pinToJoin: Pin) => {
@@ -167,9 +170,10 @@ export class SocketManager {
                 leaveLobby();
             });
 
-            socket.on('startCountDown', (initialCount: number, isQuestionTransition: boolean, gameMode: GameMode) => {
-                if (isQuestionTransition) this.sio.emit('questionTransition', isQuestionTransition);
-                startCountDown(initialCount, gameMode);
+            socket.on('startCountDown', (initialCount: number, configuration: TimerConfiguration, gameMode: GameMode) => {
+                if (configuration.isQuestionTransition) this.sio.emit('questionTransition', configuration.isQuestionTransition);
+                if (gameMode === GameMode.Testing) pin = socket.id;
+                startCountDown(initialCount, configuration.isPanicModeEnabled);
             });
 
             socket.on('stopCountDown', () => {
@@ -195,11 +199,7 @@ export class SocketManager {
 
                     const areAllSubmitted = !currentLobby.players.some((player) => player.answerSubmitted === false);
                     if (areAllSubmitted) {
-                        const organisatorSocketId = currentLobby.players[0].socketId;
-                        const organisatorSocket = this.sio.sockets.sockets.get(organisatorSocketId);
-
-                        organisatorSocket.broadcast.to(pin).emit('allSubmitted', currentLobby.bonusRecipient);
-                        organisatorSocket.emit('canLoadNextQuestion');
+                        this.sio.to(pin).emit('allSubmitted', currentLobby.bonusRecipient);
 
                         currentLobby.players.forEach((player) => {
                             if (player.name !== ORGANISER) player.answerSubmitted = false;
@@ -207,6 +207,10 @@ export class SocketManager {
                         currentLobby.bonusRecipient = '';
                     }
                 }
+            });
+
+            socket.on('enablePanicMode', () => {
+                this.sio.to(pin).emit('panicMode');
             });
 
             socket.on('histogramUpdate', (updateData: { [key: string]: number }) => {

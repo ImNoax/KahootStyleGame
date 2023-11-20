@@ -27,7 +27,15 @@
             <div id="item-text">{{ item.text }}</div>
         </li>
     </ul>
+    <button mat-raised-button (click)="startNextQuestionCountDown()" [disabled]="!canLoadNextQuestion">Charger la prochaine question</button>
+    <button mat-raised-button (click)="pause()" [disabled]="hasQuestionEnded && !isQuestionTransition">
+        <i *ngIf="!isGamePaused" class="fa-solid fa-pause fa-2xl"></i>
+        <i *ngIf="isGamePaused" class="fa-solid fa-play fa-beat-fade fa-2xl"></i>
+        {{ pauseMessage }}
+    </button>
+    <button mat-raised-button (click)="panic()" [disabled]="!isPanicModeAvailable || isPanicModeEnabled || isGamePaused || hasQuestionEnded">
+        <i class="fa-solid fa-triangle-exclamation fa-2xl"></i>
+        PANIQUER
+        <div *ngIf="!isPanicModeAvailable">Disponible dans {{ remainingCountForPanic }}</div>
+    </button>
 </div>
-<button mat-raised-button (click)="startNextQuestionCountDown()" [disabled]="!canLoadNextQuestion" *ngIf="isOrganizer">
-    Charger la prochaine question
-</button>
