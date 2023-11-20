@@ -1,15 +1,18 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { MessageData } from '@common/message';
 import { Subscription } from 'rxjs/internal/Subscription';
+const SCROLL_SENSITIVITY = 5;
+const MESSAGE_TIMEOUT = 5;
 
 @Component({
     selector: 'app-chat-box',
     templateUrl: './chat-box.component.html',
     styleUrls: ['./chat-box.component.scss'],
 })
-export class ChatBoxComponent implements OnInit, OnDestroy {
+export class ChatBoxComponent implements OnInit, OnDestroy, AfterViewInit {
+    @ViewChild('messagesContainer') private messagesContainer: ElementRef;
     newMessage: string = '';
     messages: { sender: string; time: Date; content: string }[] = [];
     chatSubscription: Subscription;
@@ -26,8 +29,8 @@ export class ChatBoxComponent implements OnInit, OnDestroy {
                 content: messageData.content,
                 time: new Date(messageData.time),
             };
-            // console.log("Message received in chatbox from server:", newMessage);
             this.messages.push(newMessage);
+            this.scrollChatBottom();
         });
     }
 
@@ -35,6 +38,9 @@ export class ChatBoxComponent implements OnInit, OnDestroy {
         if (this.chatSubscription) {
             this.chatSubscription.unsubscribe();
         }
+    }
+    ngAfterViewInit() {
+        this.scrollChatBottom();
     }
 
     sendMessage() {
@@ -46,6 +52,19 @@ export class ChatBoxComponent implements OnInit, OnDestroy {
             };
             this.clientSocket.socket.emit('chatMessage', messageData);
             this.newMessage = '';
+            this.scrollChatBottom();
+        }
+    }
+    scrollChatBottom() {
+        if (this.messagesContainer) {
+            const chatComponent = this.messagesContainer.nativeElement;
+            const isChatAtBottom = chatComponent.scrollHeight - chatComponent.scrollTop - chatComponent.clientHeight < SCROLL_SENSITIVITY;
+            setTimeout(() => {
+                // timeout car sinon la fonction s'execute avant l'arriver des messages
+                if (isChatAtBottom) {
+                    chatComponent.scrollTop = chatComponent.scrollHeight;
+                }
+            }, MESSAGE_TIMEOUT);
         }
     }
 }
