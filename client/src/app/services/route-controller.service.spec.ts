@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { accessDeniedMessage, snackBarErrorConfiguration } from '@app/constants/snack-bar-configuration';
+import { ACCESS_DENIED_MESSAGE, SNACK_BAR_ERROR_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { Route } from '@app/enums';
 import { IsRouteAccessible, RouteControllerService } from './route-controller.service';
 
@@ -65,7 +65,7 @@ describe('RouteControllerService', () => {
         spyOn(service.routes, 'get').and.returnValue(false);
 
         service.isRouteAccessible(adminRoute);
-        expect(snackBarMock.open).toHaveBeenCalledWith(accessDeniedMessage, '', snackBarErrorConfiguration);
+        expect(snackBarMock.open).toHaveBeenCalledWith(ACCESS_DENIED_MESSAGE, '', SNACK_BAR_ERROR_CONFIGURATION);
         expect(routerMock.navigate).toHaveBeenCalledWith([mainMenuRoute]);
     });
 });

@@ -2,6 +2,10 @@
     Temps restant : {{ count }} secondes
 
     <div class="progress-bar">
-        <div class="progress-fill" [style.width.%]="count && currentGame.duration ? (count / currentGame.duration) * 100 : 0"></div>
+        <div
+            [ngStyle]="{ 'background-color': isPanicModeEnabled ? 'red' : '#4caf50' }"
+            class="progress-fill"
+            [style.width.%]="count && currentGame.duration ? (count / currentGame.duration) * 100 : 0"
+        ></div>
     </div>
 </div>

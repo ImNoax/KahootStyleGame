@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { snackBarErrorConfiguration } from '@app/constants/snack-bar-configuration';
+import { SNACK_BAR_ERROR_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { Route } from '@app/enums';
 import { Pin } from '@common/lobby';
 import { MessageData } from '@common/message';
@@ -51,10 +51,10 @@ export class ClientSocketService {
         this.socket.on('lobbyClosed', (reason, message) => {
             this.router.navigate([Route.MainMenu]);
             if (reason === 'NO HOST') {
-                this.snackBar.open(message, '', snackBarErrorConfiguration);
+                this.snackBar.open(message, '', SNACK_BAR_ERROR_CONFIGURATION);
             } else {
                 this.snackBar
-                    .open(message, 'Rentrer', snackBarErrorConfiguration)
+                    .open(message, 'Rentrer', SNACK_BAR_ERROR_CONFIGURATION)
                     .onAction()
                     .subscribe(() => {
                         this.socket.emit('validatePin', this.pin);

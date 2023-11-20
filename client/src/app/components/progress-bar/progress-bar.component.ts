@@ -1,7 +1,9 @@
 import { GameHandlingService } from '@angular/../../client/src/app/services/game-handling.service';
 import { Component, OnInit } from '@angular/core';
+import { ClientSocketService } from '@app/services/client-socket.service';
 import { TimerService } from '@app/services/timer.service';
 import { Game } from '@common/game';
+import { GameMode } from '@common/game-mode';
 
 @Component({
     selector: 'app-progress-bar',
@@ -9,19 +11,25 @@ import { Game } from '@common/game';
     styleUrls: ['./progress-bar.component.scss'],
 })
 export class ProgressBarComponent implements OnInit {
-    currentGame: Game;
-
     constructor(
         private timer: TimerService,
         private gameService: GameHandlingService,
+        private clientsocket: ClientSocketService,
     ) {}
 
-    get count() {
+    get count(): number {
         return this.timer.count;
     }
 
+    get isPanicModeEnabled(): boolean {
+        return this.timer.isPanicModeEnabled;
+    }
+
+    get currentGame(): Game {
+        return this.gameService.currentGame;
+    }
+
     ngOnInit() {
-        this.currentGame = this.gameService.currentGame;
-        this.timer.startCountDown(this.currentGame.duration);
+        if (this.clientsocket.isOrganizer || this.gameService.gameMode === GameMode.Testing) this.timer.startCountDown(this.currentGame.duration);
     }
 }

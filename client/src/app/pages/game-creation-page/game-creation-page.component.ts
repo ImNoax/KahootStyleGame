@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { snackBarErrorConfiguration } from '@app/constants/snack-bar-configuration';
+import { SNACK_BAR_ERROR_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { Route } from '@app/enums';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
@@ -51,7 +51,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         });
 
         this.clientSocket.socket.on('failedLobbyCreation', (reason) => {
-            this.snackBar.open(reason, '', snackBarErrorConfiguration);
+            this.snackBar.open(reason, '', SNACK_BAR_ERROR_CONFIGURATION);
         });
     }
 

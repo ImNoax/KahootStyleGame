@@ -1,7 +1,7 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { snackBarErrorConfiguration, snackBarNormalConfiguration } from '@app/constants/snack-bar-configuration';
+import { SNACK_BAR_ERROR_CONFIGURATION, SNACK_BAR_NORMAL_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { Route } from '@app/enums';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
@@ -84,7 +84,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
                 this.timer.reset();
                 this.countDownStarted = false;
                 this.toggleLobbyLock();
-                this.snackBar.open("Tous les joueurs ont quitté la salle d'attente.", '', snackBarErrorConfiguration);
+                this.snackBar.open("Tous les joueurs ont quitté la salle d'attente.", '', SNACK_BAR_ERROR_CONFIGURATION);
             }
         });
     }
@@ -110,10 +110,10 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
             return;
         }
         this.router.navigate([Route.MainMenu]);
-        this.snackBar.open("Votre nom de joueur n'a pas été défini avant le début de la partie", '', snackBarErrorConfiguration);
+        this.snackBar.open("Votre nom de joueur n'a pas été défini avant le début de la partie", '', SNACK_BAR_ERROR_CONFIGURATION);
     }
 
     notifyClipboardCopy() {
-        this.snackBar.open('PIN copié!', '', snackBarNormalConfiguration);
+        this.snackBar.open('PIN copié!', '', SNACK_BAR_NORMAL_CONFIGURATION);
     }
 }

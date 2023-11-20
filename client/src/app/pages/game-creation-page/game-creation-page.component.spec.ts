@@ -7,7 +7,7 @@ import { ActivatedRoute, Router, RouterModule, convertToParamMap } from '@angula
 import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
 import { SocketMock } from '@app/classes/socket-mock';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { snackBarErrorConfiguration } from '@app/constants/snack-bar-configuration';
+import { SNACK_BAR_ERROR_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { Route } from '@app/enums';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
@@ -122,7 +122,7 @@ describe('GameCreationPageComponent', () => {
 
         spyOn(component.snackBar, 'open');
         socketMock.simulateServerEmit(event, reason);
-        expect(component.snackBar.open).toHaveBeenCalledWith(reason, '', snackBarErrorConfiguration);
+        expect(component.snackBar.open).toHaveBeenCalledWith(reason, '', SNACK_BAR_ERROR_CONFIGURATION);
     });
 
     it('selectRow should select a row and set selectedGame', () => {

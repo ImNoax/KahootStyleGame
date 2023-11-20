@@ -14,4 +14,6 @@ export enum Limit {
     MinDuration = 10,
     MaxAnswerLength = 150,
     MaxNameLength = 20,
+    QcmRequiredPanicCount = 10,
+    QrlRequiredPanicCount = 20,
 }

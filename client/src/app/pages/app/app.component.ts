@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { serverErrorMessage, snackBarErrorConfiguration } from '@app/constants/snack-bar-configuration';
+import { SERVER_ERROR_MESSAGE, SNACK_BAR_ERROR_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { Route } from '@app/enums';
 import { ClientSocketService } from '@app/services/client-socket.service';
 
@@ -21,7 +21,7 @@ export class AppComponent implements OnInit, OnDestroy {
         this.clientSocket.connect();
 
         this.clientSocket.socket.on('disconnect', () => {
-            this.snackBar.open(serverErrorMessage, '', snackBarErrorConfiguration);
+            this.snackBar.open(SERVER_ERROR_MESSAGE, '', SNACK_BAR_ERROR_CONFIGURATION);
             this.router.navigate([Route.MainMenu]);
         });
     }
