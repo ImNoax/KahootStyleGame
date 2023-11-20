@@ -1,5 +1,5 @@
 import { GameHandlingService } from '@angular/../../client/src/app/services/game-handling.service';
-import { AfterViewInit, Component, ElementRef, EventEmitter, inject, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, inject, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { snackBarErrorConfiguration, snackBarNormalConfiguration } from '@app/constants/snack-bar-configuration';
@@ -48,6 +48,14 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
         return this.clientSocket.isOrganizer;
     }
 
+    @HostListener('document:click', ['$event'])
+    onDocumentClick(event: MouseEvent): void {
+        const clickedElement = event.target as HTMLElement;
+        if (this.buttonFocus && !clickedElement.closest('#chatInput')) {
+            this.buttonFocus.nativeElement.focus();
+        }
+    }
+
     ngOnInit(): void {
         this.currentGame = this.gameService.currentGame;
         this.updateButtons();
@@ -92,7 +100,9 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
     }
 
     ngAfterViewInit(): void {
-        this.buttonFocus.nativeElement.focus();
+        if (this.buttonFocus) {
+            this.buttonFocus.nativeElement.focus();
+        }
     }
 
     onTimerEnded() {
@@ -189,7 +199,9 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
             this.gameService.setCurrentQuestion(this.currentGame.questions[this.gameService.currentQuestionId].text);
             this.updateQuestionScore.emit(this.currentGame.questions[this.gameService.currentQuestionId].points);
             this.timer.startCountDown(this.currentGame.duration);
-            this.buttonFocus.nativeElement.focus();
+            if (this.buttonFocus) {
+                this.buttonFocus.nativeElement.focus();
+            }
         }
     }
 
