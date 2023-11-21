@@ -4,6 +4,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute, RouterModule, convertToParamMap } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { QuestionCreationPopupComponent } from '@app/components/question-creation-popup/question-creation-popup.component';
@@ -19,7 +20,7 @@ describe('QuestionCreationPageComponent', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             declarations: [QuestionCreationPageComponent, HeaderComponent],
-            imports: [MatDialogModule, HttpClientTestingModule, MatIconModule, RouterModule],
+            imports: [MatDialogModule, HttpClientTestingModule, MatIconModule, RouterModule, MatSnackBarModule],
             providers: [
                 FormManagerService,
                 {

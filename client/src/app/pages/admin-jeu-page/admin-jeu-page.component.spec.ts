@@ -4,6 +4,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder } from '@angular/forms';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router, RouterModule, convertToParamMap } from '@angular/router';
 import { GameImportPopupComponent } from '@app/components/game-import-popup/game-import-popup.component';
 import { HeaderComponent } from '@app/components/header/header.component';
@@ -57,7 +58,7 @@ describe('AdminJeuPageComponent', () => {
         formManagerServiceSpy = jasmine.createSpyObj('FormManagerService', ['preventEmptyInput']);
 
         await TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule, MatIconModule, MatDialogModule, RouterModule],
+            imports: [HttpClientTestingModule, MatIconModule, MatDialogModule, RouterModule, MatSnackBarModule],
             declarations: [AdminJeuPageComponent, HeaderComponent],
             providers: [
                 GameHandlingService,

@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router, RouterModule, convertToParamMap } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { Route } from '@app/enums';
@@ -34,7 +35,7 @@ describe('QuizCreationPageComponent', () => {
                     },
                 },
             ],
-            imports: [HttpClientTestingModule, ReactiveFormsModule, MatIconModule, RouterModule],
+            imports: [HttpClientTestingModule, ReactiveFormsModule, MatIconModule, RouterModule, MatSnackBarModule],
         }).compileComponents();
         fixture = TestBed.createComponent(QuizCreationPageComponent);
         component = fixture.componentInstance;

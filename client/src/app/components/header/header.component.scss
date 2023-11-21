@@ -12,11 +12,11 @@ header {
     background-color: rgb(black, 0.6);
 }
 
-.button {
+.home {
     margin: 0%;
     position: absolute;
     top: 30%;
-    left: 5%;
+    left: 8%;
     width: 200px;
     font-size: 18px;
     padding: 1.5%;
@@ -27,6 +27,16 @@ header {
     font-family: Georgia, 'Times New Roman', Times, serif;
     font-weight: bold;
     font-size: 20px;
+}
+
+.return {
+    margin: 0%;
+    position: absolute;
+    top: 30%;
+    right: 8%;
+    width: 200px;
+    font-size: 18px;
+    padding: 1.5%;
 }
 
 h1 {

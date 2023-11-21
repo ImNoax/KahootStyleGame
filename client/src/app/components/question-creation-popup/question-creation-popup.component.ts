@@ -18,7 +18,7 @@ export class QuestionCreationPopupComponent implements OnInit {
     isChoiceEmpty: boolean = false;
     nGoodChoices: number = 0;
     maxQuestionLength: number = Limit.MaxQuestionLength;
-    maxAnswerLength: number = Limit.MaxAnswerLength;
+    maxAnswerLength: number = Limit.MaxQcmAnswerLength;
     choiceDuplicate = false;
     questionForm: FormGroup;
 

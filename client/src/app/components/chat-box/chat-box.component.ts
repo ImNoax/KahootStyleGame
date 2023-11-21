@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { snackBarNormalConfiguration } from '@app/constants/snack-bar-configuration';
+import { SNACK_BAR_NORMAL_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { Message } from '@common/lobby';
 const SCROLL_SENSITIVITY = 5;
@@ -34,10 +34,10 @@ export class ChatBoxComponent implements OnInit, OnDestroy, AfterViewInit {
             this.scrollChatBottom();
         });
         this.clientSocket.socket.on('PlayerMuted', () => {
-            this.snackBar.open('Vous ne pouvez plus clavarder ❌', '', snackBarNormalConfiguration);
+            this.snackBar.open('Vous ne pouvez plus clavarder ❌', '', SNACK_BAR_NORMAL_CONFIGURATION);
         });
         this.clientSocket.socket.on('PlayerUnmuted', () => {
-            this.snackBar.open('Vous pouvez maintenant clavarder ✅', '', snackBarNormalConfiguration);
+            this.snackBar.open('Vous pouvez maintenant clavarder ✅', '', SNACK_BAR_NORMAL_CONFIGURATION);
         });
     }
     ngAfterViewInit() {

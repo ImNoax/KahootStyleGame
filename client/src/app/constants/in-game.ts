@@ -4,3 +4,4 @@ export const BUTTON_SELECTED = 1;
 export const BUTTON_UNSELECTED = -1;
 export const PAUSE_MESSAGE = 'Pauser la partie';
 export const UNPAUSE_MESSAGE = 'Reprendre la partie';
+export const QRL_DURATION = 60;
