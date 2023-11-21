@@ -1,8 +1,8 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { snackBarNormalConfiguration } from '@app/constants/snack-bar-configuration';
 import { ClientSocketService } from '@app/services/client-socket.service';
-import { GameHandlingService } from '@app/services/game-handling.service';
-import { MessageData } from '@common/message';
-import { Subscription } from 'rxjs/internal/Subscription';
+import { Message } from '@common/lobby';
 const SCROLL_SENSITIVITY = 5;
 const MESSAGE_TIMEOUT = 5;
 
@@ -14,30 +14,31 @@ const MESSAGE_TIMEOUT = 5;
 export class ChatBoxComponent implements OnInit, OnDestroy, AfterViewInit {
     @ViewChild('messagesContainer') private messagesContainer: ElementRef;
     newMessage: string = '';
-    messages: { sender: string; time: Date; content: string }[] = [];
-    chatSubscription: Subscription;
-
-    constructor(
-        private clientSocket: ClientSocketService,
-        private gameHand: GameHandlingService,
-    ) {}
+    chat: Message[] = [];
+    private snackBar: MatSnackBar = inject(MatSnackBar);
+    constructor(private clientSocket: ClientSocketService) {}
 
     ngOnInit() {
-        this.chatSubscription = this.clientSocket.listenToMessageReceived().subscribe((messageData: MessageData) => {
-            const newMessage = {
-                sender: this.gameHand.getPlayerNameBySocketId(messageData.sender),
-                content: messageData.content,
-                time: new Date(messageData.time),
-            };
-            this.messages.push(newMessage);
-            this.scrollChatBottom();
-        });
+        this.configureBaseSocketFeatures();
+        this.clientSocket.socket.emit('getChat');
     }
 
     ngOnDestroy() {
-        if (this.chatSubscription) {
-            this.chatSubscription.unsubscribe();
-        }
+        this.clientSocket.socket.removeAllListeners('messageReceived');
+        this.clientSocket.socket.removeAllListeners('PlayerMuted');
+        this.clientSocket.socket.removeAllListeners('PlayerUnmuted');
+    }
+    configureBaseSocketFeatures() {
+        this.clientSocket.socket.on('messageReceived', (chat: Message[]) => {
+            this.chat = chat;
+            this.scrollChatBottom();
+        });
+        this.clientSocket.socket.on('PlayerMuted', () => {
+            this.snackBar.open('Vous ne pouvez plus clavarder ❌', '', snackBarNormalConfiguration);
+        });
+        this.clientSocket.socket.on('PlayerUnmuted', () => {
+            this.snackBar.open('Vous pouvez maintenant clavarder ✅', '', snackBarNormalConfiguration);
+        });
     }
     ngAfterViewInit() {
         this.scrollChatBottom();
@@ -46,13 +47,12 @@ export class ChatBoxComponent implements OnInit, OnDestroy, AfterViewInit {
     sendMessage() {
         if (this.newMessage.trim().length > 0) {
             const messageData = {
-                sender: 'unknown',
+                sender: this.clientSocket.socket.id,
                 content: this.newMessage,
                 time: new Date(),
             };
             this.clientSocket.socket.emit('chatMessage', messageData);
             this.newMessage = '';
-            this.scrollChatBottom();
         }
     }
     scrollChatBottom() {

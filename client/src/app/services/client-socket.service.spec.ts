@@ -119,18 +119,6 @@ describe('ClientSocketService', () => {
         expect(socketMock.nEmittedEvents).toEqual(++nEmittedEvents);
     });
 
-    it('should listen for message received when subscribed', (done) => {
-        const messageReceivedObservable = service.listenToMessageReceived();
-        const messageData = { sender: 'Sender', content: 'Test Message', time: 'Test Time' };
-
-        messageReceivedObservable.subscribe((data) => {
-            expect(data).toEqual(messageData);
-            done();
-        });
-
-        socketMock.simulateServerEmit('messageReceived', messageData);
-    });
-
     it('should listen for histogram update', (done) => {
         const updateHistogramObservable = service.listenUpdateHistogram();
         const histogramData = { key1: 1, key2: 2, key3: 3 };

@@ -7,7 +7,7 @@ import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { RouteControllerService } from '@app/services/route-controller.service';
 import { TimerService } from '@app/services/timer.service';
-import { LobbyDetails, Pin, SocketId } from '@common/lobby';
+import { LobbyDetails, Pin, Player, SocketId } from '@common/lobby';
 
 const GAME_START_INITIAL_COUNT = 5;
 
@@ -17,7 +17,7 @@ const GAME_START_INITIAL_COUNT = 5;
     styleUrls: ['./lobby-page.component.scss'],
 })
 export class LobbyPageComponent implements OnInit, OnDestroy {
-    players: { socketId: SocketId; name: string }[] = [];
+    players: Player[] = [];
     isLocked: boolean = false;
     gameStarted: boolean = false;
     countDownStarted: boolean = false;
@@ -115,5 +115,10 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
 
     notifyClipboardCopy() {
         this.snackBar.open('PIN copié!', '', SNACK_BAR_NORMAL_CONFIGURATION);
+    }
+
+    toggleMute(player: Player) {
+        player.isAbleToChat = !player.isAbleToChat;
+        this.clientSocket.socket.emit('toggleMute', player);
     }
 }

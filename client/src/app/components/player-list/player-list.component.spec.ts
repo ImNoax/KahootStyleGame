@@ -3,6 +3,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
 import { SocketMock } from '@app/classes/socket-mock';
 import { ClientSocketService } from '@app/services/client-socket.service';
+import { Player } from '@common/lobby';
 import { PlayerListComponent } from './player-list.component';
 describe('PlayerListComponent', () => {
     let component: PlayerListComponent;
@@ -132,5 +133,22 @@ describe('PlayerListComponent', () => {
         component.ngOnDestroy();
         expect(socketMock.removeAllListeners).toHaveBeenCalledWith('latestPlayerList');
         expect(socketMock.removeAllListeners).toHaveBeenCalledWith('scoreUpdated');
+    });
+
+    it('should toggle mute status and emit toggleMute event on toggleMute()', () => {
+        const player: Player = {
+            socketId: 'testSocketId',
+            name: 'TestPlayer',
+            answerSubmitted: false,
+            score: 0,
+            isStillInGame: true,
+            isAbleToChat: true,
+            bonusTimes: 0,
+        };
+
+        component.toggleMute(player);
+
+        expect(player.isAbleToChat).toBeFalse();
+        expect(clientSocketServiceMock.socket.emit).toHaveBeenCalledWith('toggleMute', player);
     });
 });

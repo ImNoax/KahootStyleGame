@@ -2,7 +2,7 @@ import { Game } from '@common/game';
 import { GameMode } from '@common/game-mode';
 import { TimerConfiguration } from '@common/timer';
 
-import { LobbyDetails, Pin, REQUIRED_PIN_LENGTH, SocketId } from '@common/lobby';
+import { LobbyDetails, Message, Pin, Player, REQUIRED_PIN_LENGTH, SocketId } from '@common/lobby';
 import * as http from 'http';
 import * as io from 'socket.io';
 
@@ -125,7 +125,7 @@ export class SocketManager {
             socket.on('createLobby', (currentGame: Game) => {
                 if (this.lobbies.size <= MAX_LOBBY_QUANTITY) {
                     const newPin = generateUniquePin();
-                    this.lobbies.set(newPin, { isLocked: false, players: [], bannedNames: [], game: currentGame });
+                    this.lobbies.set(newPin, { isLocked: false, players: [], bannedNames: [], game: currentGame, chat: [] });
                     socket.join(newPin);
                     pin = newPin;
 
@@ -180,14 +180,25 @@ export class SocketManager {
                 clearInterval(counter);
             });
 
-            socket.on('chatMessage', (messageData) => {
-                this.sio.to(pin).emit('messageReceived', {
-                    sender: socket.id,
-                    content: messageData.content,
-                    time: new Date(),
-                });
+            socket.on('chatMessage', (message: Message) => {
+                const currentLobby = this.lobbies.get(pin);
+                if (currentLobby) {
+                    const sender = currentLobby.players.find((player) => player.socketId === message.sender);
+                    message.sender = sender.name;
+                    if (sender.isAbleToChat) {
+                        currentLobby.chat.push(message);
+                        this.sio.to(pin).emit('messageReceived', currentLobby.chat);
+                    } else {
+                        socket.emit('PlayerMuted');
+                    }
+                }
             });
-
+            socket.on('getChat', () => {
+                const currentLobby = this.lobbies.get(pin);
+                if (currentLobby) {
+                    this.sio.to(pin).emit('messageReceived', currentLobby.chat);
+                }
+            });
             socket.on('answerSubmitted', (isCorrect: boolean, submittedFromTimer: boolean) => {
                 const currentLobby = this.lobbies.get(pin);
                 if (currentLobby) {
@@ -261,6 +272,19 @@ export class SocketManager {
                     if (currentPlayer) {
                         currentPlayer.bonusTimes = bonusTimes;
                         this.sio.to(pin).emit('latestPlayerList', currentLobby);
+                    }
+                }
+            });
+
+            socket.on('toggleMute', (playerToMute: Player) => {
+                const currentLobby = this.lobbies.get(pin);
+                if (currentLobby) {
+                    const socketToMute = this.sio.sockets.sockets.get(playerToMute.socketId);
+                    const player = currentLobby.players.find((p) => p.socketId === playerToMute.socketId);
+                    if (player) {
+                        player.isAbleToChat = !player.isAbleToChat;
+                        const eventToEmit = player.isAbleToChat ? 'PlayerUnmuted' : 'PlayerMuted';
+                        socketToMute.emit(eventToEmit);
                     }
                 }
             });
