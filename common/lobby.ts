@@ -12,6 +12,7 @@ export interface LobbyDetails {
     game: Game;
     bonusRecipient?: string;
     histogram?: { [key: string]: number };
+    chat: Message[];
 }
 
 export interface Player {
@@ -22,4 +23,10 @@ export interface Player {
     bonusTimes: number;
     isStillInGame: boolean;
     isAbleToChat: boolean;
+}
+
+export interface Message {
+    sender: string;
+    content: string;
+    time: Date;
 }

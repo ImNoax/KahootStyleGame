@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { SNACK_BAR_ERROR_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { Route } from '@app/enums';
 import { Pin } from '@common/lobby';
-import { MessageData } from '@common/message';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Socket, io } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
@@ -60,14 +59,6 @@ export class ClientSocketService {
                         this.socket.emit('validatePin', this.pin);
                     });
             }
-        });
-    }
-
-    listenToMessageReceived(): Observable<MessageData> {
-        return new Observable((observer) => {
-            this.socket.on('messageReceived', (messageData: MessageData) => {
-                observer.next(messageData);
-            });
         });
     }
 

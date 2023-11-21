@@ -16,6 +16,7 @@ import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { RouteControllerService } from '@app/services/route-controller.service';
 import { TimerService } from '@app/services/timer.service';
+import { Player } from '@common/lobby';
 import { of } from 'rxjs';
 import { LobbyPageComponent } from './lobby-page.component';
 
@@ -144,7 +145,19 @@ describe('LobbyPageComponent', () => {
     it('should handle latestPlayerList event by getting details from lobbyDetails argument and call setPlayers from GameHandlingService', () => {
         const lobbyDetailsMock = {
             isLocked: true,
-            players: [{ socketId: '', name: '' }],
+            players: [
+                {
+                    socketId: '',
+                    name: '',
+                    answerSubmitted: true,
+                    score: 0,
+                    bonusTimes: 0,
+                    isStillInGame: true,
+                    isAbleToChat: true,
+                },
+            ],
+            bannedName: [],
+            chat: [],
         };
         component.isLocked = false;
         component.players = [];
@@ -245,5 +258,21 @@ describe('LobbyPageComponent', () => {
     it('notifyClipboardCopy should open a snackbar', () => {
         component.notifyClipboardCopy();
         expect(snackBarMock.open).toHaveBeenCalledWith('PIN copié!', '', SNACK_BAR_NORMAL_CONFIGURATION);
+    });
+    it('should toggle mute status and emit toggleMute event on toggleMute()', () => {
+        const player: Player = {
+            socketId: 'testSocketId',
+            name: 'TestPlayer',
+            answerSubmitted: false,
+            score: 0,
+            isStillInGame: true,
+            isAbleToChat: true,
+            bonusTimes: 0,
+        };
+
+        component.toggleMute(player);
+
+        expect(player.isAbleToChat).toBeFalse();
+        expect(clientSocketServiceMock.socket.emit).toHaveBeenCalledWith('toggleMute', player);
     });
 });

@@ -17,6 +17,9 @@
                         </button>
                         {{ player.name }}
                         <span *ngIf="player.name === playerName">(vous)</span>
+                        <button class="exclude-button" *ngIf="player.name !== 'Organisateur' && isOrganizer" (click)="toggleMute(player)">
+                            <span id="lock-text">{{ player.isAbleToChat ? 'Mute' : 'Unmute' }}</span>
+                        </button>
                     </li>
                 </div>
                 <p *ngIf="players.length === 1" id="no-player">Besoin de joueurs</p>
@@ -42,4 +45,5 @@
             </button>
         </div>
     </div>
+    <app-chat-box *ngIf="playerName"></app-chat-box>
 </div>

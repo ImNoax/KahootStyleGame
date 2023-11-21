@@ -41,4 +41,8 @@ export class PlayerListComponent implements OnInit, OnDestroy {
             }
         });
     }
+    toggleMute(player: Player) {
+        player.isAbleToChat = !player.isAbleToChat;
+        this.clientSocket.socket.emit('toggleMute', player);
+    }
 }
