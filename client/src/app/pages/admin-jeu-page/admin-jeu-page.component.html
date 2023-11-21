@@ -47,9 +47,15 @@
             </tbody>
         </table>
     </div>
-    <button mat-raised-button color="primary" class="adminbutton" [routerLink]="quizCreationRoute">Ajouter un nouveau jeu</button>
+    <button mat-raised-button color="primary" class="adminbutton" [routerLink]="quizCreationRoute">
+        <mat-icon class="icon-display">add</mat-icon>
+        Ajouter un nouveau jeu
+    </button>
 
-    <button mat-raised-button (click)="gameImport.click()" color="primary" class="adminbutton">Importer un nouveau jeu</button>
+    <button mat-raised-button (click)="gameImport.click()" color="primary" class="adminbutton">
+        <mat-icon class="icon-display">open_in_browser</mat-icon>
+        Importer un nouveau jeu
+    </button>
     <p class="error-empty" *ngIf="isFileEmpty">Fichier vide!</p>
     <p class="error-format" *ngIf="isFormInvalid">Le fichier JSON n'est pas bien formaté!</p>
     <input #gameImport type="file" accept="application/JSON" (change)="importGame($event)" hidden />

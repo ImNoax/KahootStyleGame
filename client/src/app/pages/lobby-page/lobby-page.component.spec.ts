@@ -13,7 +13,6 @@ import { NameDefinitionComponent } from '@app/components/name-definition/name-de
 import { SNACK_BAR_ERROR_CONFIGURATION, SNACK_BAR_NORMAL_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { Route } from '@app/enums';
 import { ClientSocketService } from '@app/services/client-socket.service';
-import { GameHandlingService } from '@app/services/game-handling.service';
 import { RouteControllerService } from '@app/services/route-controller.service';
 import { TimerService } from '@app/services/timer.service';
 import { Player } from '@common/lobby';
@@ -28,7 +27,6 @@ describe('LobbyPageComponent', () => {
     let socketMock: SocketMock;
     let clientSocketServiceMock: ClientSocketServiceMock;
     let timerServiceMock: jasmine.SpyObj<TimerService>;
-    let gameHandlingServiceMock: jasmine.SpyObj<GameHandlingService>;
     let routeControllerMock: jasmine.SpyObj<RouteControllerService>;
     let nEmittedEvents: number;
 
@@ -36,7 +34,6 @@ describe('LobbyPageComponent', () => {
         routerMock = jasmine.createSpyObj('Router', ['navigate']);
         snackBarMock = jasmine.createSpyObj('MatSnackBar', ['open']);
         timerServiceMock = jasmine.createSpyObj('TimerService', ['reset', 'startCountDown']);
-        gameHandlingServiceMock = jasmine.createSpyObj('GameHandlingService', ['setPlayers']);
         routeControllerMock = jasmine.createSpyObj('RouteControllerService', ['setRouteAccess']);
         clientSocketServiceMock = new ClientSocketServiceMock();
 
@@ -56,7 +53,6 @@ describe('LobbyPageComponent', () => {
                 { provide: ClientSocketService, useValue: clientSocketServiceMock },
                 { provide: MatSnackBar, useValue: snackBarMock },
                 { provide: TimerService, useValue: timerServiceMock },
-                { provide: GameHandlingService, useValue: gameHandlingServiceMock },
                 { provide: RouteControllerService, useValue: routeControllerMock },
                 {
                     provide: ActivatedRoute,
@@ -142,7 +138,7 @@ describe('LobbyPageComponent', () => {
         expect(clientSocketServiceMock.resetPlayerInfo).toHaveBeenCalled();
     });
 
-    it('should handle latestPlayerList event by getting details from lobbyDetails argument and call setPlayers from GameHandlingService', () => {
+    it('should handle latestPlayerList event by getting details from lobbyDetails argument', () => {
         const lobbyDetailsMock = {
             isLocked: true,
             players: [
@@ -165,7 +161,6 @@ describe('LobbyPageComponent', () => {
         socketMock.simulateServerEmit('latestPlayerList', lobbyDetailsMock);
         expect(component.isLocked).toEqual(lobbyDetailsMock.isLocked);
         expect(component.players).toEqual(lobbyDetailsMock.players);
-        expect(gameHandlingServiceMock.setPlayers).toHaveBeenCalledWith(component.players);
     });
 
     it('should handle lockToggled event by assigning isLocked argument to isLocked property', () => {
@@ -259,6 +254,7 @@ describe('LobbyPageComponent', () => {
         component.notifyClipboardCopy();
         expect(snackBarMock.open).toHaveBeenCalledWith('PIN copié!', '', SNACK_BAR_NORMAL_CONFIGURATION);
     });
+
     it('should toggle mute status and emit toggleMute event on toggleMute()', () => {
         const player: Player = {
             socketId: 'testSocketId',

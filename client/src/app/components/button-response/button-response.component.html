@@ -1,7 +1,8 @@
 <div *ngIf="!isOrganizer">
-    <div class="buttons-parent" (keydown)="playerEntries($event)" #buttonFocus tabindex="0" autofocus>
+    <div *ngIf="isQcm" class="buttons-parent" (keydown)="playerEntries($event)" #buttonFocus tabindex="0" autofocus>
         <div class="buttons-container">
             <button
+                type="button"
                 *ngFor="let button of buttons"
                 [ngClass]="{
                     'btn-default': !button.selected,
@@ -18,7 +19,17 @@
             </button>
         </div>
     </div>
-    <button class="validate-btn" (click)="verifyResponsesAndCallUpdate()" [disabled]="submitted">Soumettre</button>
+
+    <div *ngIf="!isQcm" id="qrl-input">
+        <mat-form-field id="answer-field">
+            <mat-label>Réponse</mat-label>
+            <textarea matInput (keydown.enter)="$event.preventDefault()" [maxlength]="maxQrlAnswerLength" [formControl]="answerForm" rows="5">
+            </textarea>
+        </mat-form-field>
+        <p id="answer-length">{{ answerForm.value.length }}/{{ maxQrlAnswerLength }}</p>
+    </div>
+
+    <button type="button" class="validate-btn" (click)="verifyResponsesAndCallUpdate()" [disabled]="submitted">Soumettre</button>
 </div>
 <div *ngIf="isOrganizer">
     <ul>

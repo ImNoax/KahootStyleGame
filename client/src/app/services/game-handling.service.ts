@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Game } from '@common/game';
+import { QRL_DURATION } from '@app/constants/in-game';
+import { Game, QuestionType } from '@common/game';
 import { GameMode } from '@common/game-mode';
 import { Observable, of } from 'rxjs';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
@@ -19,21 +20,11 @@ export class GameHandlingService {
     currentQuestionSource = new BehaviorSubject<string>('');
     currentQuestion$ = this.currentQuestionSource.asObservable();
     private readonly baseUrl: string = environment.serverGamesUrl;
-    private players: { socketId: string; name: string }[] = [];
 
     constructor(private http: HttpClient) {}
 
     getGames(): Observable<Game[]> {
         return this.http.get<Game[]>(this.baseUrl).pipe(catchError(this.handleError<Game[]>('getGames')));
-    }
-
-    setPlayers(players: { socketId: string; name: string }[]): void {
-        this.players = players;
-    }
-
-    getPlayerNameBySocketId(socketId: string): string {
-        const player = this.players.find((plyer) => plyer.socketId === socketId);
-        return player ? player.name : 'Unknown';
     }
 
     modifyGame(game: Game): Observable<Game[]> {
@@ -60,6 +51,11 @@ export class GameHandlingService {
 
     setCurrentQuestion(question: string): void {
         this.currentQuestionSource.next(question);
+    }
+
+    getCurrentQuestionDuration() {
+        if (this.currentGame.questions[this.currentQuestionId].type === QuestionType.QCM) return this.currentGame.duration;
+        else return QRL_DURATION;
     }
 
     setScore(newScore: number): void {

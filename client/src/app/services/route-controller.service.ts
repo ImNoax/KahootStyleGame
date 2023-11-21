@@ -10,7 +10,7 @@ export type IsRouteAccessible = boolean;
     providedIn: 'root',
 })
 export class RouteControllerService {
-    routes: Map<Route, IsRouteAccessible> = new Map<Route, boolean>([
+    routes: Map<Route, IsRouteAccessible> = new Map<Route, IsRouteAccessible>([
         [Route.Admin, false],
         [Route.InGame, false],
         [Route.Lobby, false],

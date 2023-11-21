@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
 import { SocketMock } from '@app/classes/socket-mock';
-import { snackBarNormalConfiguration } from '@app/constants/snack-bar-configuration';
+import { SNACK_BAR_NORMAL_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { Message } from '@common/lobby';
 import { ChatBoxComponent } from './chat-box.component';
@@ -64,9 +64,9 @@ describe('ChatBoxComponent', () => {
         const muteEvent = 'PlayerMuted';
         const unmuteEvent = 'PlayerUnmuted';
         socketMock.simulateServerEmit(muteEvent);
-        expect(snackBarMock.open).toHaveBeenCalledWith('Vous ne pouvez plus clavarder ❌', '', snackBarNormalConfiguration);
+        expect(snackBarMock.open).toHaveBeenCalledWith('Vous ne pouvez plus clavarder ❌', '', SNACK_BAR_NORMAL_CONFIGURATION);
         socketMock.simulateServerEmit(unmuteEvent);
-        expect(snackBarMock.open).toHaveBeenCalledWith('Vous pouvez maintenant clavarder ✅', '', snackBarNormalConfiguration);
+        expect(snackBarMock.open).toHaveBeenCalledWith('Vous pouvez maintenant clavarder ✅', '', SNACK_BAR_NORMAL_CONFIGURATION);
     });
     it('should emit message on sendMessage ', () => {
         component.newMessage = 'Test';

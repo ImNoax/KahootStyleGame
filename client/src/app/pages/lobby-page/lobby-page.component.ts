@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { SNACK_BAR_ERROR_CONFIGURATION, SNACK_BAR_NORMAL_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { Route } from '@app/enums';
 import { ClientSocketService } from '@app/services/client-socket.service';
-import { GameHandlingService } from '@app/services/game-handling.service';
 import { RouteControllerService } from '@app/services/route-controller.service';
 import { TimerService } from '@app/services/timer.service';
 import { LobbyDetails, Pin, Player, SocketId } from '@common/lobby';
@@ -28,7 +27,6 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     constructor(
         private router: Router,
         private clientSocket: ClientSocketService,
-        private gameHandler: GameHandlingService,
     ) {}
 
     get isOrganizer(): boolean {
@@ -68,7 +66,6 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         this.clientSocket.socket.on('latestPlayerList', (lobbyDetails: LobbyDetails) => {
             this.isLocked = lobbyDetails.isLocked;
             this.players = lobbyDetails.players;
-            this.gameHandler.setPlayers(this.players);
         });
 
         this.clientSocket.socket.on('lockToggled', (isLocked: boolean) => {

@@ -2,22 +2,43 @@ import { formatDate } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { Game } from '@common/game';
+import { QRL_DURATION } from '@app/constants/in-game';
+import { Game, Question, QuestionType } from '@common/game';
 import { of, throwError } from 'rxjs';
 import { GameHandlingService } from './game-handling.service';
 
 describe('GameHandlingService', () => {
-    let service: GameHandlingService;
-    let httpClientSpy: jasmine.SpyObj<HttpClient>;
-    const mockGame: Game = {
+    const MOCK_QUESTIONS: Question[] = [
+        {
+            text: 'What is the capital of France?',
+            points: 10,
+            type: QuestionType.QCM,
+            choices: [
+                { text: 'Paris', isCorrect: true },
+                { text: 'London', isCorrect: false },
+                { text: 'Berlin', isCorrect: false },
+                { text: 'Madrid', isCorrect: false },
+            ],
+        },
+        {
+            text: 'Question 2',
+            points: 10,
+            type: QuestionType.QRL,
+        },
+    ];
+
+    const MOCK_GAME: Game = {
         id: '0',
         title: 'Test Game',
         description: 'Test Description',
         duration: 30,
         lastModification: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
         isVisible: false,
-        questions: [],
+        questions: MOCK_QUESTIONS,
     };
+
+    let service: GameHandlingService;
+    let httpClientSpy: jasmine.SpyObj<HttpClient>;
 
     beforeEach(() => {
         httpClientSpy = jasmine.createSpyObj('HttpClient', ['get', 'post', 'patch', 'delete']);
@@ -33,13 +54,14 @@ describe('GameHandlingService', () => {
     });
 
     it('getGames should send a get request', (done) => {
-        httpClientSpy.get.and.returnValue(of([mockGame]));
+        httpClientSpy.get.and.returnValue(of([MOCK_GAME]));
         service.getGames().subscribe((games) => {
-            expect(games).toEqual([mockGame]);
+            expect(games).toEqual([MOCK_GAME]);
             done();
         });
         expect(httpClientSpy.get.calls.count()).withContext('one call').toBe(1);
     });
+
     it('should show an alert when there is an error', (done) => {
         const errorResponse = {
             error: new Error('Test error message'),
@@ -61,50 +83,41 @@ describe('GameHandlingService', () => {
     });
 
     it('currentGame should be able to be set', () => {
-        service.currentGame = mockGame;
-        expect(service.currentGame).toEqual(mockGame);
-    });
-    it('getPlayerNameBySocketId should return Unknown when player is not found', () => {
-        const socketId = 'nonexistent-socket-id';
-        expect(service.getPlayerNameBySocketId(socketId)).toEqual('Unknown');
-    });
-    it('getPlayerNameBySocketId should return player name when player is found', () => {
-        const players = [{ socketId: '123', name: 'Noah Nam' }];
-        service.setPlayers(players);
-        expect(service.getPlayerNameBySocketId('123')).toEqual('Noah Nam');
+        service.currentGame = MOCK_GAME;
+        expect(service.currentGame).toEqual(MOCK_GAME);
     });
 
     it('modifyGame should send a patch request', (done) => {
-        httpClientSpy.patch.and.returnValue(of([mockGame]));
-        service.modifyGame(mockGame).subscribe((games) => {
-            expect(games).toEqual([mockGame]);
+        httpClientSpy.patch.and.returnValue(of([MOCK_GAME]));
+        service.modifyGame(MOCK_GAME).subscribe((games) => {
+            expect(games).toEqual([MOCK_GAME]);
             done();
         });
         expect(httpClientSpy.patch.calls.count()).withContext('one call').toBe(1);
     });
 
     it('addGame should send a post request', (done) => {
-        httpClientSpy.post.and.returnValue(of([mockGame]));
-        service.addGame(mockGame).subscribe((games) => {
-            expect(games).toEqual([mockGame]);
+        httpClientSpy.post.and.returnValue(of([MOCK_GAME]));
+        service.addGame(MOCK_GAME).subscribe((games) => {
+            expect(games).toEqual([MOCK_GAME]);
             done();
         });
         expect(httpClientSpy.post.calls.count()).withContext('one call').toBe(1);
     });
 
     it('changeVisibility should send a patch request', (done) => {
-        httpClientSpy.patch.and.returnValue(of([mockGame]));
-        service.changeVisibility(mockGame).subscribe((games) => {
-            expect(games).toEqual([mockGame]);
+        httpClientSpy.patch.and.returnValue(of([MOCK_GAME]));
+        service.changeVisibility(MOCK_GAME).subscribe((games) => {
+            expect(games).toEqual([MOCK_GAME]);
             done();
         });
         expect(httpClientSpy.patch.calls.count()).withContext('one call').toBe(1);
     });
 
     it('export should send a get request', (done) => {
-        httpClientSpy.get.and.returnValue(of(mockGame));
-        service.export(mockGame.id).subscribe((game) => {
-            expect(game).toEqual(mockGame);
+        httpClientSpy.get.and.returnValue(of(MOCK_GAME));
+        service.export(MOCK_GAME.id).subscribe((game) => {
+            expect(game).toEqual(MOCK_GAME);
             done();
         });
         expect(httpClientSpy.get.calls.count()).withContext('one call').toBe(1);
@@ -112,7 +125,7 @@ describe('GameHandlingService', () => {
 
     it('deleteGame should send a delete request', (done) => {
         httpClientSpy.delete.and.returnValue(of(null));
-        service.deleteGame(mockGame.id).subscribe(() => {
+        service.deleteGame(MOCK_GAME.id).subscribe(() => {
             done();
         });
         expect(httpClientSpy.delete.calls.count()).withContext('one call').toBe(1);
@@ -124,6 +137,18 @@ describe('GameHandlingService', () => {
         service.currentQuestion$.subscribe((question) => {
             expect(question).toEqual(testQuestion);
         });
+    });
+
+    it("getCurrentQuestionDuration should return current game's QCM duration if question is QCM", () => {
+        service.currentGame = MOCK_GAME;
+        service.currentQuestionId = 0;
+        expect(service.getCurrentQuestionDuration()).toEqual(service.currentGame.duration);
+    });
+
+    it('getCurrentQuestionDuration should return 60 if question is QRL', () => {
+        service.currentGame = MOCK_GAME;
+        service.currentQuestionId = 1;
+        expect(service.getCurrentQuestionDuration()).toEqual(QRL_DURATION);
     });
 
     it('setScore should update the score', () => {

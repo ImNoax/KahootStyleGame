@@ -1,5 +1,6 @@
 import { GameHandlingService } from '@angular/../../client/src/app/services/game-handling.service';
 import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, inject, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { RAMDOM_AUDIO_URL, SIMS4_SOUNDS } from '@app/constants/audio-url';
@@ -22,6 +23,8 @@ import { Subscription } from 'rxjs/internal/Subscription';
 export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('buttonFocus', { static: false }) buttonFocus: ElementRef;
     @Output() updateQuestionScore = new EventEmitter<number>();
+    maxQrlAnswerLength: number = Limit.MaxQrlAnswerLength;
+    answerForm: FormControl = new FormControl('', { nonNullable: true });
     buttons: Button[] = [];
     currentGame: Game;
     timerSubscription: Subscription;
@@ -58,6 +61,10 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
         return this.currentGame.questions[this.gameService.currentQuestionId].type;
     }
 
+    get isQcm() {
+        return this.questionType === QuestionType.QCM;
+    }
+
     get isPanicModeEnabled() {
         return this.timer.isPanicModeEnabled;
     }
@@ -86,7 +93,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
 
     ngOnInit(): void {
         this.currentGame = this.gameService.currentGame;
-        this.updateButtons();
+        if (this.isQcm) this.updateButtons(); // isQcm TEMPORAIRE. À revoir après la démo
         this.configureBaseSocketFeatures();
         this.audio.volume = 1;
     }
@@ -186,25 +193,29 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
     verifyResponsesAndCallUpdate() {
         this.submitted = true;
         if (this.isProcessing) return;
-        let clickedChoicesCount = 0;
-        let correctChoicesCount = 0;
-        this.buttons.forEach((button) => {
-            if (button.isCorrect) {
-                correctChoicesCount++;
-            }
 
-            if (button.selected) {
-                clickedChoicesCount++;
-                if (!button.isCorrect) {
-                    this.isAnswerCorrect = false;
+        // isQcm TEMPORAIRE. À revoir après la démo
+        if (this.isQcm) {
+            let clickedChoicesCount = 0;
+            let correctChoicesCount = 0;
+            this.buttons.forEach((button) => {
+                if (button.isCorrect) {
+                    correctChoicesCount++;
                 }
-            }
-        });
 
-        if (clickedChoicesCount !== correctChoicesCount) {
-            this.isAnswerCorrect = false;
-        }
-        this.isProcessing = true;
+                if (button.selected) {
+                    clickedChoicesCount++;
+                    if (!button.isCorrect) {
+                        this.isAnswerCorrect = false;
+                    }
+                }
+            });
+
+            if (clickedChoicesCount !== correctChoicesCount) {
+                this.isAnswerCorrect = false;
+            }
+            this.isProcessing = true;
+        } else this.answerForm.disable(); // Temporaire
 
         if (this.gameService.gameMode === GameMode.Testing) {
             this.timer.stopCountDown();
@@ -236,10 +247,11 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
             this.clientSocket.socket.emit('gameEnded');
         } else {
             this.gameService.setCurrentQuestionId(++this.gameService.currentQuestionId);
-            this.updateButtons();
+            if (this.isQcm) this.updateButtons(); // isQcm TEMPORAIRE. À revoir après la démo
             this.gameService.setCurrentQuestion(this.currentGame.questions[this.gameService.currentQuestionId].text);
             this.updateQuestionScore.emit(this.currentGame.questions[this.gameService.currentQuestionId].points);
-            if (this.clientSocket.isOrganizer || this.gameService.gameMode === GameMode.Testing) this.timer.startCountDown(this.currentGame.duration);
+            if (this.clientSocket.isOrganizer || this.gameService.gameMode === GameMode.Testing)
+                this.timer.startCountDown(this.gameService.getCurrentQuestionDuration());
             if (this.buttonFocus) {
                 this.buttonFocus.nativeElement.focus();
             }
@@ -286,6 +298,8 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
         this.timer.isQuestionTransition = false;
         this.isGamePaused = false;
         this.hasQuestionEnded = false;
+        this.answerForm.reset();
+        this.answerForm.enable();
         this.updateGameQuestions();
     }
 
@@ -298,7 +312,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
     }
 
     startNextQuestionCountDown() {
-        this.clientSocket.sendResetHistogram();
+        if (this.isQcm) this.clientSocket.sendResetHistogram(); // isQcm TEMPORAIRE. À revoir après la démo
         this.canLoadNextQuestion = false;
         this.isGamePaused = false;
         this.timer.startCountDown(TIME_OUT, { isQuestionTransition: true });

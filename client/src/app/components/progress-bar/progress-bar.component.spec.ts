@@ -1,21 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { ProgressBarComponent } from '@app/components/progress-bar/progress-bar.component';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling.service';
 import { TimerService } from '@app/services/timer.service';
-import { Game } from '@common/game';
 import { GameMode } from '@common/game-mode';
-import { ProgressBarComponent } from './progress-bar.component';
 
 describe('ProgressBarComponent', () => {
-    const GAME_MOCK: Game = {
-        id: '',
-        title: '',
-        description: '',
-        duration: 0,
-        lastModification: '',
-        questions: [],
-    };
+    const currentQuestionDuration = 10;
 
     let component: ProgressBarComponent;
     let fixture: ComponentFixture<ProgressBarComponent>;
@@ -25,7 +17,7 @@ describe('ProgressBarComponent', () => {
 
     beforeEach(() => {
         timeServiceMock = jasmine.createSpyObj('TimeService', ['startCountDown']);
-        gameHandlingServiceMock = jasmine.createSpyObj('GameHandlingService', ['']);
+        gameHandlingServiceMock = jasmine.createSpyObj('GameHandlingService', ['getCurrentQuestionDuration']);
         clientSocketServiceMock = jasmine.createSpyObj('ClientSocketService', ['']);
 
         TestBed.configureTestingModule({
@@ -40,7 +32,6 @@ describe('ProgressBarComponent', () => {
 
         fixture = TestBed.createComponent(ProgressBarComponent);
         component = fixture.componentInstance;
-        gameHandlingServiceMock.currentGame = GAME_MOCK;
     });
 
     it('should create', () => {
@@ -61,28 +52,31 @@ describe('ProgressBarComponent', () => {
         expect(component.isPanicModeEnabled).toEqual(false);
     });
 
-    it('currentGame getter should return currentGame from GameHandlingService', () => {
-        expect(component.currentGame).toEqual(GAME_MOCK);
+    it('currentQuestionDuration getter should return value from calling getCurrentQuestionDuration from GameHandlingService', () => {
+        gameHandlingServiceMock.getCurrentQuestionDuration.and.returnValue(currentQuestionDuration);
+        expect(component.currentQuestionDuration).toEqual(currentQuestionDuration);
     });
 
     it('should start countDown on component initialization if the player is the organizer', () => {
         clientSocketServiceMock.isOrganizer = true;
-        gameHandlingServiceMock.gameMode = GameMode.Testing;
+        gameHandlingServiceMock.gameMode = GameMode.RealGame;
+        spyOnProperty(component, 'currentQuestionDuration', 'get').and.returnValue(currentQuestionDuration);
         component.ngOnInit();
-        expect(timeServiceMock.startCountDown).toHaveBeenCalledWith(GAME_MOCK.duration);
+        expect(timeServiceMock.startCountDown).toHaveBeenCalledWith(currentQuestionDuration);
     });
 
     it('should start countDown on component initialization if the player is a tester', () => {
         gameHandlingServiceMock.gameMode = GameMode.Testing;
         clientSocketServiceMock.isOrganizer = false;
+        spyOnProperty(component, 'currentQuestionDuration', 'get').and.returnValue(currentQuestionDuration);
         component.ngOnInit();
-        expect(timeServiceMock.startCountDown).toHaveBeenCalledWith(GAME_MOCK.duration);
+        expect(timeServiceMock.startCountDown).toHaveBeenCalledWith(currentQuestionDuration);
     });
 
     it('should not start countDown on component initialization if the player is not the organizer or a tester', () => {
         gameHandlingServiceMock.gameMode = GameMode.RealGame;
         clientSocketServiceMock.isOrganizer = false;
         component.ngOnInit();
-        expect(timeServiceMock.startCountDown).not.toHaveBeenCalledWith(GAME_MOCK.duration);
+        expect(timeServiceMock.startCountDown).not.toHaveBeenCalled();
     });
 });

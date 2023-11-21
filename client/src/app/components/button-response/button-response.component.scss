@@ -98,3 +98,27 @@ button {
 .incorrect {
     color: red;
 }
+
+#qrl-input {
+    margin: auto;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: large;
+    padding: 0;
+    margin-top: 5%;
+    width: 600px;
+}
+
+#answer-field {
+    width: 600px;
+}
+
+#answer-length {
+    color: white;
+    text-align: right;
+    padding: 0;
+    margin: 0;
+}
+
+textarea {
+    resize: none;
+}
