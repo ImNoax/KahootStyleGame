@@ -30,9 +30,9 @@
 
         <div *ngIf="isOrganizer" id="nav">
             <button mat-raised-button color="primary" (click)="toggleLobbyLock()" [disabled]="countDownStarted">
-                <span id="lock-text">{{ isLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}</span>
                 <i *ngIf="!isLocked" class="fa-solid fa-unlock fa-2xl"></i>
                 <i *ngIf="isLocked" class="fa-solid fa-lock fa-shake fa-2xl"></i>
+                <span id="lock-text">{{ isLocked ? 'Déverrouiller la salle' : 'Verrouiller la salle' }}</span>
             </button>
             <button
                 mat-raised-button

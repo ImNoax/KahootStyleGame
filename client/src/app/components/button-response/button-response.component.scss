@@ -13,25 +13,22 @@
     align-items: center;
 }
 
-button {
-    cursor: pointer;
-}
-
 .btn {
     flex-basis: calc(48% - 10px);
+    padding: 1%;
     display: flex;
     flex-direction: row;
     align-items: center;
     margin-top: 6%;
     font-size: 90%;
-    border-radius: 20px;
+    border-radius: 10px;
     border: 5px solid black;
     background-color: white;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 #button-id {
-    background-color: lightgray;
+    font-weight: bold;
     width: 10%;
 }
 
@@ -40,9 +37,12 @@ button {
 }
 
 .validate-btn {
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
     color: white;
-    align-self: flex-start;
-    margin-top: 70px;
     width: 20%;
     height: 60px;
     font-size: 100%;
@@ -121,4 +121,37 @@ button {
 
 textarea {
     resize: none;
+}
+
+#controls-container {
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 5%;
+}
+
+.controls {
+    font-size: 14px;
+    width: 250px;
+    padding: 4% 0;
+}
+
+.controls:hover {
+    background-color: rgb(181, 181, 181);
+}
+
+.controls:disabled {
+    background-color: silver;
+    color: gray;
+}
+
+#panic-availability {
+    position: relative;
+    font-size: 12px;
+    top: 3px;
 }
