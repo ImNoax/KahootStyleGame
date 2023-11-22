@@ -274,5 +274,320 @@
                 ]
             }
         ]
+    },
+    {
+        "id": "VsaNET",
+        "title": "Testing Quizds",
+        "description": "Quiz for testing",
+        "duration": 15,
+        "lastModification": "2023-11-17",
+        "isVisible": false,
+        "questions": [
+            {
+                "text": "Question 1 - should be 10 points + 2 points bonus",
+                "points": 10,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Good ",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Bad",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Bad.",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Bad..",
+                        "isCorrect": false
+                    }
+                ]
+            },
+            {
+                "text": "Question 2 - should be 20 points + 4 points bonus",
+                "points": 20,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Bad.",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Good",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Bad..",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Good.",
+                        "isCorrect": true
+                    }
+                ]
+            },
+            {
+                "text": "Question 3 -  should be 30 points + 6 points bonus",
+                "points": 30,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Good",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Bad",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Good.",
+                        "isCorrect": true
+                    }
+                ]
+            },
+            {
+                "text": "Question 4 - should be 40 points + 8 points bonus",
+                "points": 40,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Bad",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Good",
+                        "isCorrect": true
+                    }
+                ]
+            },
+            {
+                "text": "Question 5 -  should be 50 points + 10 points bonus",
+                "points": 50,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Good",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Bad",
+                        "isCorrect": false
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "NXxbhA",
+        "title": "Testing Quizs",
+        "description": "Quiz for testing",
+        "duration": 15,
+        "lastModification": "2023-11-17",
+        "isVisible": false,
+        "questions": [
+            {
+                "text": "Question 1 - should be 10 points + 2 points bonus",
+                "points": 10,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Good ",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Bad",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Bad.",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Bad..",
+                        "isCorrect": false
+                    }
+                ]
+            },
+            {
+                "text": "Question 2 - should be 20 points + 4 points bonus",
+                "points": 20,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Bad.",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Good",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Bad..",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Good.",
+                        "isCorrect": true
+                    }
+                ]
+            },
+            {
+                "text": "Question 3 -  should be 30 points + 6 points bonus",
+                "points": 30,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Good",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Bad",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Good.",
+                        "isCorrect": true
+                    }
+                ]
+            },
+            {
+                "text": "Question 4 - should be 40 points + 8 points bonus",
+                "points": 40,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Bad",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Good",
+                        "isCorrect": true
+                    }
+                ]
+            },
+            {
+                "text": "Question 5 -  should be 50 points + 10 points bonus",
+                "points": 50,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Good",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Bad",
+                        "isCorrect": false
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "id": "Vnpxtb",
+        "title": "Testing Quiza",
+        "description": "Quiz for testing",
+        "duration": 15,
+        "lastModification": "2023-11-17",
+        "isVisible": false,
+        "questions": [
+            {
+                "text": "Question 1 - should be 10 points + 2 points bonus",
+                "points": 10,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Good ",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Bad",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Bad.",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Bad..",
+                        "isCorrect": false
+                    }
+                ]
+            },
+            {
+                "text": "Question 2 - should be 20 points + 4 points bonus",
+                "points": 20,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Bad.",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Good",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Bad..",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Good.",
+                        "isCorrect": true
+                    }
+                ]
+            },
+            {
+                "text": "Question 3 -  should be 30 points + 6 points bonus",
+                "points": 30,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Good",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Bad",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Good.",
+                        "isCorrect": true
+                    }
+                ]
+            },
+            {
+                "text": "Question 4 - should be 40 points + 8 points bonus",
+                "points": 40,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Bad",
+                        "isCorrect": false
+                    },
+                    {
+                        "text": "Good",
+                        "isCorrect": true
+                    }
+                ]
+            },
+            {
+                "text": "Question 5 -  should be 50 points + 10 points bonus",
+                "points": 50,
+                "type": "QCM",
+                "choices": [
+                    {
+                        "text": "Good",
+                        "isCorrect": true
+                    },
+                    {
+                        "text": "Bad",
+                        "isCorrect": false
+                    }
+                ]
+            }
+        ]
     }
 ]

@@ -6,6 +6,7 @@ import { inGameGuard } from '@app/guards/in-game.guard';
 import { lobbyGuard } from '@app/guards/lobby.guard';
 import { AdminJeuPageComponent } from '@app/pages/admin-jeu-page/admin-jeu-page.component';
 import { GameCreationPageComponent } from '@app/pages/game-creation-page/game-creation-page.component';
+import { HistoryPageComponent } from '@app/pages/history-page/history-page.component';
 import { InGamePageComponent } from '@app/pages/in-game-page/in-game-page.component';
 import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
 import { MainMenuPageComponent } from '@app/pages/main-menu-page/main-menu-page.component';
@@ -21,6 +22,7 @@ const routes: Routes = [
     { path: Route.Admin, component: AdminJeuPageComponent, canActivate: [adminGuard] },
     { path: Route.QuizCreation, component: QuizCreationPageComponent, canActivate: [adminGuard] },
     { path: Route.QuestionCreation, component: QuestionCreationPageComponent, canActivate: [adminGuard] },
+    { path: Route.HistoryPage, component: HistoryPageComponent, canActivate: [adminGuard] },
     { path: '**', redirectTo: Route.MainMenu },
 ];
 

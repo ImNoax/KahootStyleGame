@@ -12,4 +12,5 @@ export enum Route {
     Admin = 'admin',
     QuizCreation = 'quiz-creation',
     QuestionCreation = 'question-creation',
+    HistoryPage = 'history-page',
 }
