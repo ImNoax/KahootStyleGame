@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { QRL_DURATION } from '@app/constants/in-game';
-import { Game, Question, QuestionType } from '@common/game';
+import { Game, GameInfo, Question, QuestionType } from '@common/game';
 import { of, throwError } from 'rxjs';
 import { GameHandlingService } from './game-handling.service';
 
@@ -183,5 +183,22 @@ describe('GameHandlingService', () => {
             done();
         });
         expect(httpClientSpy.post.calls.count()).toBe(1);
+    });
+
+    it('getHistory should send a get request and return the history', () => {
+        const games: GameInfo[] = [{ name: 'test', date: '2002-09-13 12:00:00', numberPlayers: 1, bestScore: 500 }];
+        httpClientSpy.get.and.returnValue(of(games));
+        service.getHistory().subscribe((response) => {
+            expect(httpClientSpy.get).toHaveBeenCalled();
+            expect(response).toEqual(games);
+        });
+    });
+
+    it('resetHistory should send a delete request and return an empty array', () => {
+        httpClientSpy.delete.and.returnValue(of([]));
+        service.resetHistory().subscribe((response) => {
+            expect(httpClientSpy.delete).toHaveBeenCalled();
+            expect(response).toEqual([]);
+        });
     });
 });

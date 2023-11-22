@@ -25,6 +25,7 @@ import { HistogramComponent } from './components/histogram/histogram.component';
 import { NameDefinitionComponent } from './components/name-definition/name-definition.component';
 import { PlayerListComponent } from './components/player-list/player-list.component';
 import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
+import { HistoryPageComponent } from './pages/history-page/history-page.component';
 import { InGamePageComponent } from './pages/in-game-page/in-game-page.component';
 import { MainMenuPageComponent } from './pages/main-menu-page/main-menu-page.component';
 import { QuestionCreationPageComponent } from './pages/question-creation-page/question-creation-page.component';
@@ -56,6 +57,7 @@ import { QuizCreationPageComponent } from './pages/quiz-creation-page/quiz-creat
         EndResultComponent,
         HistogramComponent,
         PlayerListComponent,
+        HistoryPageComponent,
     ],
     imports: [
         AppMaterialModule,

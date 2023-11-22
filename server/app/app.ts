@@ -8,6 +8,7 @@ import { StatusCodes } from 'http-status-codes';
 import * as swaggerJSDoc from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
 import { Service } from 'typedi';
+import { HistoryController } from './controllers/history.controller';
 
 @Service()
 export class Application {
@@ -18,6 +19,7 @@ export class Application {
     constructor(
         private readonly gameController: GameController,
         private readonly adminController: AdminController,
+        private readonly historyController: HistoryController,
     ) {
         this.app = express();
 
@@ -41,6 +43,7 @@ export class Application {
         this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(this.swaggerOptions)));
         this.app.use('/api/games', this.gameController.router);
         this.app.use('/api/admin', this.adminController.getRouter());
+        this.app.use('/api/history', this.historyController.router);
         this.errorHandling();
     }
 

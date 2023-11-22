@@ -24,3 +24,10 @@ export interface Game {
     isVisible?: boolean;
     questions: Question[];
 }
+
+export interface GameInfo {
+    name: string;
+    date: string;
+    numberPlayers: number;
+    bestScore: number;
+}

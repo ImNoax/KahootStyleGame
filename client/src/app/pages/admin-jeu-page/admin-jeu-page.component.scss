@@ -10,13 +10,6 @@
     text-align: center;
 }
 
-#game-table {
-    height: auto;
-    min-height: 250px;
-    max-height: 400px;
-    overflow-y: auto;
-}
-
 .field {
     width: 30%;
     border-color: lightgray;
@@ -57,7 +50,15 @@
 
 table {
     border-collapse: collapse;
-    width: 100%;
+    width: 99%;
+}
+
+tbody {
+    display: block;
+    height: auto;
+    min-height: 250px;
+    max-height: 300px;
+    overflow-y: auto;
 }
 
 th,
@@ -78,6 +79,12 @@ th {
     font-size: 200%;
     color: #ffffff;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
 }
 
 .adminbutton {
@@ -123,6 +130,13 @@ p.error-format {
     position: absolute;
     right: 9%;
     bottom: 17%;
+}
+
+#historybutton {
+    scale: 0.9;
+    position: absolute;
+    top: 2%;
+    right: 1.5%;
 }
 
 .icon-display {

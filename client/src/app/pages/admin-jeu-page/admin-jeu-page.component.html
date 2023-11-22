@@ -59,4 +59,6 @@
     <p class="error-empty" *ngIf="isFileEmpty">Fichier vide!</p>
     <p class="error-format" *ngIf="isFormInvalid">Le fichier JSON n'est pas bien formaté!</p>
     <input #gameImport type="file" accept="application/JSON" (change)="importGame($event)" hidden />
+
+    <button mat-raised-button [routerLink]="historyRoute" color="primary" class="adminbutton" id="historybutton">Historique des parties</button>
 </div>

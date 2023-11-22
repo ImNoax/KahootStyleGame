@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { QRL_DURATION } from '@app/constants/in-game';
-import { Game, QuestionType } from '@common/game';
+import { Game, QuestionType, GameInfo } from '@common/game';
 import { GameMode } from '@common/game-mode';
 import { Observable, of } from 'rxjs';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
@@ -75,6 +75,14 @@ export class GameHandlingService {
         return this.http
             .post<{ valid: boolean }>(`${environment.serverAdminUrl}/verify-admin-password`, { password })
             .pipe(map((response) => response.valid));
+    }
+
+    getHistory(): Observable<GameInfo[]> {
+        return this.http.get<GameInfo[]>(`${environment.serverBaseUrl}/api/history`);
+    }
+
+    resetHistory(): Observable<GameInfo[]> {
+        return this.http.delete<GameInfo[]>(`${environment.serverBaseUrl}/api/history`);
     }
 
     private handleError<T>(request: string, result?: T): (error: { error: Error }) => Observable<T> {

@@ -18,6 +18,7 @@ const JSON_SPACE = 4;
 })
 export class AdminJeuPageComponent implements OnInit {
     quizCreationRoute: string = '/' + Route.QuizCreation;
+    historyRoute: string = '/' + Route.HistoryPage;
     games: Game[];
     fileName: string = '';
     isFileEmpty: boolean = false;
