@@ -1,6 +1,9 @@
 .table-container {
-    justify-content: center;
-    align-items: center;
+    color:white;
+    position: fixed; 
+    top: 35%;
+    left: 35%;
+    
 }
 
 table {
@@ -13,14 +16,14 @@ th,
 td {
     border: 1px solid #8d3987;
     padding: 8px;
-    text-align: left;
+    text-align: middle;
     font-size: 0.9em;
     word-break: break-word;
-    color: #fff;
 }
 
 th {
     background-color: #8d3987;
+    color: #fff;
 }
 
 tr:nth-child(even) {

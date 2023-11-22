@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { QRL_DURATION } from '@app/constants/in-game';
-import { Game, QuestionType, GameInfo } from '@common/game';
+import { Game, GameInfo, QuestionType } from '@common/game';
 import { GameMode } from '@common/game-mode';
 import { Observable, of } from 'rxjs';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
@@ -19,6 +19,7 @@ export class GameHandlingService {
     score$ = this.scoreSource.asObservable();
     currentQuestionSource = new BehaviorSubject<string>('');
     currentQuestion$ = this.currentQuestionSource.asObservable();
+    private allHistogramData: { [questionId: number]: { [key: string]: number } } = {};
     private readonly baseUrl: string = environment.serverGamesUrl;
 
     constructor(private http: HttpClient) {}
@@ -83,6 +84,19 @@ export class GameHandlingService {
 
     resetHistory(): Observable<GameInfo[]> {
         return this.http.delete<GameInfo[]>(`${environment.serverBaseUrl}/api/history`);
+    }
+        resetHistogramDataForQuestion(): void {
+        this.allHistogramData = {};
+    }
+
+    updateHistogramDataForQuestion(questionId: number, newData: { [key: string]: number }): void {
+        this.allHistogramData[questionId] = {
+            ...(this.allHistogramData[questionId] || {}),
+            ...newData,
+        };
+    }
+        getAllHistogramData(): { [questionId: number]: { [key: string]: number } } {
+        return this.allHistogramData;
     }
 
     private handleError<T>(request: string, result?: T): (error: { error: Error }) => Observable<T> {

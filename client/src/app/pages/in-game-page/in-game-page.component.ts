@@ -1,5 +1,5 @@
 import { GameHandlingService } from '@angular/../../client/src/app/services/game-handling.service';
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Route } from '@app/enums';
 import { ClientSocketService } from '@app/services/client-socket.service';
@@ -66,6 +66,7 @@ export class InGamePageComponent implements OnInit, OnDestroy {
 
         this.histogramSubscription = this.clientSocket.listenUpdateHistogram().subscribe((data) => {
             this.histogramData = data;
+            this.gameService.updateHistogramDataForQuestion(this.gameService.currentQuestionId, data);
         });
 
         this.gameService.setCurrentQuestionId(0);
