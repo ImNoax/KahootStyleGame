@@ -14,7 +14,7 @@
                 class="btn"
                 [ngClass]="{ 'highlight-correct': button.showCorrectButtons, 'highlight-wrong': button.showWrongButtons }"
             >
-                <div id="button-id">{{ button.id }}</div>
+                <span id="button-id">{{ button.id }}</span>
                 <div id="button-text">{{ button.text }}</div>
             </button>
         </div>
@@ -32,21 +32,26 @@
     <button type="button" class="validate-btn" (click)="verifyResponsesAndCallUpdate()" [disabled]="submitted">Soumettre</button>
 </div>
 <div *ngIf="isOrganizer">
-    <ul>
-        <li *ngFor="let item of buttons" [ngClass]="{ correct: item.isCorrect, incorrect: !item.isCorrect }">
-            <div id="item-id">{{ item.id }}</div>
-            <div id="item-text">{{ item.text }}</div>
-        </li>
-    </ul>
-    <button mat-raised-button (click)="startNextQuestionCountDown()" [disabled]="!canLoadNextQuestion">Charger la prochaine question</button>
-    <button mat-raised-button (click)="pause()" [disabled]="hasQuestionEnded && !isQuestionTransition">
-        <i *ngIf="!isGamePaused" class="fa-solid fa-pause fa-2xl"></i>
-        <i *ngIf="isGamePaused" class="fa-solid fa-play fa-beat-fade fa-2xl"></i>
-        {{ pauseMessage }}
-    </button>
-    <button mat-raised-button (click)="panic()" [disabled]="!isPanicModeAvailable || isPanicModeEnabled || isGamePaused || hasQuestionEnded">
-        <i class="fa-solid fa-triangle-exclamation fa-2xl"></i>
-        PANIQUER
-        <div *ngIf="!isPanicModeAvailable">Disponible dans {{ remainingCountForPanic }}</div>
-    </button>
+    <div id="controls-container">
+        <button mat-raised-button class="controls" (click)="startNextQuestionCountDown()" [disabled]="!canLoadNextQuestion">
+            Charger la prochaine question
+        </button>
+        <button mat-raised-button class="controls" (click)="pause()" [disabled]="hasQuestionEnded && !isQuestionTransition">
+            <i *ngIf="!isGamePaused" class="fa-solid fa-pause fa-2xl"></i>
+            <i *ngIf="isGamePaused" class="fa-solid fa-play fa-beat-fade fa-2xl"></i>
+            {{ pauseMessage }}
+        </button>
+        <button
+            mat-raised-button
+            class="controls"
+            (click)="panic()"
+            [disabled]="!isPanicModeAvailable || isPanicModeEnabled || isGamePaused || hasQuestionEnded"
+        >
+            <div>
+                <i class="fa-solid fa-triangle-exclamation fa-2xl"></i>
+                PANIQUER
+            </div>
+            <div *ngIf="!isPanicModeAvailable" id="panic-availability">Disponible dans {{ remainingCountForPanic }}</div>
+        </button>
+    </div>
 </div>

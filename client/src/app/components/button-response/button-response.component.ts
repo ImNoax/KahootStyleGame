@@ -3,7 +3,7 @@ import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, injec
 import { FormControl } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { RAMDOM_AUDIO_URL, SIMS4_SOUNDS } from '@app/constants/audio-url';
+import { RAMDOM_AUDIO_URL, SOUNDS } from '@app/constants/audio-url';
 import { BONUS_POINTS, BUTTON_SELECTED, BUTTON_UNSELECTED, PAUSE_MESSAGE, TIME_OUT, UNPAUSE_MESSAGE } from '@app/constants/in-game';
 import { SNACK_BAR_ERROR_CONFIGURATION, SNACK_BAR_NORMAL_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { Route } from '@app/enums';
@@ -126,7 +126,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
 
         this.clientSocket.socket.on('panicMode', () => {
             this.timer.isPanicModeEnabled = true;
-            this.audio.src = RAMDOM_AUDIO_URL(SIMS4_SOUNDS);
+            this.audio.src = RAMDOM_AUDIO_URL(SOUNDS);
             this.audio.load();
             this.audio.play();
         });

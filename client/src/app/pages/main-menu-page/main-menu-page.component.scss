@@ -46,7 +46,6 @@ button {
     margin: 4% 4%;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     width: 350px;
-    cursor: pointer;
 }
 
 button:disabled {
@@ -54,7 +53,6 @@ button:disabled {
     background-color: silver;
     color: gray;
     pointer-events: none;
-    cursor: default;
 }
 
 button:hover {
