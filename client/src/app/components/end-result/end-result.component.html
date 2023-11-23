@@ -29,8 +29,7 @@
         </table>
     </div>
         <h3>{{currentQuestion}}</h3>
-        <app-histogram [data]="allHistogramData[currentQuestionId]"></app-histogram>
-
+        <app-histogram [data]="allHistogramData[currentQuestionId]" [correctAnswers]="correctAnswers"></app-histogram>
               <div class="histogram-navigation">
         <button (click)="previousQuestion()">Précédent</button>
         <button (click)="nextQuestion()">Suivant</button>

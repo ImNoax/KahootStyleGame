@@ -85,7 +85,7 @@ export class GameHandlingService {
     resetHistory(): Observable<GameInfo[]> {
         return this.http.delete<GameInfo[]>(`${environment.serverBaseUrl}/api/history`);
     }
-        resetHistogramDataForQuestion(): void {
+    resetHistogramDataForQuestion(): void {
         this.allHistogramData = {};
     }
 
@@ -95,8 +95,17 @@ export class GameHandlingService {
             ...newData,
         };
     }
-        getAllHistogramData(): { [questionId: number]: { [key: string]: number } } {
+    getAllHistogramData(): { [questionId: number]: { [key: string]: number } } {
         return this.allHistogramData;
+    }
+
+    getCorrectAnswersForCurrentQuestion(): string[] {
+        const currentQuestion = this.currentGame.questions[this.currentQuestionId];
+        if (currentQuestion.choices) {
+            const correctChoices = currentQuestion.choices.filter((choice) => choice.isCorrect);
+            return correctChoices.map((choice) => choice.text);
+        }
+        return [];
     }
 
     private handleError<T>(request: string, result?: T): (error: { error: Error }) => Observable<T> {

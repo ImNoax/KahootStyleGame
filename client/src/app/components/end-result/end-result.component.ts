@@ -10,6 +10,7 @@ import { LobbyDetails, Player } from '@common/lobby';
 export class EndResultComponent implements OnInit, OnDestroy {
     players: Player[] = [];
     currentQuestion: string = '';
+    correctAnswers: string[];
     allHistogramData: { [questionId: number]: { [key: string]: number } } = {};
     currentQuestionId: number = 0;
 
@@ -24,6 +25,8 @@ export class EndResultComponent implements OnInit, OnDestroy {
         this.allHistogramData = this.gameService.getAllHistogramData();
         this.updateCurrentQuestionText();
         this.gameService.resetHistogramDataForQuestion();
+        this.gameService.setCurrentQuestionId(this.currentQuestionId);
+        this.correctAnswers = this.gameService.getCorrectAnswersForCurrentQuestion();
     }
 
     updateCurrentQuestionText(): void {
@@ -33,7 +36,9 @@ export class EndResultComponent implements OnInit, OnDestroy {
     previousQuestion(): void {
         if (this.currentQuestionId >= 1) {
             this.currentQuestionId--;
+            this.gameService.setCurrentQuestionId(this.currentQuestionId);
             this.updateCurrentQuestionText();
+            this.correctAnswers = this.gameService.getCorrectAnswersForCurrentQuestion();
         }
     }
 
@@ -41,7 +46,9 @@ export class EndResultComponent implements OnInit, OnDestroy {
         const maxQuestionId = --Object.keys(this.allHistogramData).length;
         if (this.currentQuestionId < maxQuestionId) {
             this.currentQuestionId++;
+            this.gameService.setCurrentQuestionId(this.currentQuestionId);
             this.updateCurrentQuestionText();
+            this.correctAnswers = this.gameService.getCorrectAnswersForCurrentQuestion();
         }
     }
 

@@ -23,6 +23,7 @@ export class InGamePageComponent implements OnInit, OnDestroy {
     score: number;
     showResults: boolean = false;
     histogramData: { [key: string]: number };
+    correctAnswers: string[];
     private subscriptionScore: Subscription;
     private questionSubscription: Subscription;
     private histogramSubscription: Subscription;
@@ -53,6 +54,7 @@ export class InGamePageComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.currentGame = this.gameService.currentGame;
+        this.correctAnswers = this.gameService.getCorrectAnswersForCurrentQuestion();
         this.gameService.setScore(0);
 
         this.questionSubscription = this.gameService.currentQuestion$.subscribe(() => {
@@ -65,6 +67,7 @@ export class InGamePageComponent implements OnInit, OnDestroy {
         });
 
         this.histogramSubscription = this.clientSocket.listenUpdateHistogram().subscribe((data) => {
+            this.correctAnswers = this.gameService.getCorrectAnswersForCurrentQuestion();
             this.histogramData = data;
             this.gameService.updateHistogramDataForQuestion(this.gameService.currentQuestionId, data);
         });

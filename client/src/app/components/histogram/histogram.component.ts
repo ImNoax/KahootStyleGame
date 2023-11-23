@@ -7,5 +7,6 @@ import { Component, Input } from '@angular/core';
 })
 export class HistogramComponent {
     @Input() data: { [key: string]: number };
+    @Input() correctAnswers: string[];
     object = Object;
 }
