@@ -13,7 +13,7 @@
     </div>
     <div>
         <div *ngIf="isOrganizer && !showResults">
-            <app-histogram [data]="histogramData"></app-histogram>
+            <app-histogram [data]="histogramData" [correctAnswers]="correctAnswers"></app-histogram>
             <app-player-list></app-player-list>
         </div>
         <app-chat-box></app-chat-box>

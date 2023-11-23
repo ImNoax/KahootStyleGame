@@ -58,7 +58,13 @@ describe('InGamePageComponent', () => {
         routerMock = jasmine.createSpyObj('Router', ['navigate']);
         timerMock = jasmine.createSpyObj('Timer', ['reset']);
         clientSocketServiceMock = new ClientSocketServiceMock();
-        gameServiceSpy = jasmine.createSpyObj('GameHandlingService', ['getGames', 'setScore', 'setCurrentQuestionId']);
+        gameServiceSpy = jasmine.createSpyObj('GameHandlingService', [
+            'getGames',
+            'setScore',
+            'setCurrentQuestionId',
+            'getCorrectAnswersForCurrentQuestion',
+            'updateHistogramDataForQuestion',
+        ]);
         gameServiceSpy.currentQuestion$ = currentQuestionObservableSpy.asObservable();
         gameServiceSpy.score$ = scoreObservableSpy.asObservable();
         gameServiceSpy.currentQuestionId = 0;
