@@ -45,7 +45,7 @@
         </div>
 
         <div id="choices">
-            <div formArrayName="choices" cdkDropList id="answer-list" (cdkDropListDropped)="drop($event)">
+            <div *ngIf="!isQrl()" formArrayName="choices" cdkDropList id="answer-list" (cdkDropListDropped)="drop($event)">
                 <div
                     [formGroupName]="i"
                     class="answer-box"
