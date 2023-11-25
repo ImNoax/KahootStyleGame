@@ -10,6 +10,7 @@ const MAX_LOBBY_QUANTITY = 10000;
 const DEFAULT_COUNTDOWN_PERIOD = 1000;
 const PANIC_COUNTDOWN_PERIOD = 250;
 const ORGANISER = 'Organisateur';
+const TESTER = 'Testeur';
 
 export class SocketManager {
     private sio: io.Server;
@@ -193,7 +194,15 @@ export class SocketManager {
                     }
                 }
             });
-            socket.on('getChat', () => {
+            socket.on('getChat', (gameMode: GameMode) => {
+                if (gameMode === GameMode.Testing) {
+                    pin = socket.id;
+                    this.lobbies.set(pin, {
+                        isLocked: false,
+                        players: [{ socketId: socket.id, name: TESTER, isAbleToChat: true }],
+                        chat: [],
+                    });
+                }
                 const currentLobby = this.lobbies.get(pin);
                 if (currentLobby) {
                     this.sio.to(pin).emit('messageReceived', currentLobby.chat);

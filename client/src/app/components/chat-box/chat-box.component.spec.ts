@@ -6,6 +6,8 @@ import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock
 import { SocketMock } from '@app/classes/socket-mock';
 import { SNACK_BAR_NORMAL_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { ClientSocketService } from '@app/services/client-socket.service';
+import { GameHandlingService } from '@app/services/game-handling.service';
+import { GameMode } from '@common/game-mode';
 import { Message } from '@common/lobby';
 import { ChatBoxComponent } from './chat-box.component';
 describe('ChatBoxComponent', () => {
@@ -14,15 +16,18 @@ describe('ChatBoxComponent', () => {
     let socketMock: SocketMock;
     let clientSocketServiceMock: ClientSocketServiceMock;
     let snackBarMock: jasmine.SpyObj<MatSnackBar>;
+    let gameHandlingServiceMock: jasmine.SpyObj<GameHandlingService>;
     beforeEach(() => {
         clientSocketServiceMock = new ClientSocketServiceMock();
         snackBarMock = jasmine.createSpyObj('MatSnackBar', ['open']);
+        gameHandlingServiceMock = jasmine.createSpyObj('GameHandlingService', ['']);
         TestBed.configureTestingModule({
             declarations: [ChatBoxComponent],
             imports: [HttpClientModule, FormsModule, MatSnackBarModule],
             providers: [
                 { provide: ClientSocketService, useValue: clientSocketServiceMock },
                 { provide: MatSnackBar, useValue: snackBarMock },
+                { provide: GameHandlingService, useValue: gameHandlingServiceMock },
             ],
         });
         fixture = TestBed.createComponent(ChatBoxComponent);
@@ -35,11 +40,12 @@ describe('ChatBoxComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
-    it('should get current chat on init ', () => {
+    it('should get current chat on init', () => {
+        gameHandlingServiceMock.gameMode = GameMode.Testing;
         const configSpy = spyOn(component, 'configureBaseSocketFeatures');
         component.ngOnInit();
         expect(configSpy).toHaveBeenCalled();
-        expect(socketMock.emit).toHaveBeenCalledWith('getChat');
+        expect(socketMock.emit).toHaveBeenCalledWith('getChat', GameMode.Testing);
     });
 
     it('should remove listeners on component destruction', () => {

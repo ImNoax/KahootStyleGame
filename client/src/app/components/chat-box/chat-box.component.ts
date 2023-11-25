@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild, inj
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SNACK_BAR_NORMAL_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { ClientSocketService } from '@app/services/client-socket.service';
+import { GameHandlingService } from '@app/services/game-handling.service';
 import { Message } from '@common/lobby';
 const SCROLL_SENSITIVITY = 5;
 const MESSAGE_TIMEOUT = 5;
@@ -16,11 +17,14 @@ export class ChatBoxComponent implements OnInit, OnDestroy, AfterViewInit {
     newMessage: string = '';
     chat: Message[] = [];
     private snackBar: MatSnackBar = inject(MatSnackBar);
-    constructor(private clientSocket: ClientSocketService) {}
+    constructor(
+        private clientSocket: ClientSocketService,
+        private gameHandler: GameHandlingService,
+    ) {}
 
     ngOnInit() {
         this.configureBaseSocketFeatures();
-        this.clientSocket.socket.emit('getChat');
+        this.clientSocket.socket.emit('getChat', this.gameHandler.gameMode);
     }
 
     ngOnDestroy() {
