@@ -10,11 +10,11 @@ import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock
 import { SocketMock } from '@app/classes/socket-mock';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { NameDefinitionComponent } from '@app/components/name-definition/name-definition.component';
+import { Route } from '@app/constants/enums';
 import { SNACK_BAR_ERROR_CONFIGURATION, SNACK_BAR_NORMAL_CONFIGURATION } from '@app/constants/snack-bar-configuration';
-import { Route } from '@app/enums';
-import { ClientSocketService } from '@app/services/client-socket.service';
-import { RouteControllerService } from '@app/services/route-controller.service';
-import { TimerService } from '@app/services/timer.service';
+import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
+import { RouteControllerService } from '@app/services/route-controller/route-controller.service';
+import { TimerService } from '@app/services/timer/timer.service';
 import { Player } from '@common/lobby';
 import { of } from 'rxjs';
 import { LobbyPageComponent } from './lobby-page.component';

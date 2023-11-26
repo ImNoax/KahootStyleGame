@@ -11,15 +11,15 @@
             <ul>
                 <div class="list-title">Liste de joueurs</div>
                 <div class="nom">
-                    <li class="player" *ngFor="let player of players">
-                        <button class="exclude-button" *ngIf="player.name !== 'Organisateur' && isOrganizer" (click)="banPlayer(player)">
-                            Exclure
-                        </button>
-                        {{ player.name }}
-                        <span *ngIf="player.name === playerName">(vous)</span>
-                        <button class="exclude-button" *ngIf="player.name !== 'Organisateur' && isOrganizer" (click)="toggleMute(player)">
-                            <span id="lock-text">{{ player.isAbleToChat ? 'Mute' : 'Unmute' }}</span>
-                        </button>
+                    <li *ngFor="let player of players">
+                        <div class="player" *ngIf="player.name !== 'Organisateur'">
+                            <button class="exclude-button" *ngIf="isOrganizer" (click)="banPlayer(player)">Exclure</button>
+                            {{ player.name }}
+                            <span *ngIf="player.name === playerName">(vous)</span>
+                            <button class="exclude-button" *ngIf="isOrganizer" (click)="toggleMute(player)">
+                                <span id="lock-text">{{ player.isAbleToChat ? 'Mute' : 'Unmute' }}</span>
+                            </button>
+                        </div>
                     </li>
                 </div>
                 <p *ngIf="players.length === 1" id="no-player">Besoin de joueurs</p>

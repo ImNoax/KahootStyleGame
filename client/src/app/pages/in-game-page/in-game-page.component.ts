@@ -1,10 +1,10 @@
-import { GameHandlingService } from '@angular/../../client/src/app/services/game-handling.service';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Route } from '@app/enums';
-import { ClientSocketService } from '@app/services/client-socket.service';
-import { RouteControllerService } from '@app/services/route-controller.service';
-import { TimerService } from '@app/services/timer.service';
+import { Route } from '@app/constants/enums';
+import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
+import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
+import { RouteControllerService } from '@app/services/route-controller/route-controller.service';
+import { TimerService } from '@app/services/timer/timer.service';
 import { Game } from '@common/game';
 import { GameMode } from '@common/game-mode';
 

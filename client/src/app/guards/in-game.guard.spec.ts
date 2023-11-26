@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRouteSnapshot, CanActivateFn, RouterStateSnapshot } from '@angular/router';
-import { Route } from '@app/enums';
-import { RouteControllerService } from '@app/services/route-controller.service';
+import { Route } from '@app/constants/enums';
+import { RouteControllerService } from '@app/services/route-controller/route-controller.service';
 import { inGameGuard } from './in-game.guard';
 
 describe('inGameGuard', () => {

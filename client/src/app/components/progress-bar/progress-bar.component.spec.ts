@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { ProgressBarComponent } from '@app/components/progress-bar/progress-bar.component';
-import { ClientSocketService } from '@app/services/client-socket.service';
-import { GameHandlingService } from '@app/services/game-handling.service';
-import { TimerService } from '@app/services/timer.service';
+import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
+import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
+import { TimerService } from '@app/services/timer/timer.service';
 import { GameMode } from '@common/game-mode';
 
 describe('ProgressBarComponent', () => {

@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Route } from '@app/enums';
-import { FormManagerService } from '@app/services/form-manager.service';
-import { GameHandlingService } from '@app/services/game-handling.service';
+import { Route } from '@app/constants/enums';
+import { FormManagerService } from '@app/services/form-manager/form-manager.service';
+import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
 import { Game } from '@common/game';
 import { Limit } from '@common/limit';
 

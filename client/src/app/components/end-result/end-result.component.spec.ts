@@ -2,7 +2,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
 import { SocketMock } from '@app/classes/socket-mock';
-import { ClientSocketService } from '@app/services/client-socket.service';
+import { HistogramComponent } from '@app/components/histogram/histogram.component';
+import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
 import { EndResultComponent } from './end-result.component';
 describe('EndResultComponent', () => {
     let component: EndResultComponent;
@@ -16,7 +17,7 @@ describe('EndResultComponent', () => {
 
         TestBed.configureTestingModule({
             imports: [HttpClientModule],
-            declarations: [EndResultComponent],
+            declarations: [EndResultComponent, HistogramComponent],
             providers: [{ provide: ClientSocketService, useValue: clientSocketServiceMock }],
         }).compileComponents();
 
