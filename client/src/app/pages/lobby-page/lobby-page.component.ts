@@ -1,11 +1,11 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { Route } from '@app/constants/enums';
 import { SNACK_BAR_ERROR_CONFIGURATION, SNACK_BAR_NORMAL_CONFIGURATION } from '@app/constants/snack-bar-configuration';
-import { Route } from '@app/enums';
-import { ClientSocketService } from '@app/services/client-socket.service';
-import { RouteControllerService } from '@app/services/route-controller.service';
-import { TimerService } from '@app/services/timer.service';
+import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
+import { RouteControllerService } from '@app/services/route-controller/route-controller.service';
+import { TimerService } from '@app/services/timer/timer.service';
 import { LobbyDetails, Pin, Player, SocketId } from '@common/lobby';
 
 const GAME_START_INITIAL_COUNT = 5;

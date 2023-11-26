@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ClientSocketService } from '@app/services/client-socket.service';
+import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
 import { LobbyDetails, Player } from '@common/lobby';
 
 @Component({

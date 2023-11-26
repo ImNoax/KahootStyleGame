@@ -1,15 +1,16 @@
-import { GameHandlingService } from '@angular/../../client/src/app/services/game-handling.service';
 import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, inject, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { RAMDOM_AUDIO_URL, SOUNDS } from '@app/constants/audio-url';
-import { BONUS_POINTS, BUTTON_SELECTED, BUTTON_UNSELECTED, PAUSE_MESSAGE, TIME_OUT, UNPAUSE_MESSAGE } from '@app/constants/in-game';
+import { PANIC_SOUNDS } from '@app/constants/audio';
+import { Route } from '@app/constants/enums';
+import { BONUS_FACTOR, BUTTON_SELECTED, BUTTON_UNSELECTED, PAUSE_MESSAGE, TIME_OUT, UNPAUSE_MESSAGE } from '@app/constants/in-game';
 import { SNACK_BAR_ERROR_CONFIGURATION, SNACK_BAR_NORMAL_CONFIGURATION } from '@app/constants/snack-bar-configuration';
-import { Route } from '@app/enums';
 import { Button } from '@app/interfaces/button-model';
-import { ClientSocketService } from '@app/services/client-socket.service';
-import { TimerService } from '@app/services/timer.service';
+import { AudioService } from '@app/services/audio/audio.service';
+import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
+import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
+import { TimerService } from '@app/services/timer/timer.service';
 import { Choice, Game, QuestionType } from '@common/game';
 import { GameMode } from '@common/game-mode';
 import { Limit } from '@common/limit';
@@ -38,9 +39,9 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
     loadingMessage: string = '';
     isGamePaused = false;
     hasQuestionEnded = false;
-    audio: HTMLAudioElement = new Audio();
     private clientSocket: ClientSocketService = inject(ClientSocketService);
     private snackBar: MatSnackBar = inject(MatSnackBar);
+    private audio: AudioService = inject(AudioService);
 
     constructor(
         private gameService: GameHandlingService,
@@ -95,7 +96,6 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
         this.currentGame = this.gameService.currentGame;
         if (this.isQcm) this.updateButtons(); // isQcm TEMPORAIRE. À revoir après la démo
         this.configureBaseSocketFeatures();
-        this.audio.volume = 1;
     }
 
     ngOnDestroy(): void {
@@ -126,9 +126,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
 
         this.clientSocket.socket.on('panicMode', () => {
             this.timer.isPanicModeEnabled = true;
-            this.audio.src = RAMDOM_AUDIO_URL(SOUNDS);
-            this.audio.load();
-            this.audio.play();
+            this.audio.play(PANIC_SOUNDS);
         });
 
         this.clientSocket.socket.on('countDownEnd', () => {
@@ -192,9 +190,10 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
 
     verifyResponsesAndCallUpdate() {
         this.submitted = true;
+        this.answerForm.disable();
+
         if (this.isProcessing) return;
 
-        // isQcm TEMPORAIRE. À revoir après la démo
         if (this.isQcm) {
             let clickedChoicesCount = 0;
             let correctChoicesCount = 0;
@@ -215,7 +214,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
                 this.isAnswerCorrect = false;
             }
             this.isProcessing = true;
-        } else this.answerForm.disable(); // Temporaire
+        }
 
         if (this.gameService.gameMode === GameMode.Testing) {
             this.timer.stopCountDown();
@@ -262,8 +261,8 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
         if (this.isAnswerCorrect) {
             let rewardedPoints = this.currentGame.questions[this.gameService.currentQuestionId].points;
             let message = `+${rewardedPoints} points ✅`;
-            if (this.hasBonus || this.gameService.gameMode === GameMode.Testing) {
-                const bonus = rewardedPoints * BONUS_POINTS;
+            if (this.isQcm && (this.hasBonus || this.gameService.gameMode === GameMode.Testing)) {
+                const bonus = rewardedPoints * BONUS_FACTOR;
                 rewardedPoints += bonus;
                 message += ` + ${bonus} points bonus 🎉🎊`;
                 this.bonusTimes++;
@@ -289,6 +288,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
         this.buttons.forEach((button) => {
             button.showCorrectButtons = false;
             button.showWrongButtons = false;
+            button.selected = false;
         });
         this.isProcessing = false;
         this.submitted = false;
@@ -333,5 +333,9 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
         this.clientSocket.socket.emit('enablePanicMode');
         this.timer.stopCountDown();
         this.timer.startCountDown(this.timer.count, { isPanicModeEnabled: true });
+    }
+
+    isAnswerEmpty() {
+        return this.answerForm.value.trim().length === 0 && !this.buttons.some((button) => button.selected === true);
     }
 }

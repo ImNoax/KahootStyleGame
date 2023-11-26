@@ -2,10 +2,10 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, Inject, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { FormManagerService } from '@app/services/form-manager.service';
+import { FormManagerService } from '@app/services/form-manager/form-manager.service';
 import { Choice, Question, QuestionType } from '@common/game';
 import { Limit } from '@common/limit';
-import * as _ from 'lodash';
+import * as lodash from 'lodash-es';
 
 @Component({
     selector: 'app-question-creation-popup',
@@ -40,7 +40,7 @@ export class QuestionCreationPopupComponent implements OnInit {
 
     loadForm(fb: FormBuilder, index: number): void {
         const questionToModify: AbstractControl = this.data.questionsFormArray.controls[index];
-        const choicesToModify: FormArray = _.cloneDeep(questionToModify.get('choices')) as FormArray;
+        const choicesToModify: FormArray = lodash.cloneDeep(questionToModify.get('choices')) as FormArray;
 
         this.createNewForm(fb);
         this.questionForm.patchValue({

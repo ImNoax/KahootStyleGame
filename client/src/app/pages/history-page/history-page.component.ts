@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Route } from '@app/enums';
-import { GameHandlingService } from '@app/services/game-handling.service';
+import { Route } from '@app/constants/enums';
+import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
 import { GameInfo } from '@common/game';
 
 const SORT_FALSE = -1;

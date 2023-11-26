@@ -7,10 +7,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, convertToParamMap, Router, RouterModule } from '@angular/router';
 import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
 import { SocketMock } from '@app/classes/socket-mock';
-import { Route } from '@app/enums';
+import { Route } from '@app/constants/enums';
 import { MainMenuPageComponent } from '@app/pages/main-menu-page/main-menu-page.component';
-import { ClientSocketService } from '@app/services/client-socket.service';
-import { GameHandlingService } from '@app/services/game-handling.service';
+import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
+import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
 import { Game } from '@common/game';
 import { of, throwError } from 'rxjs';
 

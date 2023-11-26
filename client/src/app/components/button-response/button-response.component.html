@@ -23,20 +23,20 @@
     <div *ngIf="!isQcm" id="qrl-input">
         <mat-form-field id="answer-field">
             <mat-label>Réponse</mat-label>
-            <textarea matInput (keydown.enter)="$event.preventDefault()" [maxlength]="maxQrlAnswerLength" [formControl]="answerForm" rows="5">
+            <textarea #answerInput matInput (keydown.enter)="answerInput.blur()" [maxlength]="maxQrlAnswerLength" [formControl]="answerForm" rows="5">
             </textarea>
         </mat-form-field>
         <p id="answer-length">{{ answerForm.value.length }}/{{ maxQrlAnswerLength }}</p>
     </div>
 
-    <button type="button" class="validate-btn" (click)="verifyResponsesAndCallUpdate()" [disabled]="submitted">Soumettre</button>
+    <button type="button" class="validate-btn" (click)="verifyResponsesAndCallUpdate()" [disabled]="submitted || isAnswerEmpty()">Soumettre</button>
 </div>
 <div *ngIf="isOrganizer">
     <div id="controls-container">
         <button mat-raised-button class="controls" (click)="startNextQuestionCountDown()" [disabled]="!canLoadNextQuestion">
             Charger la prochaine question
         </button>
-        <button mat-raised-button class="controls" (click)="pause()" [disabled]="hasQuestionEnded && !isQuestionTransition">
+        <button mat-raised-button class="controls" (click)="pause()" [disabled]="hasQuestionEnded">
             <i *ngIf="!isGamePaused" class="fa-solid fa-pause fa-2xl"></i>
             <i *ngIf="isGamePaused" class="fa-solid fa-play fa-beat-fade fa-2xl"></i>
             {{ pauseMessage }}

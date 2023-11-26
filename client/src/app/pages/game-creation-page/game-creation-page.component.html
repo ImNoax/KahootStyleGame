@@ -8,9 +8,11 @@
                         <th>Liste de jeux</th>
                     </tr>
                 </thead>
-                <tr *ngFor="let game of games; index as i" (click)="selectRow(i)">
-                    <td *ngIf="game.isVisible === true" [class.selected-game]="game.id === selectedGame?.id">{{ game.title }}</td>
-                </tr>
+                <tbody>
+                    <tr *ngFor="let game of games; index as i" (click)="selectRow(i)">
+                        <td *ngIf="game.isVisible === true" [class.selected-game]="game.id === selectedGame?.id">{{ game.title }}</td>
+                    </tr>
+                </tbody>
             </table>
             <ng-template #emptyList>
                 <div class="empty-list">Aucun jeu n'est disponible pour le moment</div>

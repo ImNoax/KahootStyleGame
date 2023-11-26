@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
 import { SocketMock } from '@app/classes/socket-mock';
-import { ClientSocketService } from '@app/services/client-socket.service';
+import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
 import { Player } from '@common/lobby';
 import { PlayerListComponent } from './player-list.component';
 describe('PlayerListComponent', () => {

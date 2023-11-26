@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { Route } from '@app/enums';
+import { Route } from '@app/constants/enums';
 import { adminGuard } from '@app/guards/admin.guard';
 import { inGameGuard } from '@app/guards/in-game.guard';
 import { lobbyGuard } from '@app/guards/lobby.guard';

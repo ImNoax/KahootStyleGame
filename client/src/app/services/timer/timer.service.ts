@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
+import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
+import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
 import { TimerConfiguration } from '@common/timer';
-import { ClientSocketService } from './client-socket.service';
-import { GameHandlingService } from './game-handling.service';
 
 @Injectable({
     providedIn: 'root',
