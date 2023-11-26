@@ -39,6 +39,7 @@ export class Server {
             this.server.on('error', (error: NodeJS.ErrnoException) => this.onError(error));
             this.server.on('listening', () => this.onListening());
         } catch (error) {
+            // eslint-disable-next-line no-console
             console.error('Error initializing server:', error);
         }
     }
