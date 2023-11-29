@@ -13,9 +13,7 @@ import * as lodash from 'lodash-es';
     styleUrls: ['./question-creation-popup.component.scss'],
 })
 export class QuestionCreationPopupComponent implements OnInit {
-    pageTitle: string = 'Liste des questions';
     questionType: QuestionType = QuestionType.QCM;
-    isChoiceEmpty: boolean = false;
     nGoodChoices: number = 0;
     maxQuestionLength: number = Limit.MaxQuestionLength;
     maxAnswerLength: number = Limit.MaxQcmAnswerLength;

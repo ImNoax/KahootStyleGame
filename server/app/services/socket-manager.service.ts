@@ -217,7 +217,7 @@ export class SocketManager {
                         if (player.socketId === socket.id) player.answerSubmitted = true;
                     });
 
-                    const areAllSubmitted = !currentLobby.players.some((player) => player.answerSubmitted === false);
+                    const areAllSubmitted = !currentLobby.players.some((player) => !player.answerSubmitted);
                     if (areAllSubmitted) {
                         this.sio.to(pin).emit('allSubmitted', currentLobby.bonusRecipient);
 
