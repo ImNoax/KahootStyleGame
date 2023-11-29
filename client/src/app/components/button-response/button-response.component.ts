@@ -39,6 +39,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
     loadingMessage: string = '';
     isGamePaused = false;
     hasQuestionEnded = false;
+    playerHasInteracted: boolean = false;
     private clientSocket: ClientSocketService = inject(ClientSocketService);
     private snackBar: MatSnackBar = inject(MatSnackBar);
     private audio: AudioService = inject(AudioService);
@@ -152,8 +153,8 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
     }
 
     onTimerEnded() {
-        this.verifyResponsesAndCallUpdate();
         this.submittedFromTimer = true;
+        this.verifyResponsesAndCallUpdate();
     }
 
     updateButtons() {
@@ -178,6 +179,11 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
 
     onButtonClick(button: Button) {
         if (this.isProcessing) return;
+        if (!this.playerHasInteracted) {
+            this.clientSocket.socket.emit('socketInteracted');
+            this.playerHasInteracted = true;
+        }
+
         button.selected = !button.selected;
 
         const changeValue = button.selected ? BUTTON_SELECTED : BUTTON_UNSELECTED;
@@ -246,6 +252,8 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
             this.clientSocket.socket.emit('gameEnded');
         } else {
             this.gameService.setCurrentQuestionId(++this.gameService.currentQuestionId);
+            if (this.isOrganizer) this.clientSocket.socket.emit('resetPlayersActivityState');
+            this.playerHasInteracted = false;
             if (this.isQcm) this.updateButtons(); // isQcm TEMPORAIRE. À revoir après la démo
             this.gameService.setCurrentQuestion(this.currentGame.questions[this.gameService.currentQuestionId].text);
             this.updateQuestionScore.emit(this.currentGame.questions[this.gameService.currentQuestionId].points);

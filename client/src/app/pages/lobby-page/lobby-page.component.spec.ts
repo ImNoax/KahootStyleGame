@@ -15,7 +15,7 @@ import { SNACK_BAR_ERROR_CONFIGURATION, SNACK_BAR_NORMAL_CONFIGURATION } from '@
 import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
 import { RouteControllerService } from '@app/services/route-controller/route-controller.service';
 import { TimerService } from '@app/services/timer/timer.service';
-import { Player } from '@common/lobby';
+import { Player, PlayerColor } from '@common/lobby';
 import { of } from 'rxjs';
 import { LobbyPageComponent } from './lobby-page.component';
 
@@ -148,7 +148,7 @@ describe('LobbyPageComponent', () => {
                     answerSubmitted: true,
                     score: 0,
                     bonusTimes: 0,
-                    isStillInGame: true,
+                    activityState: PlayerColor.Red,
                     isAbleToChat: true,
                 },
             ],
@@ -261,7 +261,7 @@ describe('LobbyPageComponent', () => {
             name: 'TestPlayer',
             answerSubmitted: false,
             score: 0,
-            isStillInGame: true,
+            activityState: PlayerColor.Red,
             isAbleToChat: true,
             bonusTimes: 0,
         };
