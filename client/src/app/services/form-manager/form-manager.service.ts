@@ -59,7 +59,7 @@ export class FormManagerService {
     }
 
     sendGameForm(importedGameForm?: FormGroup): void | Observable<Game[]> {
-        if (this.nameModif !== '') this.modifyGame();
+        if (this.nameModif) this.modifyGame();
         else if (importedGameForm === undefined) this.addGame();
         else return this.gameHandler.addGame(importedGameForm.value);
     }
