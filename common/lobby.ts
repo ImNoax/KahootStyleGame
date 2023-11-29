@@ -14,14 +14,19 @@ export interface LobbyDetails {
     histogram?: { [key: string]: number };
     chat: Message[];
 }
-
+export enum PlayerColor {
+    Red = 'red',
+    Yellow = 'yellow',
+    Green = 'green',
+    Black = 'black',
+}
 export interface Player {
     socketId: SocketId;
     name: string;
     answerSubmitted?: boolean;
-    score?: number;
+    score: number;
     bonusTimes?: number;
-    isStillInGame?: boolean;
+    activityState: PlayerColor;
     isAbleToChat: boolean;
 }
 

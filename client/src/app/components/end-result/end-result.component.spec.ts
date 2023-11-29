@@ -4,6 +4,7 @@ import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock
 import { SocketMock } from '@app/classes/socket-mock';
 import { HistogramComponent } from '@app/components/histogram/histogram.component';
 import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
+import { PlayerColor } from '@common/lobby';
 import { EndResultComponent } from './end-result.component';
 describe('EndResultComponent', () => {
     let component: EndResultComponent;
@@ -56,7 +57,7 @@ describe('EndResultComponent', () => {
                     answerSubmitted: true,
                     score: 1,
                     bonusTimes: 1,
-                    isStillInGame: true,
+                    activityState: PlayerColor.Red,
                     isAbleToChat: true,
                 },
             ],

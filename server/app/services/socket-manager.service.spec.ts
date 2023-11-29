@@ -1,6 +1,6 @@
 /* eslint-disable max-lines */
 import { GameMode } from '@common/game-mode';
-import { LobbyDetails, Pin, Player } from '@common/lobby';
+import { LobbyDetails, Pin, Player, PlayerColor } from '@common/lobby';
 import { Server } from 'app/server';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
@@ -358,18 +358,18 @@ describe('SocketManager service tests', () => {
     });
 
     it('chatMessage should return messageReceived', (done) => {
-        // const messageSent: Message = { sender: 'sender1', content: 'content1', time: new Date('date1') };
-        // setTimeout(()=> {
+        // const message: Message = { sender: 'sender1', content: 'content1', time: new Date('date1') };
+        // createGame();
+
+        // setTimeout(() => {
         //     service['lobbies'].get(roomPin).chat = [];
-        //     clientSocket.emit('chatMessage', messageSent);
-        // })
-        // setTimeout(()=> {
-        // })
-        // clientSocket.on('messageReceived', (chat:Message[]) => {
-        //     expect(chat[0].sender).to.equal(clientSocket.);
-        //     expect(message.content).to.equal(message);
-        //     done();
-        // });
+        //     clientSocket.emit('chatMessage', message);
+        //     clientSocket.on('messageReceived', (currentLobbyChat: Message[]) => {
+        //         expect(currentLobbyChat[0].content).to.equal('content1');
+        //         expect(currentLobbyChat[0].time).to.equal(message.time);
+        //         done();
+        //     });
+        // }, RESPONSE_DELAY);
         done();
     });
     it('getChat should return chat', (done) => {
@@ -630,6 +630,64 @@ describe('SocketManager service tests', () => {
                 expect(playerListReceived).to.equal(false);
                 done();
             }, RESPONSE_DELAY);
+        }, RESPONSE_DELAY);
+    });
+
+    it('toggleMute should toggle the isAbleToChat status of a player', (done) => {
+        const clientSocket2 = ioClient(urlString);
+        const nameClient2 = 'test';
+        createGame();
+
+        setTimeout(() => {
+            const pin = roomPin;
+            clientSocket2.emit('validatePin', pin);
+            clientSocket2.emit('joinLobby', nameClient2);
+
+            setTimeout(() => {
+                clientSocket.emit('toggleMute', {
+                    socketId: clientSocket2.id,
+                    name: nameClient2,
+                    answerSubmitted: true,
+                    score: 0,
+                    bonusTimes: 0,
+                    activityState: PlayerColor.Red,
+                    isAbleToChat: true,
+                });
+
+                clientSocket2.on('PlayerMuted', () => {
+                    done();
+                });
+            }, RESPONSE_DELAY);
+        }, RESPONSE_DELAY);
+    });
+
+    it('socketInteracted should change the status of the player of interacted to yellow', (done) => {
+        createGame();
+
+        setTimeout(() => {
+            clientSocket.emit('socketInteracted');
+
+            clientSocket.on('latestPlayerList', (lobby: LobbyDetails) => {
+                expect(lobby).to.deep.equal(service['lobbies'].get(roomPin));
+                expect(lobby.players[0].activityState).to.equal(PlayerColor.Yellow);
+                done();
+            });
+        }, RESPONSE_DELAY);
+    });
+
+    it('resetPlayersActivityState should reset the status of all players in lobby to red', (done) => {
+        createGame();
+
+        setTimeout(() => {
+            clientSocket.emit('resetPlayersActivityState');
+
+            clientSocket.on('latestPlayerList', (lobby: LobbyDetails) => {
+                expect(lobby).to.deep.equal(service['lobbies'].get(roomPin));
+                lobby.players.forEach((player) => {
+                    expect(player.activityState).to.equal(PlayerColor.Red);
+                });
+                done();
+            });
         }, RESPONSE_DELAY);
     });
 });

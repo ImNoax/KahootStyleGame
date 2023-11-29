@@ -2,7 +2,7 @@ import { Game } from '@common/game';
 import { GameMode } from '@common/game-mode';
 import { TimerConfiguration } from '@common/timer';
 
-import { LobbyDetails, Message, Pin, Player, REQUIRED_PIN_LENGTH, SocketId } from '@common/lobby';
+import { LobbyDetails, Message, Pin, Player, PlayerColor, REQUIRED_PIN_LENGTH, SocketId } from '@common/lobby';
 import * as http from 'http';
 import * as io from 'socket.io';
 
@@ -114,7 +114,7 @@ export class SocketManager {
                         name: nameToValidate,
                         answerSubmitted: false,
                         score: 0,
-                        isStillInGame: true,
+                        activityState: PlayerColor.Red,
                         isAbleToChat: true,
                         bonusTimes: 0,
                     });
@@ -136,7 +136,7 @@ export class SocketManager {
                         name: ORGANISER,
                         answerSubmitted: true,
                         score: 0,
-                        isStillInGame: true,
+                        activityState: PlayerColor.Green,
                         isAbleToChat: true,
                         bonusTimes: 0,
                     });
@@ -199,7 +199,7 @@ export class SocketManager {
                     pin = socket.id;
                     this.lobbies.set(pin, {
                         isLocked: false,
-                        players: [{ socketId: socket.id, name: TESTER, isAbleToChat: true }],
+                        players: [{ socketId: socket.id, name: TESTER, score: 0, activityState: PlayerColor.Green, isAbleToChat: true }],
                         chat: [],
                     });
                 }
@@ -214,15 +214,22 @@ export class SocketManager {
                     if (!currentLobby.bonusRecipient && isCorrect && !submittedFromTimer) currentLobby.bonusRecipient = socket.id;
 
                     currentLobby.players.forEach((player) => {
-                        if (player.socketId === socket.id) player.answerSubmitted = true;
+                        if (player.socketId === socket.id) {
+                            player.answerSubmitted = true;
+                            if (!submittedFromTimer) {
+                                player.activityState = PlayerColor.Green;
+                            }
+                        }
                     });
-
+                    sendLatestPlayersList();
                     const areAllSubmitted = !currentLobby.players.some((player) => !player.answerSubmitted);
                     if (areAllSubmitted) {
                         this.sio.to(pin).emit('allSubmitted', currentLobby.bonusRecipient);
 
                         currentLobby.players.forEach((player) => {
-                            if (player.name !== ORGANISER) player.answerSubmitted = false;
+                            if (player.name !== ORGANISER) {
+                                player.answerSubmitted = false;
+                            }
                         });
                         currentLobby.bonusRecipient = '';
                     }
@@ -295,6 +302,26 @@ export class SocketManager {
                         const eventToEmit = player.isAbleToChat ? 'PlayerUnmuted' : 'PlayerMuted';
                         socketToMute.emit(eventToEmit);
                     }
+                }
+            });
+            socket.on('socketInteracted', () => {
+                const currentLobby = this.lobbies.get(pin);
+                if (currentLobby) {
+                    currentLobby.players.forEach((player) => {
+                        if (player.socketId === socket.id) {
+                            player.activityState = PlayerColor.Yellow;
+                        }
+                    });
+                    sendLatestPlayersList();
+                }
+            });
+            socket.on('resetPlayersActivityState', () => {
+                const currentLobby = this.lobbies.get(pin);
+                if (currentLobby) {
+                    currentLobby.players.forEach((player) => {
+                        player.activityState = PlayerColor.Red;
+                    });
+                    sendLatestPlayersList();
                 }
             });
         });
