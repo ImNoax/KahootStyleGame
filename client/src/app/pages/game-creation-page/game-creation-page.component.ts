@@ -20,9 +20,8 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     selectedRowIndex: number | null = null;
     selectedGame: Game | null = null;
     testing: GameMode = GameMode.Testing;
-    snackBar: MatSnackBar = inject(MatSnackBar);
-    routeController: RouteControllerService = inject(RouteControllerService);
-
+    private snackBar: MatSnackBar = inject(MatSnackBar);
+    private routeController: RouteControllerService = inject(RouteControllerService);
     constructor(
         public router: Router,
         private gameHandler: GameHandlingService,
@@ -82,7 +81,8 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
                     return;
                 }
             }
-            window.alert('Erreur: Jeu Indisponible... Rafraichissement de page.');
+
+            this.snackBar.open('Erreur: Jeu Indisponible... Rafraîchissement de page', '', SNACK_BAR_ERROR_CONFIGURATION);
             this.selectRow(null);
         });
     }

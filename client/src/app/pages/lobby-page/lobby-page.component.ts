@@ -81,7 +81,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
                 this.timer.reset();
                 this.countDownStarted = false;
                 this.toggleLobbyLock();
-                this.snackBar.open("Tous les joueurs ont quitté la salle d'attente.", '', SNACK_BAR_ERROR_CONFIGURATION);
+                this.snackBar.open("Tous les joueurs ont quitté la salle d'attente", '', SNACK_BAR_ERROR_CONFIGURATION);
             }
         });
     }

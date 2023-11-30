@@ -193,7 +193,7 @@ describe('SocketManager service tests', () => {
 
                 clientSocket2.once('lobbyClosed', (reason: string, message: string) => {
                     expect(reason).to.equal('BAN');
-                    expect(message).to.equal("Vous avez été expulsé de la salle d'attente.");
+                    expect(message).to.equal("Vous avez été expulsé de la salle d'attente");
                 });
 
                 setTimeout(() => {
@@ -250,7 +250,7 @@ describe('SocketManager service tests', () => {
 
         clientSocket2.once('lobbyClosed', (reason: string, message: string) => {
             expect(reason).to.equal('NO HOST');
-            expect(message).to.equal("L'organisateur a quitté la partie.");
+            expect(message).to.equal("L'organisateur a quitté la partie");
             clientSocket2.close();
             done();
         });
