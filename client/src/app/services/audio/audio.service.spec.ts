@@ -6,7 +6,7 @@ describe('AudioService', () => {
     let service: AudioService;
 
     beforeEach(() => {
-        audioCollectionMock = ['meow.mp3', 'woof.mp3'];
+        audioCollectionMock = ['', ''];
         TestBed.configureTestingModule({});
         service = TestBed.inject(AudioService);
     });

@@ -35,7 +35,7 @@ export class SocketManager {
                 if (pin) {
                     const currentLobby = this.lobbies.get(pin);
                     if (currentLobby) {
-                        if (isOrganizer) socket.broadcast.to(pin).emit('lobbyClosed', 'NO HOST', "L'organisateur a quitté la partie.");
+                        if (isOrganizer) socket.broadcast.to(pin).emit('lobbyClosed', 'NO HOST', "L'organisateur a quitté la partie");
 
                         currentLobby.players = currentLobby.players.filter((player) => player.socketId !== socket.id);
                         if (currentLobby.players.length === 1 && currentLobby.players[0].name === ORGANISER) {
@@ -154,7 +154,7 @@ export class SocketManager {
                 const currentLobby = this.lobbies.get(pin);
                 currentLobby.players = currentLobby.players.filter((player) => player.name !== playerToBan.name);
                 currentLobby.bannedNames.push(playerToBan.name);
-                socketToBan.emit('lobbyClosed', 'BAN', "Vous avez été expulsé de la salle d'attente.");
+                socketToBan.emit('lobbyClosed', 'BAN', "Vous avez été expulsé de la salle d'attente");
             });
 
             socket.on('toggleLock', () => {

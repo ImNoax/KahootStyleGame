@@ -191,7 +191,7 @@ describe('LobbyPageComponent', () => {
 
         socketMock.simulateServerEmit('noPlayers');
         expect(component.toggleLobbyLock).toHaveBeenCalled();
-        expect(snackBarMock.open).toHaveBeenCalledWith("Tous les joueurs ont quitté la salle d'attente.", '', SNACK_BAR_ERROR_CONFIGURATION);
+        expect(snackBarMock.open).toHaveBeenCalledWith("Tous les joueurs ont quitté la salle d'attente", '', SNACK_BAR_ERROR_CONFIGURATION);
     });
 
     it('should handle noPlayers event by doing nothing if countDownStarted is false', () => {

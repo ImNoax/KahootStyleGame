@@ -1,18 +1,19 @@
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, convertToParamMap, Router, RouterModule } from '@angular/router';
 import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
 import { SocketMock } from '@app/classes/socket-mock';
+import { PasswordPopupComponent } from '@app/components/password-popup/password-popup.component';
 import { Route } from '@app/constants/enums';
 import { MainMenuPageComponent } from '@app/pages/main-menu-page/main-menu-page.component';
 import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
 import { Game } from '@common/game';
-import { of, throwError } from 'rxjs';
+import { of } from 'rxjs';
 
 describe('MainMenuPageComponent', () => {
     let component: MainMenuPageComponent;
@@ -30,7 +31,7 @@ describe('MainMenuPageComponent', () => {
 
         TestBed.configureTestingModule({
             declarations: [MainMenuPageComponent],
-            imports: [MatSnackBarModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, BrowserAnimationsModule, RouterModule],
+            imports: [MatSnackBarModule, MatDialogModule, ReactiveFormsModule, MatInputModule, BrowserAnimationsModule, RouterModule],
             providers: [
                 { provide: GameHandlingService, useValue: gameHandlingServiceMock },
                 { provide: Router, useValue: routerMock },
@@ -68,25 +69,13 @@ describe('MainMenuPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should navigate to admin route when password is correct', fakeAsync(() => {
-        gameHandlingServiceMock.verifyAdminPassword.and.returnValue(of(true));
+    it('adminLogin should open a dialog', fakeAsync(() => {
+        const dialogSpy = spyOn(component['dialog'], 'open');
         component.adminLogin();
-        tick();
-        expect(routerMock.navigate).toHaveBeenCalledWith([Route.Admin]);
-    }));
-
-    it('should alert when password is incorrect', fakeAsync(() => {
-        gameHandlingServiceMock.verifyAdminPassword.and.returnValue(throwError(() => ({ status: 401 })));
-        component.adminLogin();
-        tick();
-        expect(window.alert).toHaveBeenCalledWith('Mot de passe incorrect !');
-    }));
-
-    it('should alert on other errors', fakeAsync(() => {
-        gameHandlingServiceMock.verifyAdminPassword.and.returnValue(throwError(() => ({ status: 500 })));
-        component.adminLogin();
-        tick();
-        expect(window.alert).toHaveBeenCalledWith('Une erreur est survenue');
+        expect(dialogSpy).toHaveBeenCalledWith(PasswordPopupComponent, {
+            backdropClass: 'backdropBackground',
+            disableClose: true,
+        });
     }));
 
     it('should handle validPin event by navigating to the lobby', () => {
