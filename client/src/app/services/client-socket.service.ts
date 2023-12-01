@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { Route } from '@app/constants/enums';
 import { SNACK_BAR_ERROR_CONFIGURATION } from '@app/constants/snack-bar-configuration';
-import { Pin, Player } from '@common/lobby';
+import { Route } from '@app/enums';
+import { Pin } from '@common/lobby';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Socket, io } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
@@ -18,7 +18,6 @@ export class ClientSocketService {
     pin: Pin = '';
     histogramData: BehaviorSubject<{ [key: string]: number }> = new BehaviorSubject({});
     histogramData$: Observable<{ [key: string]: number }> = this.histogramData.asObservable();
-    players: Player[] = [];
 
     constructor(
         private router: Router,

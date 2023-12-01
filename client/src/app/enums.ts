@@ -14,8 +14,3 @@ export enum Route {
     QuestionCreation = 'question-creation',
     HistoryPage = 'history-page',
 }
-
-export enum ButtonState {
-    Selected = 1,
-    Unselected = -1,
-}

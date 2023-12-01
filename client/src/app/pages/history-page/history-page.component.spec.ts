@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute, RouterModule, convertToParamMap } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
+import { GameHandlingService } from '@app/services/game-handling.service';
 import { GameInfo } from '@common/game';
 import { of } from 'rxjs';
 import { HistoryPageComponent } from './history-page.component';

@@ -29,7 +29,7 @@ describe('SocketManager service tests', () => {
 
     beforeEach(async () => {
         server = Container.get(Server);
-        server.init();
+        await server.init();
         service = server['socketManager'];
         clientSocket = ioClient(urlString);
         sinon.stub(console, 'log');
@@ -286,15 +286,14 @@ describe('SocketManager service tests', () => {
 
                 clientSocket2.emit('leaveLobby');
             }, RESPONSE_DELAY);
+            clientSocket2.once('latestPlayerList', () => {
+                setTimeout(() => {
+                    expect(service['lobbies'].get(roomPin).players.length).to.equal(1);
+                    clientSocket2.close();
+                    done();
+                }, RESPONSE_DELAY);
+            });
         }, RESPONSE_DELAY);
-
-        clientSocket2.once('latestPlayerList', () => {
-            setTimeout(() => {
-                expect(service['lobbies'].get(roomPin).players.length).to.equal(1);
-                clientSocket2.close();
-                done();
-            }, RESPONSE_DELAY);
-        });
     });
 
     it('startCountdown should emit questionTransition event if the next question is loading', (done) => {

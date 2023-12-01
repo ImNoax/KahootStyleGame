@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
-import { FormManagerService } from '@app/services/form-manager/form-manager.service';
+import { ClientSocketService } from '@app/services/client-socket.service';
+import { FormManagerService } from '@app/services/form-manager.service';
 import { Limit } from '@common/limit';
 
 @Component({

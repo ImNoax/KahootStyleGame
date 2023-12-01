@@ -1,15 +1,16 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { PasswordPopupComponent } from '@app/components/password-popup/password-popup.component';
-import { Route } from '@app/constants/enums';
-import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
-import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
-import { RouteControllerService } from '@app/services/route-controller/route-controller.service';
+import { Route } from '@app/enums';
+import { ClientSocketService } from '@app/services/client-socket.service';
+import { GameHandlingService } from '@app/services/game-handling.service';
+import { RouteControllerService } from '@app/services/route-controller.service';
 import { Game } from '@common/game';
 import { Pin, REQUIRED_PIN_LENGTH } from '@common/lobby';
 import { BehaviorSubject } from 'rxjs';
+
+const ERROR401 = 401;
 
 @Component({
     selector: 'app-main-menu-page',
@@ -23,7 +24,6 @@ export class MainMenuPageComponent implements OnInit, OnDestroy {
     pinForm: FormGroup;
     serverErrorMessage: string = '';
     private routeController: RouteControllerService = inject(RouteControllerService);
-    private dialog: MatDialog = inject(MatDialog);
 
     constructor(
         private readonly gameHandler: GameHandlingService,
@@ -48,10 +48,24 @@ export class MainMenuPageComponent implements OnInit, OnDestroy {
     }
 
     adminLogin(): void {
-        this.dialog.open(PasswordPopupComponent, {
-            backdropClass: 'backdropBackground',
-            disableClose: true,
-        });
+        const password = prompt('Veuillez entrer le mot de passe:');
+        if (password) {
+            this.gameHandler.verifyAdminPassword(password).subscribe({
+                next: (response) => {
+                    if (response) {
+                        this.routeController.setRouteAccess(Route.Admin, true);
+                        this.router.navigate([Route.Admin]);
+                    }
+                },
+                error: (error: HttpErrorResponse) => {
+                    if (error.status === ERROR401) {
+                        alert('Mot de passe incorrect !');
+                    } else {
+                        alert('Une erreur est survenue');
+                    }
+                },
+            });
+        }
     }
 
     configureBaseSocketFeatures() {

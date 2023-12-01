@@ -2,12 +2,12 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { GameImportPopupComponent } from '@app/components/game-import-popup/game-import-popup.component';
-import { Route } from '@app/constants/enums';
-import { FormManagerService } from '@app/services/form-manager/form-manager.service';
-import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
+import { Route } from '@app/enums';
+import { FormManagerService } from '@app/services/form-manager.service';
+import { GameHandlingService } from '@app/services/game-handling.service';
 import { Choice, Game, Question, QuestionType } from '@common/game';
 import { Limit } from '@common/limit';
-import { saveAs } from 'file-saver-es';
+import { saveAs } from 'file-saver';
 
 const JSON_SPACE = 4;
 

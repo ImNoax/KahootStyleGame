@@ -8,7 +8,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute, RouterModule, convertToParamMap } from '@angular/router';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { QuestionCreationPopupComponent } from '@app/components/question-creation-popup/question-creation-popup.component';
-import { FormManagerService } from '@app/services/form-manager/form-manager.service';
+import { FormManagerService } from '@app/services/form-manager.service';
 import { Question, QuestionType } from '@common/game';
 import { Observable, of } from 'rxjs';
 import { QCM_COLOR, QRL_COLOR, QuestionCreationPageComponent } from './question-creation-page.component';

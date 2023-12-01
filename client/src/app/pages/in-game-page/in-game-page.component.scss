@@ -1,22 +1,10 @@
 .container {
     height: 100%;
-    background-image: url(../../../assets/backgrounds/dark-theater-stage.jpg);
+    background-image: url(../../../assets/dark-theater-stage.jpg);
     background-size: cover;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-}
-
-#evaluation-message {
-    position: fixed;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    background-color: rgb(black, 0.6);
-    padding: 5%;
-    font-size: 200%;
-    border-radius: 10px;
 }
 
 #quit-button {
@@ -95,7 +83,7 @@ app-histogram {
 app-player-list {
     position: fixed;
     bottom: 50%;
-    right: 5%;
+    left: 70%;
     z-index: 9999;
 }
 
@@ -105,12 +93,4 @@ app-player-list {
     left: 3%;
     color: white;
     font-size: 30px;
-}
-
-#player-name {
-    color: white;
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    margin: 2%;
 }

@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
-import { Route } from '@app/constants/enums';
-import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
-import { RouteControllerService } from '@app/services/route-controller/route-controller.service';
+import { Route } from '@app/enums';
+import { ClientSocketService } from '@app/services/client-socket.service';
+import { RouteControllerService } from '@app/services/route-controller.service';
 
 @Component({
     selector: 'app-header',

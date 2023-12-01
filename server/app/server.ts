@@ -2,6 +2,7 @@ import { Application } from '@app/app';
 import * as http from 'http';
 import { AddressInfo } from 'net';
 import { Service } from 'typedi';
+import { DatabaseService } from './services/database.service';
 import { SocketManager } from './services/socket-manager.service';
 
 @Service()
@@ -11,23 +12,36 @@ export class Server {
     private server: http.Server;
     private socketManager: SocketManager;
 
-    constructor(private readonly application: Application) {}
-
+    constructor(
+        private readonly application: Application,
+        private readonly databaseService: DatabaseService,
+    ) {}
     private static normalizePort(val: number | string): number | string | boolean {
         const port: number = typeof val === 'string' ? parseInt(val, this.baseDix) : val;
         return isNaN(port) ? val : port >= 0 ? port : false;
     }
-    init(): void {
-        this.application.app.set('port', Server.appPort);
+    async init(): Promise<void> {
+        await this.databaseService.connect();
+        try {
+            // Used to import the games for the first time
+            if (process.env.IMPORT_GAMES === 'true') {
+                const gamesPath = 'C:\\Users\\istra\\Documents\\LOG2990\\LOG2990-106\\server\\data\\games.json';
+                await this.databaseService.importGames(gamesPath);
+            }
+            this.application.app.set('port', Server.appPort);
 
-        this.server = http.createServer(this.application.app);
+            this.server = http.createServer(this.application.app);
 
-        this.socketManager = new SocketManager(this.server);
-        this.socketManager.handleSockets();
+            this.socketManager = new SocketManager(this.server);
+            this.socketManager.handleSockets();
 
-        this.server.listen(Server.appPort);
-        this.server.on('error', (error: NodeJS.ErrnoException) => this.onError(error));
-        this.server.on('listening', () => this.onListening());
+            this.server.listen(Server.appPort);
+            this.server.on('error', (error: NodeJS.ErrnoException) => this.onError(error));
+            this.server.on('listening', () => this.onListening());
+        } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error('Error initializing server:', error);
+        }
     }
 
     private onError(error: NodeJS.ErrnoException): void {

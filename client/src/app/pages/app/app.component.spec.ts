@@ -3,11 +3,11 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
 import { SocketMock } from '@app/classes/socket-mock';
-import { Route } from '@app/constants/enums';
 import { SERVER_ERROR_MESSAGE, SNACK_BAR_ERROR_CONFIGURATION } from '@app/constants/snack-bar-configuration';
+import { Route } from '@app/enums';
 import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppComponent } from '@app/pages/app/app.component';
-import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
+import { ClientSocketService } from '@app/services/client-socket.service';
 
 describe('AppComponent', () => {
     let app: AppComponent;

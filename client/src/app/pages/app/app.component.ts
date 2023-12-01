@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { Route } from '@app/constants/enums';
 import { SERVER_ERROR_MESSAGE, SNACK_BAR_ERROR_CONFIGURATION } from '@app/constants/snack-bar-configuration';
-import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
+import { Route } from '@app/enums';
+import { ClientSocketService } from '@app/services/client-socket.service';
 
 @Component({
     selector: 'app-root',

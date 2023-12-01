@@ -7,8 +7,7 @@
                 <mat-form-field class="field question-field">
                     <mat-label>Texte de la question</mat-label>
                     <textarea
-                        #questionInput
-                        (keydown.enter)="questionInput.blur()"
+                        (keydown.enter)="$event.preventDefault()"
                         matInput
                         [maxlength]="maxQuestionLength"
                         formControlName="text"
@@ -40,13 +39,13 @@
                 <span class="error" *ngIf="questionForm.controls['points'].invalid">{{ showPointsError() }}</span>
             </div>
 
-            <mat-slide-toggle [checked]="isQcm()" color="primary" (click)="toggleQuestionType()">
+            <mat-slide-toggle [checked]="isQrl()" color="primary" (click)="toggleQuestionType()">
                 <span class="text-color">{{ questionType }}</span>
             </mat-slide-toggle>
         </div>
 
         <div id="choices">
-            <div *ngIf="isQcm()" formArrayName="choices" cdkDropList id="answer-list" (cdkDropListDropped)="drop($event)">
+            <div *ngIf="!isQrl()" formArrayName="choices" cdkDropList id="answer-list" (cdkDropListDropped)="drop($event)">
                 <div
                     [formGroupName]="i"
                     class="answer-box"
