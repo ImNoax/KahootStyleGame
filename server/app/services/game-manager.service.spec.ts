@@ -317,3 +317,5 @@ describe('GameManagerService', () => {
         });
     });
 });
+
+// a delete
