@@ -29,11 +29,10 @@ describe('SocketManager service tests', () => {
 
     beforeEach(async () => {
         server = Container.get(Server);
-        server.init();
+        await server.init();
         service = server['socketManager'];
-        console.log(service);
         clientSocket = ioClient(urlString);
-        // sinon.stub(console, 'log');
+        sinon.stub(console, 'log');
     });
 
     afterEach(() => {
