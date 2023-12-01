@@ -16,7 +16,7 @@ describe('ProgressBarComponent', () => {
     let clientSocketServiceMock: jasmine.SpyObj<ClientSocketService>;
 
     beforeEach(() => {
-        timeServiceMock = jasmine.createSpyObj('TimeService', ['startCountDown']);
+        timeServiceMock = jasmine.createSpyObj('TimeService', ['startCountdown']);
         gameHandlingServiceMock = jasmine.createSpyObj('GameHandlingService', ['getCurrentQuestionDuration']);
         clientSocketServiceMock = jasmine.createSpyObj('ClientSocketService', ['']);
 
@@ -52,6 +52,14 @@ describe('ProgressBarComponent', () => {
         expect(component.isPanicModeEnabled).toEqual(false);
     });
 
+    it('isCountdownRunning getter should return isCountdownRunning from TimerService', () => {
+        timeServiceMock.isCountdownRunning = true;
+        expect(component.isCountdownRunning).toEqual(true);
+
+        timeServiceMock.isCountdownRunning = false;
+        expect(component.isCountdownRunning).toEqual(false);
+    });
+
     it('currentQuestionDuration getter should return value from calling getCurrentQuestionDuration from GameHandlingService', () => {
         gameHandlingServiceMock.getCurrentQuestionDuration.and.returnValue(currentQuestionDuration);
         expect(component.currentQuestionDuration).toEqual(currentQuestionDuration);
@@ -62,7 +70,7 @@ describe('ProgressBarComponent', () => {
         gameHandlingServiceMock.gameMode = GameMode.RealGame;
         spyOnProperty(component, 'currentQuestionDuration', 'get').and.returnValue(currentQuestionDuration);
         component.ngOnInit();
-        expect(timeServiceMock.startCountDown).toHaveBeenCalledWith(currentQuestionDuration);
+        expect(timeServiceMock.startCountdown).toHaveBeenCalledWith(currentQuestionDuration);
     });
 
     it('should start countDown on component initialization if the player is a tester', () => {
@@ -70,13 +78,13 @@ describe('ProgressBarComponent', () => {
         clientSocketServiceMock.isOrganizer = false;
         spyOnProperty(component, 'currentQuestionDuration', 'get').and.returnValue(currentQuestionDuration);
         component.ngOnInit();
-        expect(timeServiceMock.startCountDown).toHaveBeenCalledWith(currentQuestionDuration);
+        expect(timeServiceMock.startCountdown).toHaveBeenCalledWith(currentQuestionDuration);
     });
 
     it('should not start countDown on component initialization if the player is not the organizer or a tester', () => {
         gameHandlingServiceMock.gameMode = GameMode.RealGame;
         clientSocketServiceMock.isOrganizer = false;
         component.ngOnInit();
-        expect(timeServiceMock.startCountDown).not.toHaveBeenCalled();
+        expect(timeServiceMock.startCountdown).not.toHaveBeenCalled();
     });
 });

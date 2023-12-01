@@ -7,6 +7,18 @@
     align-items: flex-start;
 }
 
+#evaluation-message {
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    background-color: rgb(black, 0.6);
+    padding: 5%;
+    font-size: 200%;
+    border-radius: 10px;
+}
+
 #quit-button {
     position: absolute;
     left: 85%;
@@ -83,7 +95,7 @@ app-histogram {
 app-player-list {
     position: fixed;
     bottom: 50%;
-    left: 70%;
+    right: 5%;
     z-index: 9999;
 }
 
@@ -93,4 +105,12 @@ app-player-list {
     left: 3%;
     color: white;
     font-size: 30px;
+}
+
+#player-name {
+    color: white;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin: 2%;
 }

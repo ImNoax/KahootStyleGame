@@ -7,7 +7,7 @@ import { FormManagerService } from '@app/services/form-manager/form-manager.serv
 import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
 import { Choice, Game, Question, QuestionType } from '@common/game';
 import { Limit } from '@common/limit';
-import { saveAs } from 'file-saver';
+import { saveAs } from 'file-saver-es';
 
 const JSON_SPACE = 4;
 

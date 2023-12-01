@@ -24,11 +24,15 @@ export class ProgressBarComponent implements OnInit {
         return this.timer.isPanicModeEnabled;
     }
 
+    get isCountdownRunning(): boolean {
+        return this.timer.isCountdownRunning;
+    }
+
     get currentQuestionDuration(): number {
         return this.gameService.getCurrentQuestionDuration();
     }
 
     ngOnInit() {
-        if (this.clientsocket.isOrganizer || this.gameService.gameMode === GameMode.Testing) this.timer.startCountDown(this.currentQuestionDuration);
+        if (this.clientsocket.isOrganizer || this.gameService.gameMode === GameMode.Testing) this.timer.startCountdown(this.currentQuestionDuration);
     }
 }

@@ -51,8 +51,8 @@ export class QuestionCreationPopupComponent implements OnInit {
         else this.toggleQuestionType();
     }
 
-    isQrl() {
-        if (this.questionType === QuestionType.QRL) return true;
+    isQcm() {
+        if (this.questionType === QuestionType.QCM) return true;
         return false;
     }
 

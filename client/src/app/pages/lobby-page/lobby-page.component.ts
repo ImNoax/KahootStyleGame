@@ -19,7 +19,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     players: Player[] = [];
     isLocked: boolean = false;
     gameStarted: boolean = false;
-    countDownStarted: boolean = false;
+    countdownStarted: boolean = false;
     private snackBar: MatSnackBar = inject(MatSnackBar);
     private routeController: RouteControllerService = inject(RouteControllerService);
     private timer: TimerService = inject(TimerService);
@@ -53,7 +53,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this.clientSocket.socket.removeAllListeners('latestPlayerList');
         this.clientSocket.socket.removeAllListeners('lockToggled');
-        this.clientSocket.socket.removeAllListeners('countDownEnd');
+        this.clientSocket.socket.removeAllListeners('countdownEnd');
         this.clientSocket.socket.removeAllListeners('noPlayers');
 
         this.timer.reset();
@@ -72,14 +72,14 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
             this.isLocked = isLocked;
         });
 
-        this.clientSocket.socket.on('countDownEnd', () => {
+        this.clientSocket.socket.on('countdownEnd', () => {
             this.startGame();
         });
 
         this.clientSocket.socket.on('noPlayers', () => {
-            if (this.countDownStarted) {
+            if (this.countdownStarted) {
                 this.timer.reset();
-                this.countDownStarted = false;
+                this.countdownStarted = false;
                 this.toggleLobbyLock();
                 this.snackBar.open("Tous les joueurs ont quitté la salle d'attente", '', SNACK_BAR_ERROR_CONFIGURATION);
             }
@@ -95,8 +95,8 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     }
 
     startGameEmit() {
-        this.countDownStarted = true;
-        this.timer.startCountDown(GAME_START_INITIAL_COUNT);
+        this.countdownStarted = true;
+        this.timer.startCountdown(GAME_START_INITIAL_COUNT);
     }
 
     startGame() {
@@ -104,6 +104,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
             this.gameStarted = true;
             this.routeController.setRouteAccess(Route.InGame, true);
             this.router.navigate([Route.InGame]);
+            this.clientSocket.players = this.players;
             return;
         }
         this.router.navigate([Route.MainMenu]);
