@@ -107,6 +107,12 @@ export class SocketManager {
                 }
             };
 
+            const QRL_UPDATE_HISTOGRAM = (updateData: { [key: string]: number }) => {
+                const currentLobby = this.lobbies.get(pin);
+                currentLobby.histogram = updateData;
+                this.sio.to(pin).emit('qrlUpdateHistogram', currentLobby.histogram);
+            };
+
             const START_COUNTDOWN = (initialCount: number, configuration: TimerConfiguration): void => {
                 let countdownPeriod = DEFAULT_COUNTDOWN_PERIOD;
                 if (configuration.isPanicModeEnabled) countdownPeriod = PANIC_COUNTDOWN_PERIOD;
@@ -240,7 +246,7 @@ export class SocketManager {
                 const currentLobby = this.lobbies.get(pin);
                 currentLobby.players = currentLobby.players.filter((player) => player.name !== playerToBan.name);
                 currentLobby.bannedNames.push(playerToBan.name);
-                socketToBan.emit('lobbyClosed', 'BAN', "Vous avez été expulsé de la salle d'attente");
+                socketToBan.emit('lobbyClosed', 'BAN', "Vous avez été expulsé de la salle d'attente.");
             });
 
             socket.on('toggleLock', () => {
@@ -405,6 +411,10 @@ export class SocketManager {
                     });
                     SEND_LATEST_PLAYERS();
                 }
+            });
+
+            socket.on('qrlHistogramUpdate', (updateData: { [key: string]: number }) => {
+                QRL_UPDATE_HISTOGRAM(updateData);
             });
         });
     }

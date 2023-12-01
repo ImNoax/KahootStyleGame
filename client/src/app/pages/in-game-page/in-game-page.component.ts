@@ -7,6 +7,7 @@ import { RouteControllerService } from '@app/services/route-controller/route-con
 import { TimerService } from '@app/services/timer/timer.service';
 import { Game } from '@common/game';
 import { GameMode } from '@common/game-mode';
+import { ACTIVE_PLAYERS_TEXT, INACTIVE_PLAYERS_TEXT, indexFind } from '@common/lobby';
 
 import { Subscription } from 'rxjs/internal/Subscription';
 
@@ -26,6 +27,7 @@ export class InGamePageComponent implements OnInit, OnDestroy {
     histogramData: { [key: string]: number };
     correctAnswers: string[];
     playerName = this.clientSocket.playerName;
+    private histogramQrlSubscription: Subscription;
     private subscriptionScore: Subscription;
     private questionSubscription: Subscription;
     private histogramSubscription: Subscription;
@@ -73,7 +75,35 @@ export class InGamePageComponent implements OnInit, OnDestroy {
         });
 
         this.histogramSubscription = this.clientSocket.listenUpdateHistogram().subscribe((data) => {
-            this.correctAnswers = this.gameService.getCorrectAnswersForCurrentQuestion();
+            if (this.gameService.isCurrentQuestionQcm()) {
+                this.correctAnswers = this.gameService.getCorrectAnswersForCurrentQuestion();
+                this.histogramData = data;
+                this.gameService.updateHistogramDataForQuestion(this.gameService.currentQuestionId, data);
+            } else {
+                const firstValueToFind = ACTIVE_PLAYERS_TEXT;
+                const secondValueToFind = INACTIVE_PLAYERS_TEXT;
+                this.histogramData = data;
+
+                if (!data) {
+                    return;
+                }
+                const histogramKeys = Object.keys(this.histogramData);
+                const index = histogramKeys.findIndex((key) => key === firstValueToFind || key === secondValueToFind);
+
+                if (index !== indexFind) {
+                    // ACTIVE_PLAYERS_TEXT et INACTIVE_PLAYERS_TEXT trouver on remplace alors
+                    const histogramUpdateData: { [key: string]: number } = {};
+                    histogramUpdateData['0%'] = 0;
+                    histogramUpdateData['50%'] = 0;
+                    histogramUpdateData['100%'] = 0;
+                    this.gameService.updateHistogramDataForQuestion(this.gameService.currentQuestionId, histogramUpdateData);
+                } else {
+                    this.gameService.updateHistogramDataForQuestion(this.gameService.currentQuestionId, data);
+                }
+            }
+        });
+
+        this.histogramQrlSubscription = this.clientSocket.listenQrlUpdateHistogram().subscribe((data) => {
             this.histogramData = data;
             this.gameService.updateHistogramDataForQuestion(this.gameService.currentQuestionId, data);
         });
@@ -94,6 +124,10 @@ export class InGamePageComponent implements OnInit, OnDestroy {
 
         if (this.histogramSubscription) {
             this.histogramSubscription.unsubscribe();
+        }
+
+        if (this.histogramQrlSubscription) {
+            this.histogramQrlSubscription.unsubscribe();
         }
 
         this.timer.reset();
