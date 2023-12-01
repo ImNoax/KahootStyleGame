@@ -1,6 +1,6 @@
 <div class="table-container">
     <div>
-        <h1>Vue des résultats</h1>
+        <h1>Résultats</h1>
     </div>
     <div>
         <table>
@@ -28,9 +28,9 @@
             </tbody>
         </table>
     </div>
-        <h3>{{currentQuestion}}</h3>
-        <app-histogram [data]="allHistogramData[currentQuestionId]" [correctAnswers]="correctAnswers"></app-histogram>
-              <div class="histogram-navigation">
+    <h3>{{ currentQuestion }}</h3>
+    <app-histogram [data]="allHistogramData[currentQuestionId]" [correctAnswers]="correctAnswers"></app-histogram>
+    <div class="histogram-navigation">
         <button (click)="previousQuestion()">Précédent</button>
         <button (click)="nextQuestion()">Suivant</button>
     </div>

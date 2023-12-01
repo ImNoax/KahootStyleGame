@@ -24,6 +24,16 @@ tr:nth-child(odd) {
     background-color: #4c0852;
 }
 
-.strikethrough {
+.black {
+    color: black;
     text-decoration: line-through;
+}
+.red {
+    color: red;
+}
+.yellow {
+    color: yellow;
+}
+.green {
+    color: green;
 }

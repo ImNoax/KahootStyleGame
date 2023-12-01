@@ -1,11 +1,10 @@
-import { TestBed } from '@angular/core/testing';
-
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
 import { SocketMock } from '@app/classes/socket-mock';
-import { ClientSocketService } from './client-socket.service';
-import { GameHandlingService } from './game-handling.service';
+import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
+import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
 import { TimerService } from './timer.service';
 
 describe('TimerService', () => {
@@ -46,8 +45,8 @@ describe('TimerService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('should handle countDown event by assigning newCount argument to transitionCount if isQuestionTransition is true', () => {
-        const event = 'countDown';
+    it('should handle countdown event by assigning newCount argument to transitionCount if isQuestionTransition is true', () => {
+        const event = 'countdown';
         const newCount = 10;
         service.isQuestionTransition = true;
         service.transitionCount = 0;
@@ -58,8 +57,8 @@ describe('TimerService', () => {
         expect(service.count).toEqual(0);
     });
 
-    it('should handle countDown event by assigning newCount argument to count if isQuestionTransition is false', () => {
-        const event = 'countDown';
+    it('should handle countdown event by assigning newCount argument to count if isQuestionTransition is false', () => {
+        const event = 'countdown';
         const newCount = 10;
         service.isQuestionTransition = false;
         service.transitionCount = 0;
@@ -102,35 +101,51 @@ describe('TimerService', () => {
         expect(service.transitionMessage).toEqual(nextQuestionMessage);
     });
 
-    it('startCountDown should emit startCountDown event', () => {
-        const event = 'startCountDown';
+    it('should handle countdownStarted event by setting isCountdownRunning to true', () => {
+        const event = 'countdownStarted';
+        service.isCountdownRunning = false;
+        socketMock.simulateServerEmit(event);
+        expect(service.isCountdownRunning).toBeTrue();
+    });
 
-        service.startCountDown(initialCount, { isQuestionTransition: true });
+    it('should handle countdownStopped event by setting isCountdownRunning to false', () => {
+        const event = 'countdownStopped';
+        service.isCountdownRunning = true;
+        socketMock.simulateServerEmit(event);
+        expect(service.isCountdownRunning).toBeFalse();
+    });
+
+    it('startCountdown should emit startCountdown event', () => {
+        const event = 'startCountdown';
+
+        service.startCountdown(initialCount, { isQuestionTransition: true });
         expect(socketMock.emit).toHaveBeenCalledWith(
             event,
             initialCount,
-            { isQuestionTransition: true, isPanicModeEnabled: false },
+            { isQuestionTransition: true, isPanicModeEnabled: false, isInputInactivityCountdown: false },
             gameHandlingServiceMock.gameMode,
         );
         expect(socketMock.nEmittedEvents).toEqual(++nEmittedEvents);
     });
 
-    it('stopCountDown should emit stopCountDown event', () => {
-        const event = 'stopCountDown';
-        service.stopCountDown();
+    it('stopCountdown should emit stopCountdown event', () => {
+        const event = 'stopCountdown';
+        service.stopCountdown();
         expect(socketMock.emit).toHaveBeenCalledWith(event);
         expect(socketMock.nEmittedEvents).toEqual(++nEmittedEvents);
     });
 
-    it('reset should call stopCountDown and reinitialize every property', () => {
+    it('reset should call stopCountdown and reinitialize every property', () => {
         const currentCount = 10;
         service.count = currentCount;
         service.transitionCount = currentCount;
         service.isQuestionTransition = true;
+        service.isPanicModeEnabled = true;
+        service.isPanicModeEnabled = true;
 
-        spyOn(service, 'stopCountDown');
+        spyOn(service, 'stopCountdown');
         service.reset();
-        expect(service.stopCountDown).toHaveBeenCalled();
+        expect(service.stopCountdown).toHaveBeenCalled();
         expect(service.count).toEqual(0);
         expect(service.transitionCount).toEqual(0);
         expect(service.isQuestionTransition).toBeFalse();

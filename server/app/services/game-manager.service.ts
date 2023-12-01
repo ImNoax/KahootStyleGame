@@ -1,4 +1,3 @@
-import { DatabaseService } from '@app/services/database.service';
 import { FileManagerService } from '@app/services/file-manager.service';
 import { Choice, Game, Question } from '@common/game';
 import { Limit } from '@common/limit';
@@ -7,23 +6,17 @@ import * as randomstring from 'randomstring';
 import { Service } from 'typedi';
 
 const JSON_SPACE = 4;
+const NOT_FOUND_INDEX = -1;
 const ID_LENGTH = 6;
 
 @Service()
 export class GameManagerService {
     error: Error;
-    constructor(
-        private databaseService: DatabaseService,
-        private fileManager: FileManagerService,
-    ) {}
+    constructor(private fileManager: FileManagerService) {}
 
     async getGames(): Promise<Game[]> {
-        const db = this.databaseService.getDb();
-        const gamesCollection = db.collection('Games');
-
-        const games = (await gamesCollection.find({}).toArray()) as unknown as Game[];
-
-        return games;
+        const fileBuffer: Buffer = await this.fileManager.readJsonFile('./data/games.json');
+        return JSON.parse(fileBuffer.toString());
     }
 
     async exportGame(id: string): Promise<string> {
@@ -38,65 +31,48 @@ export class GameManagerService {
     }
 
     async modifyGame(id: string, modifiedGame: Game): Promise<Game[]> {
-        const ajv = new Ajv({ allErrors: true });
-        const schemaContent = await this.fileManager.readJsonFile('./data/game-schema.json');
-        const schema = JSON.parse(schemaContent.toString());
-
-        const valid = ajv.validate(schema, modifiedGame) && this.validateGame(modifiedGame);
-        if (!valid) {
-            if (ajv.errors) {
-                this.error = new Error(ajv.errors[0].instancePath + ' ' + ajv.errors[0].message);
-            }
-            return null;
+        const games: Game[] = await this.getGames();
+        const index = games.findIndex((game) => game.id === id);
+        if (index !== NOT_FOUND_INDEX) {
+            games[index] = modifiedGame;
+            this.fileManager.writeJsonFile('./data/games.json', JSON.stringify(games, null, JSON_SPACE));
+        } else {
+            this.addGame(modifiedGame);
         }
-
-        const db = this.databaseService.getDb();
-        const gamesCollection = db.collection('Games');
-
-        await gamesCollection.updateOne({ id }, { $set: modifiedGame });
-
-        const games = (await gamesCollection.find({}).toArray()) as unknown as Game[];
 
         return games;
     }
 
     async modifyGameVisibility(id: string, newVisibility: { isVisible: boolean }): Promise<Game[]> {
-        const db = this.databaseService.getDb();
-        const gamesCollection = db.collection('Games');
+        const games: Game[] = await this.getGames();
+        const gameToUpdate = games.find((game) => game.id === id);
 
-        await gamesCollection.updateOne({ id }, { $set: { isVisible: newVisibility.isVisible } });
-
-        const games = (await gamesCollection.find({}).toArray()) as unknown as Game[];
+        if (gameToUpdate) {
+            gameToUpdate.isVisible = newVisibility.isVisible;
+            await this.fileManager.writeJsonFile('./data/games.json', JSON.stringify(games, null, JSON_SPACE));
+        }
 
         return games;
     }
 
     async addGame(newGame: Game): Promise<Game[]> {
         const ajv = new Ajv({ allErrors: true });
-        const schemaContent = await this.fileManager.readJsonFile('./data/game-schema.json');
-        const schema = JSON.parse(schemaContent.toString());
-
-        const existingGames: Game[] = await this.getGames();
+        const schema = JSON.parse((await this.fileManager.readJsonFile('./data/game-schema.json')).toString());
+        const games: Game[] = await this.getGames();
         do {
             newGame.id = randomstring.generate(ID_LENGTH);
-        } while (existingGames.some((game) => game.id === newGame.id));
+        } while (games.find((game) => game.id === newGame.id));
 
         const valid = ajv.validate(schema, newGame) && this.validateGame(newGame);
         if (!valid) {
-            if (ajv.errors) {
-                this.error = new Error(ajv.errors[0].instancePath + ' ' + ajv.errors[0].message);
-            }
+            if (ajv.errors) this.error = new Error(ajv.errors[0].instancePath + ' ' + ajv.errors[0].message);
             return null;
         }
+        games.push(newGame);
 
-        const db = this.databaseService.getDb();
-        const gamesCollection = db.collection('Games');
+        this.fileManager.writeJsonFile('./data/games.json', JSON.stringify(games, null, JSON_SPACE));
 
-        await gamesCollection.insertOne(newGame);
-
-        const allGames = (await gamesCollection.find({}).toArray()) as unknown as Game[];
-
-        return allGames;
+        return games;
     }
 
     validateGame(game: Game): boolean {
@@ -168,9 +144,11 @@ export class GameManagerService {
     }
 
     async deleteGameById(id: string): Promise<void> {
-        const db = this.databaseService.getDb();
-        const gamesCollection = db.collection('Games');
-
-        await gamesCollection.deleteOne({ id });
+        const games: Game[] = await this.getGames();
+        const index = games.findIndex((game) => game.id === id);
+        if (index !== NOT_FOUND_INDEX) {
+            games.splice(index, 1);
+            await this.fileManager.writeJsonFile('./data/games.json', JSON.stringify(games, null, JSON_SPACE));
+        }
     }
 }

@@ -1,10 +1,10 @@
-import { GameHandlingService } from '@angular/../../client/src/app/services/game-handling.service';
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Route } from '@app/enums';
-import { ClientSocketService } from '@app/services/client-socket.service';
-import { RouteControllerService } from '@app/services/route-controller.service';
-import { TimerService } from '@app/services/timer.service';
+import { Route } from '@app/constants/enums';
+import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
+import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
+import { RouteControllerService } from '@app/services/route-controller/route-controller.service';
+import { TimerService } from '@app/services/timer/timer.service';
 import { Game } from '@common/game';
 import { GameMode } from '@common/game-mode';
 
@@ -19,11 +19,13 @@ export class InGamePageComponent implements OnInit, OnDestroy {
     currentGame: Game;
     currentQuestion: string = '';
     currentQuestionScore: number;
-    bonusTimes: number;
     score: number;
+    isEvaluationMessageVisible: boolean = false;
+    isHistogramVisible: boolean = true;
     showResults: boolean = false;
     histogramData: { [key: string]: number };
     correctAnswers: string[];
+    playerName = this.clientSocket.playerName;
     private subscriptionScore: Subscription;
     private questionSubscription: Subscription;
     private histogramSubscription: Subscription;
@@ -54,6 +56,10 @@ export class InGamePageComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.currentGame = this.gameService.currentGame;
+        this.gameService.setCurrentQuestionId(0);
+        this.currentQuestion = this.currentGame.questions[this.gameService.currentQuestionId].text;
+        this.currentQuestionScore = this.currentGame.questions[this.gameService.currentQuestionId].points;
+
         this.correctAnswers = this.gameService.getCorrectAnswersForCurrentQuestion();
         this.gameService.setScore(0);
 
@@ -71,10 +77,6 @@ export class InGamePageComponent implements OnInit, OnDestroy {
             this.histogramData = data;
             this.gameService.updateHistogramDataForQuestion(this.gameService.currentQuestionId, data);
         });
-
-        this.gameService.setCurrentQuestionId(0);
-        this.currentQuestion = this.currentGame.questions[this.gameService.currentQuestionId].text;
-        this.currentQuestionScore = this.currentGame.questions[this.gameService.currentQuestionId].points;
 
         this.clientSocket.socket.on('showResults', () => {
             this.showResults = true;
@@ -96,12 +98,24 @@ export class InGamePageComponent implements OnInit, OnDestroy {
 
         this.timer.reset();
         this.clientSocket.socket.removeAllListeners('showResults');
+        this.clientSocket.socket.removeAllListeners('qcmEnd');
+        this.clientSocket.socket.removeAllListeners('qrlEnd');
+        this.clientSocket.socket.removeAllListeners('qrlResults');
+        this.clientSocket.socket.removeAllListeners('panicMode');
+        this.clientSocket.socket.removeAllListeners('countdownEnd');
+        this.clientSocket.socket.removeAllListeners('noPlayers');
         this.clientSocket.resetPlayerInfo();
         this.routeController.setRouteAccess(Route.InGame, false);
+        this.clientSocket.players = [];
     }
 
     onUpdateQuestionScore(score: number) {
         this.currentQuestionScore = score;
+    }
+
+    setEvaluationPhase(isEvaluationPhase: boolean) {
+        this.isEvaluationMessageVisible = isEvaluationPhase;
+        this.isHistogramVisible = !isEvaluationPhase;
     }
 
     leaveGame(): void {

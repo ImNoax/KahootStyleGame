@@ -202,7 +202,6 @@ export class SocketManager {
                         isAbleToChat: true,
                         bonusTimes: 0,
                         isTyping: false,
-                        isStillInGame: false,
                     });
                     SEND_LATEST_PLAYERS();
                     socket.emit('successfulLobbyConnection', nameToValidate);
@@ -226,7 +225,6 @@ export class SocketManager {
                         isAbleToChat: true,
                         bonusTimes: 0,
                         isTyping: false,
-                        isStillInGame: false,
                     });
                     isOrganizer = true;
                     socket.emit('successfulLobbyCreation', pin);
