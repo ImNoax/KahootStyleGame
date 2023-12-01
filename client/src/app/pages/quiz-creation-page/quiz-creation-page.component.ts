@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Route } from '@app/enums';
-import { FormManagerService } from '@app/services/form-manager.service';
-import { GameHandlingService } from '@app/services/game-handling.service';
+import { Route } from '@app/constants/enums';
+import { FormManagerService } from '@app/services/form-manager/form-manager.service';
+import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
 import { Game } from '@common/game';
 import { Limit } from '@common/limit';
 
@@ -48,7 +48,7 @@ export class QuizCreationPageComponent implements OnInit, OnDestroy {
     }
 
     verifyName(event: Event): void {
-        this.isNameEmpty = (event.target as HTMLInputElement).value.trim() === '';
+        this.isNameEmpty = !(event.target as HTMLInputElement).value.trim();
 
         if ((event.target as HTMLInputElement).value.trim().toLowerCase() === this.nameModif.toLowerCase() && !this.isNameEmpty) {
             this.isNameDuplicate = false;
@@ -65,12 +65,12 @@ export class QuizCreationPageComponent implements OnInit, OnDestroy {
     }
 
     verifyDesc(event: Event) {
-        this.isDescEmpty = (event.target as HTMLInputElement).value.trim() === '';
+        this.isDescEmpty = !(event.target as HTMLInputElement).value.trim();
     }
 
     verifyTimer(event: Event) {
         this.isTimerInvalid =
-            (event.target as HTMLInputElement).value.trim() === '' ||
+            !(event.target as HTMLInputElement).value.trim() ||
             Number((event.target as HTMLInputElement).value) < Limit.MinDuration ||
             Number((event.target as HTMLInputElement).value) > Limit.MaxDuration;
     }

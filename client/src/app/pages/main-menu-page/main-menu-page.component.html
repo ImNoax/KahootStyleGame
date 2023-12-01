@@ -1,5 +1,5 @@
 <div class="container justified">
-    <img src="./assets/logo.png" alt="Logo Projet" class="logo" />
+    <img src="./assets/backgrounds/logo.png" alt="Logo Projet" class="logo" />
     <section id="server-message" class="justified">
         <form [formGroup]="pinForm" (ngSubmit)="onSubmit()" class="justified">
             <div id="joining">
@@ -7,7 +7,6 @@
                 <mat-form-field id="pin-input">
                     <mat-label>PIN de jeu</mat-label>
                     <input #joining formControlName="pin" matInput maxlength="4" placeholder="1234" />
-                    {{ joining.focus() }}
                     <p class="error" *ngIf="pinContainsNonNumeric()">Entrez un PIN à 4 chiffres</p>
                 </mat-form-field>
                 <p id="server-error-message" class="error">{{ serverErrorMessage }}</p>

@@ -1,9 +1,8 @@
 .table-container {
-    color:white;
-    position: fixed; 
+    color: white;
+    position: fixed;
     top: 35%;
     left: 35%;
-    
 }
 
 table {
@@ -19,11 +18,11 @@ td {
     text-align: middle;
     font-size: 0.9em;
     word-break: break-word;
+    color: #fff;
 }
 
 th {
     background-color: #8d3987;
-    color: #fff;
 }
 
 tr:nth-child(even) {

@@ -7,11 +7,11 @@ import { SocketMock } from '@app/classes/socket-mock';
 import { ButtonResponseComponent } from '@app/components/button-response/button-response.component';
 import { ChatBoxComponent } from '@app/components/chat-box/chat-box.component';
 import { ProgressBarComponent } from '@app/components/progress-bar/progress-bar.component';
-import { Route } from '@app/enums';
-import { ClientSocketService } from '@app/services/client-socket.service';
-import { GameHandlingService } from '@app/services/game-handling.service';
-import { RouteControllerService } from '@app/services/route-controller.service';
-import { TimerService } from '@app/services/timer.service';
+import { Route } from '@app/constants/enums';
+import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
+import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
+import { RouteControllerService } from '@app/services/route-controller/route-controller.service';
+import { TimerService } from '@app/services/timer/timer.service';
 import { Game, QuestionType } from '@common/game';
 import { GameMode } from '@common/game-mode';
 import { Observable, Subject } from 'rxjs';
@@ -189,6 +189,12 @@ describe('InGamePageComponent', () => {
         component.ngOnDestroy();
         expect(timerMock.reset).toHaveBeenCalled();
         expect(socketMock.removeAllListeners).toHaveBeenCalledWith('showResults');
+        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('qcmEnd');
+        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('qrlEnd');
+        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('qrlResults');
+        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('panicMode');
+        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('countdownEnd');
+        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('noPlayers');
     });
 
     it('should call resetPlayerInfo from ClientSocketService and setRouteAccess from RouteControllerService on component destruction', () => {
@@ -206,6 +212,15 @@ describe('InGamePageComponent', () => {
 
         component.onUpdateQuestionScore(newScore);
         expect(component.currentQuestionScore).toEqual(newScore);
+    });
+
+    it("setEvaluationPhase should change the evaluation message and histogram's visibility", () => {
+        component.isEvaluationMessageVisible = false;
+        component.isHistogramVisible = true;
+
+        component.setEvaluationPhase(true);
+        expect(component.isEvaluationMessageVisible).toBeTrue();
+        expect(component.isHistogramVisible).toBeFalse();
     });
 
     it('leaveGame should navigate to game creation page if game mode is Testing', () => {
