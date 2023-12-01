@@ -150,7 +150,7 @@ describe('GameManagerService', () => {
         mockCursor.toArray.resolves([]);
         await gameManager.deleteGameById('0');
         const result = await gameManager.getGames();
-        expect(result.length).to.not.equal(0);
+        expect(result.length).to.equal(0);
     });
     it('validateGame should return false if one of the elements is not valid and true otherwise', async () => {
         const nbChar = 1000;
