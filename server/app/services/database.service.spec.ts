@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import * as fs from 'fs';
 import { Collection, Db, InsertManyResult, MongoClient, ObjectId, WithId } from 'mongodb';
 import * as Sinon from 'sinon';
-import DatabaseService from './database.service';
+import { DatabaseService } from './database.service';
 
 describe('DatabaseService', () => {
     let databaseService: DatabaseService;
@@ -29,17 +29,17 @@ describe('DatabaseService', () => {
 
     it('should connect to the database', async () => {
         await databaseService.connect();
-        expect(mockClient.connect.calledOnce).to.be.true;
+        expect(mockClient.connect.calledOnce).to.equal(true);
     });
 
     it('should disconnect from the database', async () => {
         await databaseService.disconnect();
-        expect(mockClient.close.calledOnce).to.be.true;
+        expect(mockClient.close.calledOnce).to.equal(true);
     });
     it('should get the database', () => {
         const db = databaseService.getDb();
         expect(db).to.equal(mockDb);
-        expect(mockClient.db.calledWith('Log2990_database')).to.be.true;
+        expect(mockClient.db.calledWith('Log2990_database')).to.equal(true);
     });
 
     it('should import games from a file', async () => {
@@ -58,9 +58,9 @@ describe('DatabaseService', () => {
 
         await databaseService.importGames(filePath);
 
-        expect(mockClient.connect.calledOnce).to.be.true;
-        expect(mockDb.collection.calledWith('Games')).to.be.true;
-        expect(mockCollection.insertMany.calledWith(gamesData)).to.be.true;
+        expect(mockClient.connect.calledOnce).to.equal(true);
+        expect(mockDb.collection.calledWith('Games')).to.equal(true);
+        expect(mockCollection.insertMany.calledWith(gamesData)).to.equal(true);
     });
 
     afterEach(() => {
