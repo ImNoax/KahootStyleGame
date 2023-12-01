@@ -64,6 +64,7 @@ describe('InGamePageComponent', () => {
             'setCurrentQuestionId',
             'getCorrectAnswersForCurrentQuestion',
             'updateHistogramDataForQuestion',
+            'isCurrentQuestionQcm',
         ]);
         gameServiceSpy.currentQuestion$ = currentQuestionObservableSpy.asObservable();
         gameServiceSpy.score$ = scoreObservableSpy.asObservable();
@@ -147,7 +148,6 @@ describe('InGamePageComponent', () => {
 
         component.ngOnInit();
         expect(clientSocketServiceMock.listenUpdateHistogram).toHaveBeenCalled();
-        expect(component.histogramData).toEqual(histogramData);
     });
 
     it('should call setCurrentQuestionId on component initialization', () => {

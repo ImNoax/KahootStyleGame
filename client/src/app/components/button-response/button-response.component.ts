@@ -15,7 +15,7 @@ import { TimerService } from '@app/services/timer/timer.service';
 import { Choice, Game } from '@common/game';
 import { GameMode } from '@common/game-mode';
 import { Limit } from '@common/limit';
-import { ACTIVE_PLAYERS_TEXT, Answer, INACTIVE_PLAYERS_TEXT } from '@common/lobby';
+import { ACTIVE_PLAYERS_TEXT, Answer, FIFTY, HUNDRED, INACTIVE_PLAYERS_TEXT, ZERO } from '@common/lobby';
 import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
@@ -39,6 +39,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
     isOrganizer: boolean = this.clientSocket.isOrganizer;
     answerForm: FormControl = this.answerValidator.answerForm;
     playerHasInteracted: boolean = false;
+    private studentGrades: { [studentName: string]: number } = {};
     private initialPlayers = this.clientSocket.players;
     private submittedFromTimer: boolean = false;
     private timerSubscription: Subscription;
@@ -55,8 +56,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
     ) {}
 
     get pauseMessage(): string {
-        if (this.isGamePaused) return UNPAUSE_MESSAGE;
-        return PAUSE_MESSAGE;
+        return this.isGamePaused ? UNPAUSE_MESSAGE : PAUSE_MESSAGE;
     }
 
     get isCurrentQuestionQcm(): boolean {
@@ -68,13 +68,11 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
     }
 
     get isPanicModeAvailable(): boolean {
-        if (this.isCurrentQuestionQcm) return this.timer.count <= Limit.QcmRequiredPanicCount;
-        return this.timer.count <= Limit.QrlRequiredPanicCount;
+        return this.timer.count <= (this.isCurrentQuestionQcm ? Limit.QcmRequiredPanicCount : Limit.QrlRequiredPanicCount);
     }
 
     get remainingCountForPanic(): number {
-        if (this.isCurrentQuestionQcm) return this.timer.count - Limit.QcmRequiredPanicCount;
-        return this.timer.count - Limit.QrlRequiredPanicCount;
+        return this.timer.count - (this.isCurrentQuestionQcm ? Limit.QcmRequiredPanicCount : Limit.QrlRequiredPanicCount);
     }
 
     get isQuestionTransition(): boolean {
@@ -156,7 +154,6 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
             }
             this.onTimerEnded();
         });
-
         this.clientSocket.socket.on('noPlayers', () => {
             this.snackBar.open('Tous les joueurs ont quitté la partie.', '', SNACK_BAR_ERROR_CONFIGURATION);
             this.timer.stopCountdown();
@@ -199,9 +196,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
             this.clientSocket.socket.emit('socketInteracted');
             this.playerHasInteracted = true;
         }
-
         button.selected = !button.selected;
-
         const changeValue: number = button.selected ? ButtonState.Selected : ButtonState.Unselected;
         if (this.gameService.gameMode === GameMode.RealGame) {
             const histogramUpdateData = { [button.text]: changeValue };
@@ -297,7 +292,34 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
 
     evaluateAnswer(points: number): void {
         this.currentEvaluatedAnswer.pointsPercentage = points;
+        const studentName = this.currentEvaluatedAnswer.submitter;
+        if (studentName !== undefined) this.studentGrades[studentName] = this.currentEvaluatedAnswer.pointsPercentage * HUNDRED;
+        this.updateHistogram();
         if (this.currentAnswerIndex !== this.qrlAnswers.length - 1) ++this.currentAnswerIndex;
+    }
+
+    updateHistogram(): void {
+        let count0 = 0;
+        let count50 = 0;
+        let count100 = 0;
+        Object.values(this.studentGrades).forEach((grade) => {
+            switch (grade) {
+                case ZERO:
+                    count0++;
+                    break;
+                case FIFTY:
+                    count50++;
+                    break;
+                case HUNDRED:
+                    count100++;
+                    break;
+            }
+        });
+        const histogramUpdateData: { [key: string]: number } = {};
+        histogramUpdateData['0%'] = count0;
+        histogramUpdateData['50%'] = count50;
+        histogramUpdateData['100%'] = count100;
+        this.clientSocket.sendQrlUpdateHistogram(histogramUpdateData);
     }
 
     getPreviousAnswer(): void {

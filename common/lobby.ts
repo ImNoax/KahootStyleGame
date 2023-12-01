@@ -6,6 +6,10 @@ export type Pin = string;
 export const REQUIRED_PIN_LENGTH = 4;
 export const ACTIVE_PLAYERS_TEXT = 'Joueurs qui écrivent';
 export const INACTIVE_PLAYERS_TEXT = "Joueurs qui n'écrivent pas";
+export const ZERO= 0;
+export const FIFTY= 50;
+export const HUNDRED= 100;
+export const indexFind=-1;
 
 export interface LobbyDetails {
     isLocked: boolean;
