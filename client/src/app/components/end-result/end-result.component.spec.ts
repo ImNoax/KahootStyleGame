@@ -3,6 +3,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
 import { SocketMock } from '@app/classes/socket-mock';
 import { ClientSocketService } from '@app/services/client-socket.service';
+import { PlayerColor } from '@common/lobby';
+// eslint-disable-next-line no-restricted-imports
+import { HistogramComponent } from '../histogram/histogram.component';
 import { EndResultComponent } from './end-result.component';
 describe('EndResultComponent', () => {
     let component: EndResultComponent;
@@ -16,7 +19,7 @@ describe('EndResultComponent', () => {
 
         TestBed.configureTestingModule({
             imports: [HttpClientModule],
-            declarations: [EndResultComponent],
+            declarations: [EndResultComponent, HistogramComponent],
             providers: [{ provide: ClientSocketService, useValue: clientSocketServiceMock }],
         }).compileComponents();
 
@@ -57,6 +60,8 @@ describe('EndResultComponent', () => {
                     bonusTimes: 1,
                     isStillInGame: true,
                     isAbleToChat: true,
+                    isTyping: false,
+                    activityState: PlayerColor.Red,
                 },
             ],
         };

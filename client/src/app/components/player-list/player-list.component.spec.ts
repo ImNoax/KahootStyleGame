@@ -3,7 +3,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
 import { SocketMock } from '@app/classes/socket-mock';
 import { ClientSocketService } from '@app/services/client-socket.service';
-import { Player } from '@common/lobby';
+import { Player, PlayerColor } from '@common/lobby';
 import { PlayerListComponent } from './player-list.component';
 describe('PlayerListComponent', () => {
     let component: PlayerListComponent;
@@ -22,6 +22,8 @@ describe('PlayerListComponent', () => {
                 bonusTimes: 0,
                 isStillInGame: true,
                 isAbleToChat: true,
+                isTyping: false,
+                activityState: PlayerColor.Red,
             },
             {
                 socketId: 'id2',
@@ -31,6 +33,8 @@ describe('PlayerListComponent', () => {
                 bonusTimes: 0,
                 isStillInGame: true,
                 isAbleToChat: true,
+                isTyping: false,
+                activityState: PlayerColor.Red,
             },
         ],
         bannedNames: [],
@@ -80,6 +84,8 @@ describe('PlayerListComponent', () => {
                 bonusTimes: 0,
                 isStillInGame: true,
                 isAbleToChat: true,
+                isTyping: false,
+                activityState: PlayerColor.Red,
             },
             {
                 socketId: 'id2',
@@ -89,6 +95,8 @@ describe('PlayerListComponent', () => {
                 bonusTimes: 0,
                 isStillInGame: true,
                 isAbleToChat: true,
+                isTyping: false,
+                activityState: PlayerColor.Red,
             },
         ];
         const event = 'scoreUpdated';
@@ -100,6 +108,8 @@ describe('PlayerListComponent', () => {
             bonusTimes: 0,
             isStillInGame: true,
             isAbleToChat: true,
+            isTyping: false,
+            activityState: PlayerColor.Red,
         };
         socketMock.simulateServerEmit(event, playerToUpdateMock);
         expect(component.players[0].score).toBe(playerToUpdateMock.score);
@@ -117,6 +127,8 @@ describe('PlayerListComponent', () => {
                 bonusTimes: 0,
                 isStillInGame: true,
                 isAbleToChat: true,
+                isTyping: false,
+                activityState: PlayerColor.Red,
             },
         ];
         const lobbyDetailsMock = lobbyDetails;
@@ -144,6 +156,8 @@ describe('PlayerListComponent', () => {
             isStillInGame: true,
             isAbleToChat: true,
             bonusTimes: 0,
+            activityState: PlayerColor.Red,
+            isTyping: false,
         };
 
         component.toggleMute(player);

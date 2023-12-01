@@ -30,6 +30,7 @@ export interface Player {
     answerSubmitted?: boolean;
     score: number;
     bonusTimes?: number;
+    isStillInGame: boolean;
     activityState: PlayerColor;
     isAbleToChat: boolean;
     isTyping: boolean;

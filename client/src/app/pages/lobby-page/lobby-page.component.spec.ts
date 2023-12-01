@@ -15,7 +15,7 @@ import { Route } from '@app/enums';
 import { ClientSocketService } from '@app/services/client-socket.service';
 import { RouteControllerService } from '@app/services/route-controller.service';
 import { TimerService } from '@app/services/timer.service';
-import { Player } from '@common/lobby';
+import { Player, PlayerColor } from '@common/lobby';
 import { of } from 'rxjs';
 import { LobbyPageComponent } from './lobby-page.component';
 
@@ -150,6 +150,8 @@ describe('LobbyPageComponent', () => {
                     bonusTimes: 0,
                     isStillInGame: true,
                     isAbleToChat: true,
+                    isTyping: false,
+                    activityState: PlayerColor.Red,
                 },
             ],
             bannedName: [],
@@ -264,6 +266,8 @@ describe('LobbyPageComponent', () => {
             isStillInGame: true,
             isAbleToChat: true,
             bonusTimes: 0,
+            activityState: PlayerColor.Red,
+            isTyping: false,
         };
 
         component.toggleMute(player);
