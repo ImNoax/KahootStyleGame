@@ -1,9 +1,11 @@
-import { Game } from './game';
+import { Game, QuestionType } from './game';
 
 export type SocketId = string;
 export type Pin = string;
 
 export const REQUIRED_PIN_LENGTH = 4;
+export const ACTIVE_PLAYERS_TEXT = 'Joueurs qui écrivent';
+export const INACTIVE_PLAYERS_TEXT = "Joueurs qui n'écrivent pas";
 
 export interface LobbyDetails {
     isLocked: boolean;
@@ -13,6 +15,8 @@ export interface LobbyDetails {
     bonusRecipient?: string;
     histogram?: { [key: string]: number };
     chat: Message[];
+    qrlAnswers: Answer[];
+    currentQuestionType?: QuestionType;
 }
 export enum PlayerColor {
     Red = 'red',
@@ -28,10 +32,19 @@ export interface Player {
     bonusTimes?: number;
     activityState: PlayerColor;
     isAbleToChat: boolean;
+    isTyping: boolean;
 }
 
 export interface Message {
     sender: string;
     content: string;
     time: Date;
+}
+
+export interface Answer {
+    submitter?: string;
+    questionType: QuestionType;
+    isCorrect?: boolean;
+    text?: string;
+    pointsPercentage?: number;
 }

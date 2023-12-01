@@ -189,6 +189,12 @@ describe('InGamePageComponent', () => {
         component.ngOnDestroy();
         expect(timerMock.reset).toHaveBeenCalled();
         expect(socketMock.removeAllListeners).toHaveBeenCalledWith('showResults');
+        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('qcmEnd');
+        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('qrlEnd');
+        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('qrlResults');
+        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('panicMode');
+        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('countdownEnd');
+        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('noPlayers');
     });
 
     it('should call resetPlayerInfo from ClientSocketService and setRouteAccess from RouteControllerService on component destruction', () => {
@@ -206,6 +212,15 @@ describe('InGamePageComponent', () => {
 
         component.onUpdateQuestionScore(newScore);
         expect(component.currentQuestionScore).toEqual(newScore);
+    });
+
+    it("setEvaluationPhase should change the evaluation message and histogram's visibility", () => {
+        component.isEvaluationMessageVisible = false;
+        component.isHistogramVisible = true;
+
+        component.setEvaluationPhase(true);
+        expect(component.isEvaluationMessageVisible).toBeTrue();
+        expect(component.isHistogramVisible).toBeFalse();
     });
 
     it('leaveGame should navigate to game creation page if game mode is Testing', () => {

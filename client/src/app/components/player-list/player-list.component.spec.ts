@@ -4,7 +4,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
 import { SocketMock } from '@app/classes/socket-mock';
 import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
-import { Player, PlayerColor } from '@common/lobby';
+import { LobbyDetails, Player, PlayerColor } from '@common/lobby';
 import { PlayerListComponent } from './player-list.component';
 // const REVERT_SORT = -1;
 describe('PlayerListComponent', () => {
@@ -13,7 +13,7 @@ describe('PlayerListComponent', () => {
     let socketMock: SocketMock;
     let clientSocketServiceMock: ClientSocketServiceMock;
 
-    const lobbyDetails = {
+    const lobbyDetails: LobbyDetails = {
         isLocked: true,
         players: [
             {
@@ -24,6 +24,7 @@ describe('PlayerListComponent', () => {
                 bonusTimes: 0,
                 activityState: PlayerColor.Red,
                 isAbleToChat: true,
+                isTyping: false,
             },
             {
                 socketId: 'id2',
@@ -33,10 +34,12 @@ describe('PlayerListComponent', () => {
                 bonusTimes: 0,
                 activityState: PlayerColor.Red,
                 isAbleToChat: true,
+                isTyping: false,
             },
         ],
         bannedNames: [],
-        game: {},
+        chat: [],
+        qrlAnswers: [],
     };
 
     beforeEach(() => {
@@ -85,6 +88,7 @@ describe('PlayerListComponent', () => {
                 bonusTimes: 0,
                 activityState: PlayerColor.Red,
                 isAbleToChat: true,
+                isTyping: false,
             },
             {
                 socketId: 'id2',
@@ -94,6 +98,7 @@ describe('PlayerListComponent', () => {
                 bonusTimes: 0,
                 activityState: PlayerColor.Red,
                 isAbleToChat: true,
+                isTyping: false,
             },
         ];
         const event = 'scoreUpdated';
@@ -129,6 +134,7 @@ describe('PlayerListComponent', () => {
                 bonusTimes: 0,
                 activityState: PlayerColor.Green,
                 isAbleToChat: true,
+                isTyping: false,
             },
         ];
         const lobbyDetailsMock = lobbyDetails;
@@ -158,6 +164,7 @@ describe('PlayerListComponent', () => {
             activityState: PlayerColor.Red,
             isAbleToChat: true,
             bonusTimes: 0,
+            isTyping: false,
         };
 
         component.toggleMute(player);
@@ -176,6 +183,7 @@ describe('PlayerListComponent', () => {
                 bonusTimes: 0,
                 activityState: PlayerColor.Green,
                 isAbleToChat: true,
+                isTyping: false,
             },
             {
                 socketId: 'id2',
@@ -185,6 +193,7 @@ describe('PlayerListComponent', () => {
                 bonusTimes: 0,
                 activityState: PlayerColor.Red,
                 isAbleToChat: true,
+                isTyping: false,
             },
         ];
         component.players = playerListMock.slice();
@@ -209,6 +218,7 @@ describe('PlayerListComponent', () => {
                 bonusTimes: 0,
                 activityState: PlayerColor.Green,
                 isAbleToChat: true,
+                isTyping: false,
             },
             {
                 socketId: 'id2',
@@ -218,6 +228,7 @@ describe('PlayerListComponent', () => {
                 bonusTimes: 0,
                 activityState: PlayerColor.Red,
                 isAbleToChat: true,
+                isTyping: false,
             },
         ];
         component.players = playerListMock.slice();
@@ -242,6 +253,7 @@ describe('PlayerListComponent', () => {
                 bonusTimes: 0,
                 activityState: PlayerColor.Green,
                 isAbleToChat: true,
+                isTyping: false,
             },
             {
                 socketId: 'id2',
@@ -251,6 +263,7 @@ describe('PlayerListComponent', () => {
                 bonusTimes: 0,
                 activityState: PlayerColor.Red,
                 isAbleToChat: true,
+                isTyping: false,
             },
         ];
         component.players = playerListMock.slice();
@@ -291,6 +304,7 @@ describe('PlayerListComponent', () => {
             bonusTimes: 0,
             activityState: PlayerColor.Red,
             isAbleToChat: true,
+            isTyping: false,
         };
         const yellowPlayer: Player = {
             socketId: '2',
@@ -300,6 +314,7 @@ describe('PlayerListComponent', () => {
             bonusTimes: 0,
             activityState: PlayerColor.Yellow,
             isAbleToChat: true,
+            isTyping: false,
         };
         const greenPlayer: Player = {
             socketId: '3',
@@ -309,6 +324,7 @@ describe('PlayerListComponent', () => {
             bonusTimes: 0,
             activityState: PlayerColor.Green,
             isAbleToChat: true,
+            isTyping: false,
         };
         const blackPlayer: Player = {
             socketId: '4',
@@ -318,6 +334,7 @@ describe('PlayerListComponent', () => {
             bonusTimes: 0,
             activityState: PlayerColor.Black,
             isAbleToChat: true,
+            isTyping: false,
         };
 
         expect(component.getActivityClass(redPlayer)).toBe('red');

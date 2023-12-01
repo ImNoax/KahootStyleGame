@@ -1,6 +1,6 @@
 import { MatSnackBarConfig } from '@angular/material/snack-bar';
 
-const SNACK_BAR_DURATION = 4000;
+const SNACK_BAR_DURATION = 3000;
 export const ACCESS_DENIED_MESSAGE = 'Erreur: Accès non autorisé ⚠️';
 export const SERVER_ERROR_MESSAGE = 'Erreur du serveur ⚠️';
 
