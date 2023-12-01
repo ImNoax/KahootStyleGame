@@ -1,13 +1,8 @@
-.container {
-    min-height: 100vh;
-    height: auto;
-    background-image: url(../../../assets/backgrounds/dark-theater-stage.jpg);
-    background-size: cover;
-}
+@import url(../main-menu-page/main-menu-page.component.scss);
+@import url(../quiz-creation-page/quiz-creation-page.component.scss);
 
 .fields {
     display: flex;
-    justify-content: center;
     background-color: rgba(255, 255, 255, 0.3);
     padding: 2%;
     margin: 2% 20%;
@@ -17,6 +12,8 @@
 
 .table-container {
     flex: 3;
+    height: 400%;
+    background-color: #ffffff;
 }
 
 .game-block {
@@ -41,30 +38,23 @@
     overflow-y: auto;
 }
 
+button:hover {
+    color: white;
+}
+
 table {
-    table-layout: fixed;
-    border: 2px solid black;
     border-collapse: collapse;
-    width: 100%;
     text-align: center;
 }
 
-table tr:last-child {
-    border-bottom: none;
-}
-
-.table-container tr {
-    display: table;
-    width: 100%;
-}
-
 td {
-    background-color: #ffffff;
-    padding: 8px;
+    border-left: 2px solid black;
+    border-right: 2px solid black;
     border-bottom: 1px solid black;
 }
 
 th {
+    border: 2px solid black;
     padding: 8px;
     background-color: #534e4e;
     text-align: center;
@@ -72,17 +62,14 @@ th {
     color: #ffffff;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
+table tr:last-child {
+    border-bottom: 2px solid black;
+}
 
 td:hover {
     background-color: #4a2d5b;
     cursor: pointer;
     color: white;
-}
-
-tbody {
-    display: block;
-    max-height: 400px;
-    overflow-y: auto;
 }
 
 .selected-game {
@@ -112,14 +99,6 @@ tbody {
     width: 150px;
     cursor: pointer;
     left: 85%;
-}
-
-.bott:hover {
-    background-color: lightgray;
-}
-
-.bott:active {
-    background-color: silver;
 }
 
 .table-question {

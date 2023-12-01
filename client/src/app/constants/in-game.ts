@@ -1,10 +1,7 @@
-const FULL_POINTS = 1;
-const HALF_POINTS = 0.5;
-const NO_POINTS = 0;
 export const TIME_OUT = 3;
-export const BONUS_FACTOR = 0.2;
+export const BONUS_POINTS = 0.2;
+export const BUTTON_SELECTED = 1;
+export const BUTTON_UNSELECTED = -1;
 export const PAUSE_MESSAGE = 'Pauser la partie';
 export const UNPAUSE_MESSAGE = 'Reprendre la partie';
 export const QRL_DURATION = 60;
-export const DELAY_BEFORE_INPUT_INACTIVITY = 5;
-export const POINTS_PERCENTAGES = [FULL_POINTS, HALF_POINTS, NO_POINTS];

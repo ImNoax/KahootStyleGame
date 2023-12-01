@@ -1,7 +1,7 @@
+import { GameHandlingService } from '@angular/../../client/src/app/services/game-handling.service';
 import { Component, OnInit } from '@angular/core';
-import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
-import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
-import { TimerService } from '@app/services/timer/timer.service';
+import { ClientSocketService } from '@app/services/client-socket.service';
+import { TimerService } from '@app/services/timer.service';
 import { GameMode } from '@common/game-mode';
 
 @Component({
@@ -24,15 +24,11 @@ export class ProgressBarComponent implements OnInit {
         return this.timer.isPanicModeEnabled;
     }
 
-    get isCountdownRunning(): boolean {
-        return this.timer.isCountdownRunning;
-    }
-
     get currentQuestionDuration(): number {
         return this.gameService.getCurrentQuestionDuration();
     }
 
     ngOnInit() {
-        if (this.clientsocket.isOrganizer || this.gameService.gameMode === GameMode.Testing) this.timer.startCountdown(this.currentQuestionDuration);
+        if (this.clientsocket.isOrganizer || this.gameService.gameMode === GameMode.Testing) this.timer.startCountDown(this.currentQuestionDuration);
     }
 }

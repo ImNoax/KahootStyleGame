@@ -3,11 +3,11 @@ import { Component } from '@angular/core';
 import { FormArray, FormGroup } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { QuestionCreationPopupComponent } from '@app/components/question-creation-popup/question-creation-popup.component';
-import { Route } from '@app/constants/enums';
-import { FormManagerService } from '@app/services/form-manager/form-manager.service';
+import { Route } from '@app/enums';
+import { FormManagerService } from '@app/services/form-manager.service';
 import { Question, QuestionType } from '@common/game';
 import { Limit } from '@common/limit';
-import * as lodash from 'lodash-es';
+import * as _ from 'lodash';
 
 export const QCM_COLOR = '#1F7DF1';
 export const QRL_COLOR = '#FF6400';
@@ -23,7 +23,7 @@ export class QuestionCreationPageComponent {
     pageTitle: string = 'Liste des questions';
     gameName: string = this.formManager.gameForm.value.title;
     gameNameUnavailable: string = 'À déterminer';
-    questionsFormArray: FormArray = lodash.cloneDeep(this.formManager.questions) as FormArray;
+    questionsFormArray: FormArray = _.cloneDeep(this.formManager.questions) as FormArray;
 
     constructor(
         private dialog: MatDialog,

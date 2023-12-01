@@ -1,11 +1,11 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { Route } from '@app/constants/enums';
 import { SNACK_BAR_ERROR_CONFIGURATION, SNACK_BAR_NORMAL_CONFIGURATION } from '@app/constants/snack-bar-configuration';
-import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
-import { RouteControllerService } from '@app/services/route-controller/route-controller.service';
-import { TimerService } from '@app/services/timer/timer.service';
+import { Route } from '@app/enums';
+import { ClientSocketService } from '@app/services/client-socket.service';
+import { RouteControllerService } from '@app/services/route-controller.service';
+import { TimerService } from '@app/services/timer.service';
 import { LobbyDetails, Pin, Player, SocketId } from '@common/lobby';
 
 const GAME_START_INITIAL_COUNT = 5;
@@ -19,7 +19,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     players: Player[] = [];
     isLocked: boolean = false;
     gameStarted: boolean = false;
-    countdownStarted: boolean = false;
+    countDownStarted: boolean = false;
     private snackBar: MatSnackBar = inject(MatSnackBar);
     private routeController: RouteControllerService = inject(RouteControllerService);
     private timer: TimerService = inject(TimerService);
@@ -53,7 +53,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this.clientSocket.socket.removeAllListeners('latestPlayerList');
         this.clientSocket.socket.removeAllListeners('lockToggled');
-        this.clientSocket.socket.removeAllListeners('countdownEnd');
+        this.clientSocket.socket.removeAllListeners('countDownEnd');
         this.clientSocket.socket.removeAllListeners('noPlayers');
 
         this.timer.reset();
@@ -72,16 +72,16 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
             this.isLocked = isLocked;
         });
 
-        this.clientSocket.socket.on('countdownEnd', () => {
+        this.clientSocket.socket.on('countDownEnd', () => {
             this.startGame();
         });
 
         this.clientSocket.socket.on('noPlayers', () => {
-            if (this.countdownStarted) {
+            if (this.countDownStarted) {
                 this.timer.reset();
-                this.countdownStarted = false;
+                this.countDownStarted = false;
                 this.toggleLobbyLock();
-                this.snackBar.open("Tous les joueurs ont quitté la salle d'attente", '', SNACK_BAR_ERROR_CONFIGURATION);
+                this.snackBar.open("Tous les joueurs ont quitté la salle d'attente.", '', SNACK_BAR_ERROR_CONFIGURATION);
             }
         });
     }
@@ -95,8 +95,8 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     }
 
     startGameEmit() {
-        this.countdownStarted = true;
-        this.timer.startCountdown(GAME_START_INITIAL_COUNT);
+        this.countDownStarted = true;
+        this.timer.startCountDown(GAME_START_INITIAL_COUNT);
     }
 
     startGame() {
@@ -104,7 +104,6 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
             this.gameStarted = true;
             this.routeController.setRouteAccess(Route.InGame, true);
             this.router.navigate([Route.InGame]);
-            this.clientSocket.players = this.players;
             return;
         }
         this.router.navigate([Route.MainMenu]);

@@ -108,10 +108,6 @@ export class GameHandlingService {
         return [];
     }
 
-    isCurrentQuestionQcm() {
-        return this.currentGame.questions[this.currentQuestionId].type === QuestionType.QCM;
-    }
-
     private handleError<T>(request: string, result?: T): (error: { error: Error }) => Observable<T> {
         return (error) => {
             window.alert(error.error.message);

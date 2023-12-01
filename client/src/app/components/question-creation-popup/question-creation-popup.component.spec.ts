@@ -97,11 +97,12 @@ describe('QuestionCreationPopupComponent', () => {
         expect(component.toggleQuestionType).toHaveBeenCalled();
     });
 
-    it('isQcm should return true if the question type is QCM', () => {
+    it('isQrl should return true if the question type is QRL', () => {
         component.questionType = QuestionType.QCM;
-        expect(component.isQcm()).toBeTrue();
+        expect(component.isQrl()).toBeFalse();
+
         component.questionType = QuestionType.QRL;
-        expect(component.isQcm()).toBeFalse();
+        expect(component.isQrl()).toBeTrue();
     });
 
     it('createNewForm should correctly set the question form', () => {

@@ -1,8 +1,8 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SNACK_BAR_NORMAL_CONFIGURATION } from '@app/constants/snack-bar-configuration';
-import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
-import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
+import { ClientSocketService } from '@app/services/client-socket.service';
+import { GameHandlingService } from '@app/services/game-handling.service';
 import { Message } from '@common/lobby';
 const SCROLL_SENSITIVITY = 5;
 const MESSAGE_TIMEOUT = 5;

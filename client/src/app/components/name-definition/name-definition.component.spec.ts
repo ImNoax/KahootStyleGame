@@ -6,7 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
 import { SocketMock } from '@app/classes/socket-mock';
-import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
+import { ClientSocketService } from '@app/services/client-socket.service';
 import { NameDefinitionComponent } from './name-definition.component';
 
 describe('NameDefinitionComponent', () => {

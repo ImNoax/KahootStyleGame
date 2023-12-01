@@ -3,10 +3,10 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
 import { Game, QuestionType } from '@common/game';
 import { of } from 'rxjs';
 import { FormManagerService } from './form-manager.service';
+import { GameHandlingService } from './game-handling.service';
 
 describe('FormManagerService', () => {
     let service: FormManagerService;

@@ -23,7 +23,6 @@ import { GameImportPopupComponent } from './components/game-import-popup/game-im
 import { HeaderComponent } from './components/header/header.component';
 import { HistogramComponent } from './components/histogram/histogram.component';
 import { NameDefinitionComponent } from './components/name-definition/name-definition.component';
-import { PasswordPopupComponent } from './components/password-popup/password-popup.component';
 import { PlayerListComponent } from './components/player-list/player-list.component';
 import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
 import { HistoryPageComponent } from './pages/history-page/history-page.component';
@@ -59,7 +58,6 @@ import { QuizCreationPageComponent } from './pages/quiz-creation-page/quiz-creat
         HistogramComponent,
         PlayerListComponent,
         HistoryPageComponent,
-        PasswordPopupComponent,
     ],
     imports: [
         AppMaterialModule,

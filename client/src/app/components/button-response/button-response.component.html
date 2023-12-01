@@ -1,5 +1,5 @@
 <div *ngIf="!isOrganizer">
-    <div *ngIf="isCurrentQuestionQcm" class="buttons-parent" (keydown)="playerEntries($event)" #buttonFocus tabindex="0" autofocus>
+    <div *ngIf="isQcm" class="buttons-parent" (keydown)="playerEntries($event)" #buttonFocus tabindex="0" autofocus>
         <div class="buttons-container">
             <button
                 type="button"
@@ -20,67 +20,38 @@
         </div>
     </div>
 
-    <div *ngIf="!isCurrentQuestionQcm && !isEvaluationPhase" id="qrl-input">
+    <div *ngIf="!isQcm" id="qrl-input">
         <mat-form-field id="answer-field">
             <mat-label>Réponse</mat-label>
-            <textarea
-                #answerInput
-                matInput
-                (keydown.enter)="answerInput.blur()"
-                (input)="markInputActivity()"
-                [maxlength]="maxQrlAnswerLength"
-                [formControl]="answerForm"
-                rows="5"
-            >
+            <textarea matInput (keydown.enter)="$event.preventDefault()" [maxlength]="maxQrlAnswerLength" [formControl]="answerForm" rows="5">
             </textarea>
         </mat-form-field>
         <p id="answer-length">{{ answerForm.value.length }}/{{ maxQrlAnswerLength }}</p>
     </div>
 
-    <button type="button" class="validate-btn" (click)="submit()" [disabled]="submitted || isAnswerEmpty()">Soumettre</button>
+    <button type="button" class="validate-btn" (click)="verifyResponsesAndCallUpdate()" [disabled]="submitted">Soumettre</button>
 </div>
 <div *ngIf="isOrganizer">
-    <div *ngIf="!isEvaluationPhase" class="controls-container">
-        <button mat-raised-button (click)="startNextQuestionCountdown()" [disabled]="!canLoadNextQuestion">{{ buttonLoadingMessage }}</button>
-        <button mat-raised-button (click)="pause()" [disabled]="hasQuestionEnded">
+    <div id="controls-container">
+        <button mat-raised-button class="controls" (click)="startNextQuestionCountDown()" [disabled]="!canLoadNextQuestion">
+            Charger la prochaine question
+        </button>
+        <button mat-raised-button class="controls" (click)="pause()" [disabled]="hasQuestionEnded && !isQuestionTransition">
             <i *ngIf="!isGamePaused" class="fa-solid fa-pause fa-2xl"></i>
             <i *ngIf="isGamePaused" class="fa-solid fa-play fa-beat-fade fa-2xl"></i>
             {{ pauseMessage }}
         </button>
-        <button mat-raised-button (click)="panic()" [disabled]="!isPanicModeAvailable || isPanicModeEnabled || isGamePaused || hasQuestionEnded">
+        <button
+            mat-raised-button
+            class="controls"
+            (click)="panic()"
+            [disabled]="!isPanicModeAvailable || isPanicModeEnabled || isGamePaused || hasQuestionEnded"
+        >
             <div>
                 <i class="fa-solid fa-triangle-exclamation fa-2xl"></i>
                 PANIQUER
             </div>
             <div *ngIf="!isPanicModeAvailable" id="panic-availability">Disponible dans {{ remainingCountForPanic }}</div>
         </button>
-    </div>
-
-    <div *ngIf="isEvaluationPhase">
-        <div id="answer-container">
-            <h3>Joueur: {{ currentEvaluatedAnswer.submitter }}</h3>
-            <p>{{ currentEvaluatedAnswer.text }}</p>
-            <p>{{ currentAnswerIndex + 1 }}/{{ qrlAnswers.length }}</p>
-        </div>
-        <div id="evaluation-button-container">
-            <div class="controls-container">
-                <button
-                    [ngClass]="{ btn: true, 'btn-selected': currentEvaluatedAnswer.pointsPercentage === pointsPercentage }"
-                    (click)="evaluateAnswer(pointsPercentage)"
-                    *ngFor="let pointsPercentage of pointsPercentages"
-                    mat-raised-button
-                >
-                    {{ pointsPercentage * 100 }}%
-                </button>
-            </div>
-            <button [disabled]="currentAnswerIndex === 0" (click)="getPreviousAnswer()" mat-raised-button>Réponse précédente</button>
-            <button
-                [disabled]="currentAnswerIndex !== qrlAnswers.length - 1 || currentEvaluatedAnswer.pointsPercentage === undefined"
-                (click)="endEvaluationPhase()"
-                mat-raised-button
-            >
-                Soumettre les notes
-            </button>
-        </div>
     </div>
 </div>

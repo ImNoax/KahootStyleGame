@@ -1,8 +1,8 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ImportStates } from '@app/constants/enums';
-import { FormManagerService } from '@app/services/form-manager/form-manager.service';
+import { ImportStates } from '@app/enums';
+import { FormManagerService } from '@app/services/form-manager.service';
 import { Game } from '@common/game';
 import { Limit } from '@common/limit';
 import { Observable } from 'rxjs';

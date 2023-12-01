@@ -2,10 +2,10 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, Inject, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { FormManagerService } from '@app/services/form-manager/form-manager.service';
+import { FormManagerService } from '@app/services/form-manager.service';
 import { Choice, Question, QuestionType } from '@common/game';
 import { Limit } from '@common/limit';
-import * as lodash from 'lodash-es';
+import * as _ from 'lodash';
 
 @Component({
     selector: 'app-question-creation-popup',
@@ -13,7 +13,9 @@ import * as lodash from 'lodash-es';
     styleUrls: ['./question-creation-popup.component.scss'],
 })
 export class QuestionCreationPopupComponent implements OnInit {
+    pageTitle: string = 'Liste des questions';
     questionType: QuestionType = QuestionType.QCM;
+    isChoiceEmpty: boolean = false;
     nGoodChoices: number = 0;
     maxQuestionLength: number = Limit.MaxQuestionLength;
     maxAnswerLength: number = Limit.MaxQcmAnswerLength;
@@ -38,7 +40,7 @@ export class QuestionCreationPopupComponent implements OnInit {
 
     loadForm(fb: FormBuilder, index: number): void {
         const questionToModify: AbstractControl = this.data.questionsFormArray.controls[index];
-        const choicesToModify: FormArray = lodash.cloneDeep(questionToModify.get('choices')) as FormArray;
+        const choicesToModify: FormArray = _.cloneDeep(questionToModify.get('choices')) as FormArray;
 
         this.createNewForm(fb);
         this.questionForm.patchValue({
@@ -51,8 +53,8 @@ export class QuestionCreationPopupComponent implements OnInit {
         else this.toggleQuestionType();
     }
 
-    isQcm() {
-        if (this.questionType === QuestionType.QCM) return true;
+    isQrl() {
+        if (this.questionType === QuestionType.QRL) return true;
         return false;
     }
 
