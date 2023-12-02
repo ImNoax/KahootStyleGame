@@ -2,10 +2,10 @@ import { formatDate } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Route } from '@app/enums';
+import { Route } from '@app/constants/enums';
+import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
 import { Game } from '@common/game';
 import { Observable } from 'rxjs';
-import { GameHandlingService } from './game-handling.service';
 
 const BASE_TIMER = 30;
 
@@ -59,7 +59,7 @@ export class FormManagerService {
     }
 
     sendGameForm(importedGameForm?: FormGroup): void | Observable<Game[]> {
-        if (this.nameModif !== '') this.modifyGame();
+        if (this.nameModif) this.modifyGame();
         else if (importedGameForm === undefined) this.addGame();
         else return this.gameHandler.addGame(importedGameForm.value);
     }

@@ -194,7 +194,7 @@ describe('SocketManager service tests', () => {
 
                 clientSocket2.once('lobbyClosed', (reason: string, message: string) => {
                     expect(reason).to.equal('BAN');
-                    expect(message).to.equal("Vous avez été expulsé de la salle d'attente");
+                    expect(message).to.equal("Vous avez été expulsé de la salle d'attente.");
                 });
 
                 setTimeout(() => {
@@ -286,14 +286,15 @@ describe('SocketManager service tests', () => {
 
                 clientSocket2.emit('leaveLobby');
             }, RESPONSE_DELAY);
-            clientSocket2.once('latestPlayerList', () => {
-                setTimeout(() => {
-                    expect(service['lobbies'].get(roomPin).players.length).to.equal(1);
-                    clientSocket2.close();
-                    done();
-                }, RESPONSE_DELAY);
-            });
         }, RESPONSE_DELAY);
+
+        clientSocket2.once('latestPlayerList', () => {
+            setTimeout(() => {
+                expect(service['lobbies'].get(roomPin).players.length).to.equal(1);
+                clientSocket2.close();
+                done();
+            }, RESPONSE_DELAY);
+        });
     });
 
     it('startCountdown should emit questionTransition event if the next question is loading', (done) => {

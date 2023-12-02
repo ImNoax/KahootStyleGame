@@ -5,11 +5,12 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
 import { SocketMock } from '@app/classes/socket-mock';
 import { SNACK_BAR_NORMAL_CONFIGURATION } from '@app/constants/snack-bar-configuration';
-import { ClientSocketService } from '@app/services/client-socket.service';
-import { GameHandlingService } from '@app/services/game-handling.service';
+import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
+import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
 import { GameMode } from '@common/game-mode';
 import { Message } from '@common/lobby';
 import { ChatBoxComponent } from './chat-box.component';
+
 describe('ChatBoxComponent', () => {
     let component: ChatBoxComponent;
     let fixture: ComponentFixture<ChatBoxComponent>;

@@ -123,7 +123,7 @@ textarea {
     resize: none;
 }
 
-#controls-container {
+.controls-container {
     position: absolute;
     bottom: 20%;
     left: 50%;
@@ -135,17 +135,17 @@ textarea {
     gap: 5%;
 }
 
-.controls {
+.controls-container button {
     font-size: 14px;
     width: 250px;
     padding: 4% 0;
 }
 
-.controls:hover {
+.controls-container button:hover {
     background-color: rgb(181, 181, 181);
 }
 
-.controls:disabled {
+.controls-container button:disabled {
     background-color: silver;
     color: gray;
 }
@@ -154,4 +154,7 @@ textarea {
     position: relative;
     font-size: 12px;
     top: 3px;
+}
+
+#answer-container {
 }

@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { Route } from '@app/constants/enums';
 import { SNACK_BAR_ERROR_CONFIGURATION } from '@app/constants/snack-bar-configuration';
-import { Route } from '@app/enums';
-import { ClientSocketService } from '@app/services/client-socket.service';
-import { GameHandlingService } from '@app/services/game-handling.service';
-import { RouteControllerService } from '@app/services/route-controller.service';
+import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
+import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
+import { RouteControllerService } from '@app/services/route-controller/route-controller.service';
 import { Game } from '@common/game';
 import { GameMode } from '@common/game-mode';
 import { Pin } from '@common/lobby';
@@ -20,9 +20,8 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
     selectedRowIndex: number | null = null;
     selectedGame: Game | null = null;
     testing: GameMode = GameMode.Testing;
-    snackBar: MatSnackBar = inject(MatSnackBar);
-    routeController: RouteControllerService = inject(RouteControllerService);
-
+    private snackBar: MatSnackBar = inject(MatSnackBar);
+    private routeController: RouteControllerService = inject(RouteControllerService);
     constructor(
         public router: Router,
         private gameHandler: GameHandlingService,
@@ -76,13 +75,15 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
                     this.gameHandler.currentGame = game;
                     this.gameHandler.gameMode = mode;
                     if (mode === GameMode.Testing) {
+                        this.clientSocket.playerName = 'Testeur';
                         this.routeController.setRouteAccess(Route.InGame, true);
                         this.router.navigate([mode]);
                     } else this.clientSocket.socket.emit('createLobby', this.gameHandler.currentGame);
                     return;
                 }
             }
-            window.alert('Erreur: Jeu Indisponible... Rafraichissement de page.');
+
+            this.snackBar.open('Erreur: Jeu Indisponible... Rafraîchissement de page', '', SNACK_BAR_ERROR_CONFIGURATION);
             this.selectRow(null);
         });
     }

@@ -4,8 +4,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute, RouterModule, convertToParamMap } from '@angular/router';
 import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
-import { ClientSocketService } from '@app/services/client-socket.service';
-import { RouteControllerService } from '@app/services/route-controller.service';
+import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
+import { RouteControllerService } from '@app/services/route-controller/route-controller.service';
 import { of } from 'rxjs';
 import { HeaderComponent } from './header.component';
 

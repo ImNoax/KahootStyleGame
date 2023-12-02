@@ -10,11 +10,11 @@ import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock
 import { SocketMock } from '@app/classes/socket-mock';
 import { HeaderComponent } from '@app/components/header/header.component';
 import { NameDefinitionComponent } from '@app/components/name-definition/name-definition.component';
+import { Route } from '@app/constants/enums';
 import { SNACK_BAR_ERROR_CONFIGURATION, SNACK_BAR_NORMAL_CONFIGURATION } from '@app/constants/snack-bar-configuration';
-import { Route } from '@app/enums';
-import { ClientSocketService } from '@app/services/client-socket.service';
-import { RouteControllerService } from '@app/services/route-controller.service';
-import { TimerService } from '@app/services/timer.service';
+import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
+import { RouteControllerService } from '@app/services/route-controller/route-controller.service';
+import { TimerService } from '@app/services/timer/timer.service';
 import { Player, PlayerColor } from '@common/lobby';
 import { of } from 'rxjs';
 import { LobbyPageComponent } from './lobby-page.component';
@@ -33,7 +33,7 @@ describe('LobbyPageComponent', () => {
     beforeEach(() => {
         routerMock = jasmine.createSpyObj('Router', ['navigate']);
         snackBarMock = jasmine.createSpyObj('MatSnackBar', ['open']);
-        timerServiceMock = jasmine.createSpyObj('TimerService', ['reset', 'startCountDown']);
+        timerServiceMock = jasmine.createSpyObj('TimerService', ['reset', 'startCountdown']);
         routeControllerMock = jasmine.createSpyObj('RouteControllerService', ['setRouteAccess']);
         clientSocketServiceMock = new ClientSocketServiceMock();
 
@@ -114,7 +114,7 @@ describe('LobbyPageComponent', () => {
         component.ngOnDestroy();
         expect(socketMock.removeAllListeners).toHaveBeenCalledWith('latestPlayerList');
         expect(socketMock.removeAllListeners).toHaveBeenCalledWith('lockToggled');
-        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('countDownEnd');
+        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('countdownEnd');
         expect(socketMock.removeAllListeners).toHaveBeenCalledWith('noPlayers');
     });
 
@@ -148,10 +148,9 @@ describe('LobbyPageComponent', () => {
                     answerSubmitted: true,
                     score: 0,
                     bonusTimes: 0,
-                    isStillInGame: true,
+                    activityState: PlayerColor.Red,
                     isAbleToChat: true,
                     isTyping: false,
-                    activityState: PlayerColor.Red,
                 },
             ],
             bannedName: [],
@@ -171,38 +170,38 @@ describe('LobbyPageComponent', () => {
         expect(component.isLocked).toBeTrue();
     });
 
-    it('should handle countDownEnd event by calling startGame', () => {
+    it('should handle countdownEnd event by calling startGame', () => {
         spyOn(component, 'startGame');
 
-        socketMock.simulateServerEmit('countDownEnd');
+        socketMock.simulateServerEmit('countdownEnd');
         expect(component.startGame).toHaveBeenCalled();
     });
 
-    it('should handle noPlayers event by resetting the timer if countDownStarted is true', () => {
+    it('should handle noPlayers event by resetting the timer if countdownStarted is true', () => {
         spyOn(component, 'toggleLobbyLock');
-        component.countDownStarted = true;
+        component.countdownStarted = true;
 
         socketMock.simulateServerEmit('noPlayers');
         expect(timerServiceMock.reset).toHaveBeenCalled();
-        expect(component.countDownStarted).toBeFalse();
+        expect(component.countdownStarted).toBeFalse();
     });
 
-    it('should handle noPlayers event by calling toggleLobbyLock and opening a snack bar if countDownStarted is true', () => {
+    it('should handle noPlayers event by calling toggleLobbyLock and opening a snack bar if countdownStarted is true', () => {
         spyOn(component, 'toggleLobbyLock');
-        component.countDownStarted = true;
+        component.countdownStarted = true;
 
         socketMock.simulateServerEmit('noPlayers');
         expect(component.toggleLobbyLock).toHaveBeenCalled();
-        expect(snackBarMock.open).toHaveBeenCalledWith("Tous les joueurs ont quitté la salle d'attente.", '', SNACK_BAR_ERROR_CONFIGURATION);
+        expect(snackBarMock.open).toHaveBeenCalledWith("Tous les joueurs ont quitté la salle d'attente", '', SNACK_BAR_ERROR_CONFIGURATION);
     });
 
-    it('should handle noPlayers event by doing nothing if countDownStarted is false', () => {
+    it('should handle noPlayers event by doing nothing if countdownStarted is false', () => {
         spyOn(component, 'toggleLobbyLock');
-        component.countDownStarted = false;
+        component.countdownStarted = false;
 
         socketMock.simulateServerEmit('noPlayers');
         expect(timerServiceMock.reset).not.toHaveBeenCalled();
-        expect(component.countDownStarted).toBeFalse();
+        expect(component.countdownStarted).toBeFalse();
         expect(component.toggleLobbyLock).not.toHaveBeenCalled();
         expect(snackBarMock.open).not.toHaveBeenCalled();
     });
@@ -220,12 +219,12 @@ describe('LobbyPageComponent', () => {
         expect(socketMock.nEmittedEvents).toEqual(++nEmittedEvents);
     });
 
-    it('startGameEmit should set countDownStarted to true and call startCountDown', () => {
+    it('startGameEmit should set countdownStarted to true and call startCountDown', () => {
         const initialCount = 5;
-        component.countDownStarted = false;
+        component.countdownStarted = false;
         component.startGameEmit();
-        expect(component.countDownStarted).toBeTrue();
-        expect(timerServiceMock.startCountDown).toHaveBeenCalledWith(initialCount);
+        expect(component.countdownStarted).toBeTrue();
+        expect(timerServiceMock.startCountdown).toHaveBeenCalledWith(initialCount);
     });
 
     it('startGame should navigate to in-game page if playerName is defined', () => {
@@ -263,10 +262,9 @@ describe('LobbyPageComponent', () => {
             name: 'TestPlayer',
             answerSubmitted: false,
             score: 0,
-            isStillInGame: true,
+            activityState: PlayerColor.Red,
             isAbleToChat: true,
             bonusTimes: 0,
-            activityState: PlayerColor.Red,
             isTyping: false,
         };
 

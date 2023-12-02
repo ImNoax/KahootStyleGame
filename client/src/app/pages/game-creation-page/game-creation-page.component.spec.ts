@@ -7,11 +7,11 @@ import { ActivatedRoute, Router, RouterModule, convertToParamMap } from '@angula
 import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
 import { SocketMock } from '@app/classes/socket-mock';
 import { HeaderComponent } from '@app/components/header/header.component';
+import { Route } from '@app/constants/enums';
 import { SNACK_BAR_ERROR_CONFIGURATION } from '@app/constants/snack-bar-configuration';
-import { Route } from '@app/enums';
-import { ClientSocketService } from '@app/services/client-socket.service';
-import { GameHandlingService } from '@app/services/game-handling.service';
-import { RouteControllerService } from '@app/services/route-controller.service';
+import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
+import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
+import { RouteControllerService } from '@app/services/route-controller/route-controller.service';
 import { Game } from '@common/game';
 import { GameMode } from '@common/game-mode';
 import { of } from 'rxjs';
@@ -120,9 +120,9 @@ describe('GameCreationPageComponent', () => {
         const event = 'failedLobbyCreation';
         const reason = 'reason for failed lobby creation';
 
-        spyOn(component.snackBar, 'open');
+        spyOn(component['snackBar'], 'open');
         socketMock.simulateServerEmit(event, reason);
-        expect(component.snackBar.open).toHaveBeenCalledWith(reason, '', SNACK_BAR_ERROR_CONFIGURATION);
+        expect(component['snackBar'].open).toHaveBeenCalledWith(reason, '', SNACK_BAR_ERROR_CONFIGURATION);
     });
 
     it('selectRow should select a row and set selectedGame', () => {
@@ -223,14 +223,18 @@ describe('GameCreationPageComponent', () => {
 
         const mockGetGames = spyOn(gameHandler, 'getGames').and.returnValue(of(games));
 
-        spyOn(window, 'alert');
+        spyOn(component['snackBar'], 'open');
         spyOn(component, 'selectRow');
 
         component.initializeGame(GameMode.Testing);
         expect(mockGetGames).toHaveBeenCalled();
         expect(component.games).toEqual(games);
 
-        expect(window.alert).toHaveBeenCalledWith('Erreur: Jeu Indisponible... Rafraichissement de page.');
+        expect(component['snackBar'].open).toHaveBeenCalledWith(
+            'Erreur: Jeu Indisponible... Rafraîchissement de page',
+            '',
+            SNACK_BAR_ERROR_CONFIGURATION,
+        );
         expect(component.selectRow).toHaveBeenCalledWith(null);
     });
 });
