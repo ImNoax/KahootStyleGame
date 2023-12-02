@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */ // ---- SOLUTION TEMPORAIRE ----
-import { Game, QuestionType } from '@common/game';
+import { Game, GameInfo, QuestionType } from '@common/game';
 import { GameMode } from '@common/game-mode';
 import {
     ACTIVE_PLAYERS_TEXT,
@@ -16,6 +16,7 @@ import {
 import { TimerConfiguration } from '@common/timer';
 import * as http from 'http';
 import * as io from 'socket.io';
+import { DatabaseService } from './database.service';
 
 const MAX_LOBBY_QUANTITY = 10000;
 const DEFAULT_COUNTDOWN_PERIOD = 1000;
@@ -24,19 +25,26 @@ const ORGANIZER = 'Organisateur';
 const SUBMITTER1_SORTED_BEFORE = -1;
 const SUBMITTER1_SORTED_AFTER = 1;
 const ORIGINAL_ORDER = 0;
+const DATE_LENGTH = 19;
+const DATE_SLICE = 13;
 // const TESTER = 'Testeur';
 
 export class SocketManager {
     private sio: io.Server;
     private lobbies: Map<Pin, LobbyDetails> = new Map<Pin, LobbyDetails>();
 
-    constructor(server: http.Server) {
+    constructor(
+        server: http.Server,
+        private databaseService: DatabaseService,
+    ) {
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
     }
 
     handleSockets(): void {
         this.sio.on('connection', (socket) => {
             let pin: Pin = '';
+            let nbPlayers = 0;
+            let startDate = '';
             let isOrganizer = false;
             let counter: NodeJS.Timer;
 
@@ -358,6 +366,22 @@ export class SocketManager {
             });
 
             socket.on('gameEnded', () => {
+                const lobby = this.lobbies.get(pin);
+                if (isOrganizer) {
+                    const db = this.databaseService.getDb();
+                    const historyCollection = db.collection('Historique');
+                    const game: GameInfo = {
+                        name: lobby.game.title,
+                        date: startDate,
+                        numberPlayers: nbPlayers,
+                        bestScore: lobby.players.sort((a, b) => {
+                            return b.score - a.score;
+                        })[0].score,
+                    };
+
+                    historyCollection.insertOne(game);
+                }
+
                 this.sio.to(pin).emit('showResults');
             });
 
@@ -415,6 +439,11 @@ export class SocketManager {
 
             socket.on('qrlHistogramUpdate', (updateData: { [key: string]: number }) => {
                 QRL_UPDATE_HISTOGRAM(updateData);
+            });
+
+            socket.on('gameStarted', () => {
+                nbPlayers = this.lobbies.get(pin).players.length - 1;
+                startDate = new Date().toLocaleString().slice(0, DATE_SLICE) + new Date().toISOString().slice(DATE_SLICE, DATE_LENGTH);
             });
         });
     }
