@@ -5,7 +5,7 @@ import { ACTIVE_PLAYERS_TEXT, Answer, LobbyDetails, Message, Pin, Player, Player
 import { Server } from 'app/server';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
-import { io as ioClient, Socket } from 'socket.io-client';
+import { Socket, io as ioClient } from 'socket.io-client';
 import { Container } from 'typedi';
 import { SocketManager } from './socket-manager.service';
 
@@ -29,7 +29,7 @@ describe('SocketManager service tests', () => {
 
     beforeEach(async () => {
         server = Container.get(Server);
-        server.init();
+        await server.init();
         service = server['socketManager'];
         clientSocket = ioClient(urlString);
         sinon.stub(console, 'log');
