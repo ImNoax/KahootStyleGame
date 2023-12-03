@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
@@ -6,8 +7,10 @@ import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock
 import { SocketMock } from '@app/classes/socket-mock';
 import { ButtonResponseComponent } from '@app/components/button-response/button-response.component';
 import { ChatBoxComponent } from '@app/components/chat-box/chat-box.component';
+import { ConfirmationPopupComponent } from '@app/components/confirmation-popup/confirmation-popup.component';
 import { ProgressBarComponent } from '@app/components/progress-bar/progress-bar.component';
 import { Route } from '@app/constants/enums';
+import { InGamePageComponent } from '@app/pages/in-game-page/in-game-page.component';
 import { AnswerValidatorService } from '@app/services/answer-validator/answer-validator.service';
 import { AudioService } from '@app/services/audio/audio.service';
 import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
@@ -18,7 +21,6 @@ import { Game, QuestionType } from '@common/game';
 import { GameMode } from '@common/game-mode';
 import { ACTIVE_PLAYERS_TEXT, INACTIVE_PLAYERS_TEXT } from '@common/lobby';
 import { Observable, Subject } from 'rxjs';
-import { InGamePageComponent } from './in-game-page.component';
 
 const QUESTIONS_MOCK = [
     {
@@ -52,7 +54,9 @@ describe('InGamePageComponent', () => {
     let currentQuestionObservableSpy: Subject<string>;
     let scoreObservableSpy: Subject<number>;
     let routerMock: jasmine.SpyObj<Router>;
+    let dialogMock: jasmine.SpyObj<MatDialog>;
     let timerMock: jasmine.SpyObj<TimerService>;
+    let isLeaving: boolean;
     let clientSocketServiceMock: ClientSocketServiceMock;
     let socketMock: SocketMock;
     let nEmittedEvents: number;
@@ -61,6 +65,7 @@ describe('InGamePageComponent', () => {
         currentQuestionObservableSpy = new Subject<string>();
         scoreObservableSpy = new Subject<number>();
         routerMock = jasmine.createSpyObj('Router', ['navigate']);
+        dialogMock = jasmine.createSpyObj('MatDialog', ['open']);
         answerValidatorMock = jasmine.createSpyObj('AnswerValidatorService', ['reset', 'processAnswer', 'prepareNextQuestion', 'submitAnswer']);
         audioServiceMock = jasmine.createSpyObj('AudioService', ['play', 'pause']);
         timerMock = jasmine.createSpyObj('Timer', ['reset']);
@@ -76,6 +81,7 @@ describe('InGamePageComponent', () => {
         gameServiceSpy.currentQuestion$ = currentQuestionObservableSpy.asObservable();
         gameServiceSpy.score$ = scoreObservableSpy.asObservable();
         gameServiceSpy.currentQuestionId = 0;
+        isLeaving = false;
 
         TestBed.configureTestingModule({
             declarations: [InGamePageComponent, ButtonResponseComponent, ProgressBarComponent, MatIcon, ChatBoxComponent],
@@ -84,10 +90,11 @@ describe('InGamePageComponent', () => {
                 { provide: GameHandlingService, useValue: gameServiceSpy },
                 { provide: Router, useValue: routerMock },
                 { provide: TimerService, useValue: timerMock },
+                { provide: MatDialog, useValue: dialogMock },
                 { provide: AnswerValidatorService, useValue: answerValidatorMock },
                 { provide: AudioService, useValue: audioServiceMock },
             ],
-            imports: [MatSnackBarModule],
+            imports: [MatSnackBarModule, MatDialogModule],
         });
 
         fixture = TestBed.createComponent(InGamePageComponent);
@@ -97,6 +104,11 @@ describe('InGamePageComponent', () => {
         socketMock.clientUniqueEvents.clear();
         gameServiceSpy.currentGame = GAME_MOCK;
         nEmittedEvents = 0;
+
+        const observableMock = new Observable<boolean>((subscriber) => subscriber.next(isLeaving));
+        dialogMock.open.and.returnValue({
+            afterClosed: () => observableMock,
+        } as MatDialogRef<ConfirmationPopupComponent>);
     });
 
     it('should create', () => {
@@ -240,15 +252,27 @@ describe('InGamePageComponent', () => {
         expect(component.currentQuestionScore).toEqual(newScore);
     });
 
-    it('leaveGame should navigate to game creation page if game mode is Testing', () => {
+    it('abandonGame should open a dialog', () => {
+        component.abandonGame();
+        expect(dialogMock.open).toHaveBeenCalledWith(ConfirmationPopupComponent, {
+            backdropClass: 'backdropBackground',
+            disableClose: true,
+            data: { title: 'Abandon de partie', description: 'Voulez-vous vraiment abandonner la partie?', primaryAction: 'Abandonner' },
+        });
+    });
+
+    it('abandonGame should navigate to game creation page after dialog closing if the user confirms the game abandonment request\
+        and the game mode is Testing', () => {
         gameServiceSpy.gameMode = GameMode.Testing;
-        component.leaveGame();
+        isLeaving = true;
+        component.abandonGame();
         expect(routerMock.navigate).toHaveBeenCalledWith([Route.GameCreation]);
     });
 
-    it('leaveGame should navigate to main menu if game mode is RealGame', () => {
+    it('abandonGame should navigate to main menu if game mode is RealGame', () => {
         gameServiceSpy.gameMode = GameMode.RealGame;
-        component.leaveGame();
+        isLeaving = true;
+        component.abandonGame();
         expect(routerMock.navigate).toHaveBeenCalledWith([Route.MainMenu]);
     });
 

@@ -31,6 +31,7 @@ import { InGamePageComponent } from './pages/in-game-page/in-game-page.component
 import { MainMenuPageComponent } from './pages/main-menu-page/main-menu-page.component';
 import { QuestionCreationPageComponent } from './pages/question-creation-page/question-creation-page.component';
 import { QuizCreationPageComponent } from './pages/quiz-creation-page/quiz-creation-page.component';
+import { ConfirmationPopupComponent } from './components/confirmation-popup/confirmation-popup.component';
 
 /**
  * Main module that is used in main.ts.
@@ -60,6 +61,7 @@ import { QuizCreationPageComponent } from './pages/quiz-creation-page/quiz-creat
         PlayerListComponent,
         HistoryPageComponent,
         PasswordPopupComponent,
+        ConfirmationPopupComponent,
     ],
     imports: [
         AppMaterialModule,
