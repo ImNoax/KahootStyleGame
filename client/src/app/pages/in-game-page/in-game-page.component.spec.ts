@@ -8,12 +8,15 @@ import { ButtonResponseComponent } from '@app/components/button-response/button-
 import { ChatBoxComponent } from '@app/components/chat-box/chat-box.component';
 import { ProgressBarComponent } from '@app/components/progress-bar/progress-bar.component';
 import { Route } from '@app/constants/enums';
+import { AnswerValidatorService } from '@app/services/answer-validator/answer-validator.service';
+import { AudioService } from '@app/services/audio/audio.service';
 import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
 import { RouteControllerService } from '@app/services/route-controller/route-controller.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { Game, QuestionType } from '@common/game';
 import { GameMode } from '@common/game-mode';
+import { ACTIVE_PLAYERS_TEXT, INACTIVE_PLAYERS_TEXT } from '@common/lobby';
 import { Observable, Subject } from 'rxjs';
 import { InGamePageComponent } from './in-game-page.component';
 
@@ -44,6 +47,8 @@ describe('InGamePageComponent', () => {
     let component: InGamePageComponent;
     let fixture: ComponentFixture<InGamePageComponent>;
     let gameServiceSpy: jasmine.SpyObj<GameHandlingService>;
+    let answerValidatorMock: jasmine.SpyObj<AnswerValidatorService>;
+    let audioServiceMock: jasmine.SpyObj<AudioService>;
     let currentQuestionObservableSpy: Subject<string>;
     let scoreObservableSpy: Subject<number>;
     let routerMock: jasmine.SpyObj<Router>;
@@ -56,6 +61,8 @@ describe('InGamePageComponent', () => {
         currentQuestionObservableSpy = new Subject<string>();
         scoreObservableSpy = new Subject<number>();
         routerMock = jasmine.createSpyObj('Router', ['navigate']);
+        answerValidatorMock = jasmine.createSpyObj('AnswerValidatorService', ['reset', 'processAnswer', 'prepareNextQuestion', 'submitAnswer']);
+        audioServiceMock = jasmine.createSpyObj('AudioService', ['play', 'pause']);
         timerMock = jasmine.createSpyObj('Timer', ['reset']);
         clientSocketServiceMock = new ClientSocketServiceMock();
         gameServiceSpy = jasmine.createSpyObj('GameHandlingService', [
@@ -77,6 +84,8 @@ describe('InGamePageComponent', () => {
                 { provide: GameHandlingService, useValue: gameServiceSpy },
                 { provide: Router, useValue: routerMock },
                 { provide: TimerService, useValue: timerMock },
+                { provide: AnswerValidatorService, useValue: answerValidatorMock },
+                { provide: AudioService, useValue: audioServiceMock },
             ],
             imports: [MatSnackBarModule],
         });
@@ -112,6 +121,13 @@ describe('InGamePageComponent', () => {
     it('transitionMessage getter should get transitionMessage from the TimerService', () => {
         timerMock.transitionMessage = 'message';
         expect(component.transitionMessage).toEqual(timerMock.transitionMessage);
+    });
+
+    it('isEvaluationPhase getter should get isEvaluationPhase from the AnswerValidatorService', () => {
+        answerValidatorMock.isEvaluationPhase = true;
+        expect(component.isEvaluationPhase).toBeTrue();
+        answerValidatorMock.isEvaluationPhase = false;
+        expect(component.isEvaluationPhase).toBeFalse();
     });
 
     it('should assign currentGame from GameHandlingService to currentGame member on component initialization', () => {
@@ -172,6 +188,14 @@ describe('InGamePageComponent', () => {
         expect(component.showResults).toEqual(true);
     });
 
+    it('should handle panicMode event by setting isPanicModeEnabled to true and playing the audio', () => {
+        component.ngOnInit();
+        timerMock.isPanicModeEnabled = false;
+        socketMock.simulateServerEmit('panicMode');
+        expect(timerMock.isPanicModeEnabled).toBeTrue();
+        expect(audioServiceMock.play).toHaveBeenCalled();
+    });
+
     it('should unsubscribe on component destruction', () => {
         component.ngOnInit();
         const scoreSubSpy = spyOn(component['subscriptionScore'], 'unsubscribe');
@@ -189,12 +213,14 @@ describe('InGamePageComponent', () => {
         component.ngOnDestroy();
         expect(timerMock.reset).toHaveBeenCalled();
         expect(socketMock.removeAllListeners).toHaveBeenCalledWith('showResults');
-        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('qcmEnd');
-        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('qrlEnd');
-        expect(socketMock.removeAllListeners).toHaveBeenCalledWith('qrlResults');
         expect(socketMock.removeAllListeners).toHaveBeenCalledWith('panicMode');
         expect(socketMock.removeAllListeners).toHaveBeenCalledWith('countdownEnd');
         expect(socketMock.removeAllListeners).toHaveBeenCalledWith('noPlayers');
+    });
+
+    it('should pause audio on component destruction', () => {
+        component.ngOnDestroy();
+        expect(audioServiceMock.pause).toHaveBeenCalled();
     });
 
     it('should call resetPlayerInfo from ClientSocketService and setRouteAccess from RouteControllerService on component destruction', () => {
@@ -214,15 +240,6 @@ describe('InGamePageComponent', () => {
         expect(component.currentQuestionScore).toEqual(newScore);
     });
 
-    it("setEvaluationPhase should change the evaluation message and histogram's visibility", () => {
-        component.isEvaluationMessageVisible = false;
-        component.isHistogramVisible = true;
-
-        component.setEvaluationPhase(true);
-        expect(component.isEvaluationMessageVisible).toBeTrue();
-        expect(component.isHistogramVisible).toBeFalse();
-    });
-
     it('leaveGame should navigate to game creation page if game mode is Testing', () => {
         gameServiceSpy.gameMode = GameMode.Testing;
         component.leaveGame();
@@ -233,5 +250,59 @@ describe('InGamePageComponent', () => {
         gameServiceSpy.gameMode = GameMode.RealGame;
         component.leaveGame();
         expect(routerMock.navigate).toHaveBeenCalledWith([Route.MainMenu]);
+    });
+
+    it('should return early if data is falsy in histogram subscription', () => {
+        const falsyObservable = new Observable<{ [key: string]: number }>((subscriber) => {
+            subscriber.next(null as unknown as { [key: string]: number });
+            subscriber.complete();
+        });
+        spyOn(clientSocketServiceMock, 'listenUpdateHistogram').and.returnValue(falsyObservable);
+        component.ngOnInit();
+        expect(component.histogramData).toBeNull();
+    });
+
+    it('should handle histogram data correctly when current question is QCM', () => {
+        gameServiceSpy.isCurrentQuestionQcm.calls.reset();
+        gameServiceSpy.getCorrectAnswersForCurrentQuestion.calls.reset();
+        const mockData = { answer1: 10, answer2: 20 };
+        const histogramObservable = new Observable<{ [key: string]: number }>((subscriber) => {
+            subscriber.next(mockData);
+            subscriber.complete();
+        });
+
+        spyOn(clientSocketServiceMock, 'listenUpdateHistogram').and.returnValue(histogramObservable);
+        gameServiceSpy.isCurrentQuestionQcm.and.returnValue(true);
+        gameServiceSpy.getCorrectAnswersForCurrentQuestion.and.returnValue(['answer1']);
+        component.ngOnInit();
+        expect(gameServiceSpy.isCurrentQuestionQcm).toHaveBeenCalled();
+        expect(gameServiceSpy.getCorrectAnswersForCurrentQuestion).toHaveBeenCalled();
+        expect(component.histogramData).toEqual(mockData);
+        expect(gameServiceSpy.updateHistogramDataForQuestion).toHaveBeenCalledWith(gameServiceSpy.currentQuestionId, mockData);
+    });
+    it('should set histogramUpdateData to specific values when ACTIVE_PLAYERS_TEXT and INACTIVE_PLAYERS_TEXT keys are present', () => {
+        const mockData = {
+            [ACTIVE_PLAYERS_TEXT]: 5,
+            [INACTIVE_PLAYERS_TEXT]: 10,
+        };
+        const histogramObservable = new Observable<{ [key: string]: number }>((subscriber) => {
+            subscriber.next(mockData);
+            subscriber.complete();
+        });
+        spyOn(clientSocketServiceMock, 'listenUpdateHistogram').and.returnValue(histogramObservable);
+        component.ngOnInit();
+        expect(gameServiceSpy.updateHistogramDataForQuestion).toHaveBeenCalled();
+    });
+
+    it('should update histogram data on listenQrlUpdateHistogram subscription', () => {
+        const mockData = { answer1: 10, answer2: 20 };
+        const qrlHistogramObservable = new Observable<{ [key: string]: number }>((subscriber) => {
+            subscriber.next(mockData);
+            subscriber.complete();
+        });
+        spyOn(clientSocketServiceMock, 'listenQrlUpdateHistogram').and.returnValue(qrlHistogramObservable);
+        component.ngOnInit();
+        expect(component.histogramData).toEqual(mockData);
+        expect(gameServiceSpy.updateHistogramDataForQuestion).toHaveBeenCalledWith(gameServiceSpy.currentQuestionId, mockData);
     });
 });

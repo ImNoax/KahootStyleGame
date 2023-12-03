@@ -22,8 +22,6 @@
 .game-block {
     flex: 2;
     background-color: #42424275;
-    margin: 2% 20%;
-    align-items: stretch;
     height: 100%;
     text-align: center;
 }
@@ -136,4 +134,12 @@ tbody {
     font-size: 25px;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     background-color: #4a2d5b85;
+}
+
+#game-mode {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 3%;
+    padding: 3%;
 }

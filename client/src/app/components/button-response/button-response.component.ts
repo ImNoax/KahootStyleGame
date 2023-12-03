@@ -1,14 +1,24 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, inject, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import {
+    AfterViewChecked,
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
+    EventEmitter,
+    HostListener,
+    inject,
+    OnDestroy,
+    OnInit,
+    Output,
+    ViewChild,
+} from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { PANIC_SOUNDS } from '@app/constants/audio';
 import { ButtonState, Route } from '@app/constants/enums';
-import { DELAY_BEFORE_INPUT_INACTIVITY, PAUSE_MESSAGE, POINTS_PERCENTAGES, TIME_OUT, UNPAUSE_MESSAGE } from '@app/constants/in-game';
+import { DELAY_BEFORE_INPUT_INACTIVITY, GRADES, PAUSE_MESSAGE, TIME_OUT, UNPAUSE_MESSAGE } from '@app/constants/in-game';
 import { SNACK_BAR_ERROR_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { Button } from '@app/interfaces/button-model';
 import { AnswerValidatorService } from '@app/services/answer-validator/answer-validator.service';
-import { AudioService } from '@app/services/audio/audio.service';
 import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
 import { TimerService } from '@app/services/timer/timer.service';
@@ -23,22 +33,19 @@ import { Subscription } from 'rxjs/internal/Subscription';
     templateUrl: './button-response.component.html',
     styleUrls: ['./button-response.component.scss'],
 })
-export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ButtonResponseComponent implements OnInit, AfterViewChecked, OnDestroy {
     @ViewChild('buttonFocus', { static: false }) buttonFocus: ElementRef;
+    @ViewChild('answerInput', { static: false }) answerInput: ElementRef;
     @Output() updateQuestionScore = new EventEmitter<number>();
-    @Output() qrlEnd = new EventEmitter<boolean>();
-    qrlAnswers: Answer[] = [];
-    pointsPercentages: number[] = POINTS_PERCENTAGES;
+    grades: number[] = GRADES;
     maxQrlAnswerLength: number = Limit.MaxQrlAnswerLength;
     currentAnswerIndex: number = 0;
-    isEvaluationPhase: boolean = false;
-    canLoadNextQuestion: boolean = false;
     submitted: boolean = false;
     isGamePaused: boolean = false;
-    hasQuestionEnded: boolean = false;
     isOrganizer: boolean = this.clientSocket.isOrganizer;
     answerForm: FormControl = this.answerValidator.answerForm;
     playerHasInteracted: boolean = false;
+    private hasFocusedOnce: boolean = false;
     private studentGrades: { [studentName: string]: number } = {};
     private initialPlayers = this.clientSocket.players;
     private submittedFromTimer: boolean = false;
@@ -46,8 +53,8 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
     private currentGame: Game = this.gameService.currentGame;
     private router: Router = inject(Router);
     private snackBar: MatSnackBar = inject(MatSnackBar);
-    private audio: AudioService = inject(AudioService);
     private timer: TimerService = inject(TimerService);
+    private changeDetector: ChangeDetectorRef = inject(ChangeDetectorRef);
 
     constructor(
         private gameService: GameHandlingService,
@@ -55,6 +62,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
         private clientSocket: ClientSocketService,
     ) {}
 
+    // Utilisés dans le template
     get pauseMessage(): string {
         return this.isGamePaused ? UNPAUSE_MESSAGE : PAUSE_MESSAGE;
     }
@@ -80,17 +88,33 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
     }
 
     get currentEvaluatedAnswer(): Answer {
-        return this.qrlAnswers[this.currentAnswerIndex];
+        return this.answerValidator.qrlAnswers[this.currentAnswerIndex];
     }
 
     get buttons(): Button[] {
         return this.answerValidator.buttons;
     }
 
+    get qrlAnswers(): Answer[] {
+        return this.answerValidator.qrlAnswers;
+    }
+
     get buttonLoadingMessage(): string {
         return this.gameService.currentQuestionId === this.gameService.currentGame.questions.length - 1
             ? 'Charger les résultats'
             : 'Charger la prochaine question';
+    }
+
+    get isEvaluationPhase(): boolean {
+        return this.answerValidator.isEvaluationPhase;
+    }
+
+    get canLoadNextQuestion(): boolean {
+        return this.answerValidator.canLoadNextQuestion;
+    }
+
+    get hasQuestionEnded(): boolean {
+        return this.answerValidator.hasQuestionEnded;
     }
 
     @HostListener('document:click', ['$event'])
@@ -107,46 +131,23 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
 
     ngOnDestroy(): void {
         if (this.timerSubscription) this.timerSubscription.unsubscribe();
-        this.audio.pause();
         this.answerValidator.reset();
     }
 
+    ngAfterViewChecked(): void {
+        if (!this.hasFocusedOnce) {
+            if (this.buttonFocus) this.focusElement(this.buttonFocus);
+            else if (this.answerInput) this.focusElement(this.answerInput);
+        }
+    }
+
+    focusElement(elementRef: ElementRef): void {
+        elementRef.nativeElement.focus();
+        this.hasFocusedOnce = true;
+        this.changeDetector.detectChanges();
+    }
+
     configureBaseSocketFeatures(): void {
-        this.clientSocket.socket.on('qcmEnd', (bonusRecipient: string) => {
-            if (this.clientSocket.isOrganizer) {
-                this.timer.stopCountdown();
-                this.canLoadNextQuestion = true;
-                this.hasQuestionEnded = true;
-                return;
-            }
-            if (this.clientSocket.socket.id === bonusRecipient) this.answerValidator.hasBonus = true;
-            this.answerValidator.processAnswer();
-        });
-
-        this.clientSocket.socket.on('qrlEnd', (qrlAnswers: Answer[]) => {
-            this.timer.stopCountdown();
-            if (this.clientSocket.isOrganizer) this.qrlAnswers = qrlAnswers;
-            this.qrlEnd.emit((this.isEvaluationPhase = true));
-        });
-
-        this.clientSocket.socket.on('qrlResults', (qrlAnswers: Answer[]) => {
-            this.qrlEnd.emit((this.isEvaluationPhase = false));
-            if (this.clientSocket.isOrganizer) {
-                this.canLoadNextQuestion = true;
-                this.hasQuestionEnded = true;
-                return;
-            }
-            this.answerValidator.pointsPercentage = (
-                qrlAnswers.find((answer: Answer) => answer.submitter === this.clientSocket.playerName) as Answer
-            ).pointsPercentage;
-            this.answerValidator.processAnswer();
-        });
-
-        this.clientSocket.socket.on('panicMode', () => {
-            this.timer.isPanicModeEnabled = true;
-            this.audio.play(PANIC_SOUNDS);
-        });
-
         this.clientSocket.socket.on('countdownEnd', () => {
             if (this.isQuestionTransition) {
                 this.loadNextQuestion();
@@ -157,14 +158,10 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
         this.clientSocket.socket.on('noPlayers', () => {
             this.snackBar.open('Tous les joueurs ont quitté la partie.', '', SNACK_BAR_ERROR_CONFIGURATION);
             this.timer.stopCountdown();
-            this.qrlEnd.emit((this.isEvaluationPhase = false));
-            this.hasQuestionEnded = true;
-            this.canLoadNextQuestion = false;
+            this.answerValidator.isEvaluationPhase = false;
+            this.answerValidator.hasQuestionEnded = true;
+            this.answerValidator.canLoadNextQuestion = false;
         });
-    }
-
-    ngAfterViewInit(): void {
-        if (this.buttonFocus) this.buttonFocus.nativeElement.focus();
     }
 
     onTimerEnded(): void {
@@ -192,10 +189,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
 
     onButtonClick(button: Button) {
         if (this.answerValidator.isProcessing) return;
-        if (!this.playerHasInteracted) {
-            this.clientSocket.socket.emit('socketInteracted');
-            this.playerHasInteracted = true;
-        }
+        this.markFirstInteraction();
         button.selected = !button.selected;
         const changeValue: number = button.selected ? ButtonState.Selected : ButtonState.Unselected;
         if (this.gameService.gameMode === GameMode.RealGame) {
@@ -234,7 +228,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
             this.updateQuestionScore.emit(this.currentGame.questions[this.gameService.currentQuestionId].points);
             if (this.clientSocket.isOrganizer || this.gameService.gameMode === GameMode.Testing)
                 this.timer.startCountdown(this.gameService.getCurrentQuestionDuration());
-            if (this.buttonFocus) this.buttonFocus.nativeElement.focus();
+            this.hasFocusedOnce = false;
         }
     }
 
@@ -244,7 +238,6 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
         this.submittedFromTimer = false;
         this.timer.isQuestionTransition = false;
         this.isGamePaused = false;
-        this.hasQuestionEnded = false;
         this.currentAnswerIndex = 0;
         this.updateGameQuestions();
     }
@@ -264,7 +257,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
 
     startNextQuestionCountdown(): void {
         this.clientSocket.sendResetHistogram();
-        this.canLoadNextQuestion = false;
+        this.answerValidator.canLoadNextQuestion = false;
         this.isGamePaused = false;
         this.timer.startCountdown(TIME_OUT, { isQuestionTransition: true });
     }
@@ -290,12 +283,12 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
         return this.answerForm.value.trim().length === 0 && !this.buttons.some((button) => button.selected === true);
     }
 
-    evaluateAnswer(points: number): void {
-        this.currentEvaluatedAnswer.pointsPercentage = points;
+    evaluateAnswer(grade: number): void {
+        this.currentEvaluatedAnswer.grade = grade;
         const studentName = this.currentEvaluatedAnswer.submitter;
-        if (studentName !== undefined) this.studentGrades[studentName] = this.currentEvaluatedAnswer.pointsPercentage * HUNDRED;
+        if (studentName !== undefined) this.studentGrades[studentName] = this.currentEvaluatedAnswer.grade * HUNDRED;
         this.updateHistogram();
-        if (this.currentAnswerIndex !== this.qrlAnswers.length - 1) ++this.currentAnswerIndex;
+        if (this.currentAnswerIndex !== this.answerValidator.qrlAnswers.length - 1) ++this.currentAnswerIndex;
     }
 
     updateHistogram(): void {
@@ -327,7 +320,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
     }
 
     endEvaluationPhase(): void {
-        this.clientSocket.socket.emit('evaluationPhaseCompleted', this.qrlAnswers);
+        this.clientSocket.socket.emit('evaluationPhaseCompleted', this.answerValidator.qrlAnswers);
     }
 
     submit(): void {
@@ -335,14 +328,18 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
         this.answerValidator.submitAnswer(this.submittedFromTimer);
     }
 
+    markFirstInteraction() {
+        if (!this.playerHasInteracted) {
+            this.clientSocket.socket.emit('socketInteracted');
+            this.playerHasInteracted = true;
+        }
+    }
+
     markInputActivity(): void {
         if (this.gameService.gameMode === GameMode.RealGame) {
             this.clientSocket.socket.emit('markInputActivity');
             this.timer.startCountdown(DELAY_BEFORE_INPUT_INACTIVITY, { isInputInactivityCountdown: true });
-            if (!this.playerHasInteracted) {
-                this.clientSocket.socket.emit('socketInteracted');
-                this.playerHasInteracted = true;
-            }
+            this.markFirstInteraction();
         }
     }
 }

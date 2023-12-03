@@ -1,3 +1,4 @@
+import { ChangeDetectorRef } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -20,6 +21,7 @@ describe('MainMenuPageComponent', () => {
     let fixture: ComponentFixture<MainMenuPageComponent>;
     let gameHandlingServiceMock: jasmine.SpyObj<GameHandlingService>;
     let routerMock: jasmine.SpyObj<Router>;
+    let changeDetectorMock: jasmine.SpyObj<ChangeDetectorRef>;
     let socketMock: SocketMock;
     let clientSocketServiceMock: ClientSocketServiceMock;
     let nEmittedEvents: number;
@@ -27,6 +29,7 @@ describe('MainMenuPageComponent', () => {
     beforeEach(async () => {
         gameHandlingServiceMock = jasmine.createSpyObj('GameHandlingService', ['verifyAdminPassword', 'setCurrentGameId']);
         routerMock = jasmine.createSpyObj('Router', ['navigate']);
+        changeDetectorMock = jasmine.createSpyObj('ChangeDetectorRef', ['detectChanges']);
         clientSocketServiceMock = new ClientSocketServiceMock();
 
         TestBed.configureTestingModule({
@@ -46,6 +49,7 @@ describe('MainMenuPageComponent', () => {
                         ),
                     },
                 },
+                { provide: ChangeDetectorRef, useValue: changeDetectorMock },
             ],
         }).compileComponents();
 
@@ -67,6 +71,19 @@ describe('MainMenuPageComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('ngAfterViewInit should focus on joiningButton', () => {
+        component.pinInput = {
+            nativeElement: {
+                focus: () => {
+                    return;
+                },
+            },
+        };
+        const ngAfterViewInitSpy = spyOn(component.pinInput.nativeElement, 'focus');
+        component.ngAfterViewInit();
+        expect(ngAfterViewInitSpy).toHaveBeenCalled();
     });
 
     it('adminLogin should open a dialog', fakeAsync(() => {

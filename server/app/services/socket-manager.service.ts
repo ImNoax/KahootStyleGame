@@ -71,13 +71,15 @@ export class SocketManager {
                             // Si l'organisateur est seul dans le lobby, on l'avertit
                             const organizerSocketId = currentLobby.players[0].socketId;
                             this.sio.to(organizerSocketId).emit('noPlayers');
-                        } else if (currentLobby.players.length === 0) {
-                            // Si le lobby est vide, on le supprime, sinon met à jour la liste des joueurs
+                        }
+
+                        if (currentLobby.players.length === 0) {
+                            // Si le lobby est vide, on le supprime
                             this.lobbies.delete(pin);
                         } else {
+                            // Sinon, mettre à jour la liste des joueurs et mettre fin à la question si le joueur est le dernier à soumettre
                             SEND_LATEST_PLAYERS();
-                            // Mettre fin à la question si le joueur est le dernier à soumettre
-                            CHECK_QUESTION_END(currentLobby, { questionType: currentLobby.currentQuestionType });
+                            CHECK_QUESTION_END(currentLobby, { submitter: '', questionType: currentLobby.currentQuestionType, grade: null });
                         }
                     }
                 }
@@ -159,6 +161,8 @@ export class SocketManager {
             const CHECK_QUESTION_END = (currentLobby: LobbyDetails, answer: Answer) => {
                 const areAllSubmitted = !currentLobby.players.some((player) => !player.answerSubmitted);
                 if (areAllSubmitted) {
+                    if (!currentLobby.currentQuestionType) return;
+
                     if (answer.questionType === QuestionType.QCM) this.sio.to(pin).emit('qcmEnd', currentLobby.bonusRecipient);
                     else {
                         const sortedAnswers = currentLobby.qrlAnswers.sort((answer1: Answer, answer2: Answer) => {
