@@ -41,10 +41,10 @@ export class HistoryPageComponent implements OnInit {
 
     sortName() {
         if (!this.isNameSortedAscending) {
-            this.games.sort((a, b) => (a.name > b.name ? SORT_TRUE : SORT_FALSE));
+            this.games.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? SORT_TRUE : SORT_FALSE));
             this.arrowName = ARROW_UP;
         } else {
-            this.games.sort((a, b) => (a.name > b.name ? SORT_FALSE : SORT_TRUE));
+            this.games.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? SORT_FALSE : SORT_TRUE));
             this.arrowName = ARROW_DOWN;
         }
 

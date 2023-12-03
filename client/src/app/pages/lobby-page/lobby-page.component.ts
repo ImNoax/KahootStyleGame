@@ -100,6 +100,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
     }
 
     startGame() {
+        this.clientSocket.socket.emit('gameStarted');
         if (this.clientSocket.playerName) {
             this.gameStarted = true;
             this.routeController.setRouteAccess(Route.InGame, true);
