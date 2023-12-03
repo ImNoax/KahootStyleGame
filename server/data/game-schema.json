@@ -33,6 +33,7 @@
             "items": {
                 "description": "A quiz question",
                 "type": "object",
+                "additionalProperties": false,
                 "properties": {
                     "type": {
                         "description": "The type of quiz. Multiple Choice (QCM) or Open Response (QRL)",
@@ -54,6 +55,7 @@
                         "items": {
                             "description": "A choice",
                             "type": "object",
+                            "additionalProperties": false,
                             "properties": {
                                 "text": {
                                     "description": "The choice itself",

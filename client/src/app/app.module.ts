@@ -14,11 +14,8 @@ import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AdminJeuPageComponent } from '@app/pages/admin-jeu-page/admin-jeu-page.component';
 import { AppComponent } from '@app/pages/app/app.component';
-import { CreateGamePageComponent } from '@app/pages/create-game-page/create-game-page.component';
-import { GamePageComponent } from '@app/pages/game-page/game-page.component';
-import { MainPageComponent } from '@app/pages/main-page/main-page.component';
-import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
-import { WaitingViewPageComponent } from '@app/pages/waiting-view-page/waiting-view-page.component';
+import { GameCreationPageComponent } from '@app/pages/game-creation-page/game-creation-page.component';
+import { LobbyPageComponent } from '@app/pages/lobby-page/lobby-page.component';
 import { ButtonResponseComponent } from './components/button-response/button-response.component';
 import { ChatBoxComponent } from './components/chat-box/chat-box.component';
 import { EndResultComponent } from './components/end-result/end-result.component';
@@ -26,10 +23,15 @@ import { GameImportPopupComponent } from './components/game-import-popup/game-im
 import { HeaderComponent } from './components/header/header.component';
 import { HistogramComponent } from './components/histogram/histogram.component';
 import { NameDefinitionComponent } from './components/name-definition/name-definition.component';
+import { PasswordPopupComponent } from './components/password-popup/password-popup.component';
 import { PlayerListComponent } from './components/player-list/player-list.component';
 import { ProgressBarComponent } from './components/progress-bar/progress-bar.component';
-import { CreationJeuComponent } from './pages/creation-jeu/creation-jeu.component';
-import { QuestionsPageComponent } from './pages/questions-page/questions-page.component';
+import { HistoryPageComponent } from './pages/history-page/history-page.component';
+import { InGamePageComponent } from './pages/in-game-page/in-game-page.component';
+import { MainMenuPageComponent } from './pages/main-menu-page/main-menu-page.component';
+import { QuestionCreationPageComponent } from './pages/question-creation-page/question-creation-page.component';
+import { QuizCreationPageComponent } from './pages/quiz-creation-page/quiz-creation-page.component';
+import { ConfirmationPopupComponent } from './components/confirmation-popup/confirmation-popup.component';
 
 /**
  * Main module that is used in main.ts.
@@ -41,23 +43,25 @@ import { QuestionsPageComponent } from './pages/questions-page/questions-page.co
     declarations: [
         AppComponent,
         AdminJeuPageComponent,
-        GamePageComponent,
-        MainPageComponent,
-        MaterialPageComponent,
+        InGamePageComponent,
+        MainMenuPageComponent,
         ProgressBarComponent,
         ButtonResponseComponent,
-        CreationJeuComponent,
+        QuizCreationPageComponent,
         HeaderComponent,
-        QuestionsPageComponent,
-        CreateGamePageComponent,
+        QuestionCreationPageComponent,
+        GameCreationPageComponent,
         QuestionCreationPopupComponent,
         GameImportPopupComponent,
-        WaitingViewPageComponent,
+        LobbyPageComponent,
         NameDefinitionComponent,
         ChatBoxComponent,
         EndResultComponent,
         HistogramComponent,
         PlayerListComponent,
+        HistoryPageComponent,
+        PasswordPopupComponent,
+        ConfirmationPopupComponent,
     ],
     imports: [
         AppMaterialModule,

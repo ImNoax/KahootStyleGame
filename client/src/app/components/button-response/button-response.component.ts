@@ -1,173 +1,208 @@
-import { GameHandlingService } from '@angular/../../client/src/app/services/game-handling.service';
-import { AfterViewInit, Component, ElementRef, EventEmitter, inject, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import {
+    AfterViewChecked,
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
+    EventEmitter,
+    HostListener,
+    inject,
+    OnDestroy,
+    OnInit,
+    Output,
+    ViewChild,
+} from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { snackBarErrorConfiguration, snackBarNormalConfiguration } from '@app/constants/snack-bar-configuration';
-import { Route } from '@app/enums';
+import { ButtonState, Route } from '@app/constants/enums';
+import { DELAY_BEFORE_INPUT_INACTIVITY, GRADES, PAUSE_MESSAGE, TIME_OUT, UNPAUSE_MESSAGE } from '@app/constants/in-game';
+import { SNACK_BAR_ERROR_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { Button } from '@app/interfaces/button-model';
-import { ClientSocketService } from '@app/services/client-socket.service';
-import { TimerService } from '@app/services/timer.service';
+import { AnswerValidatorService } from '@app/services/answer-validator/answer-validator.service';
+import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
+import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
+import { TimerService } from '@app/services/timer/timer.service';
 import { Choice, Game } from '@common/game';
 import { GameMode } from '@common/game-mode';
+import { Limit } from '@common/limit';
+import { ACTIVE_PLAYERS_TEXT, Answer, FIFTY, HUNDRED, INACTIVE_PLAYERS_TEXT, ZERO } from '@common/lobby';
 import { Subscription } from 'rxjs/internal/Subscription';
-
-const TIME_OUT = 3;
-const BONUS_POINTS = 0.2;
-const BUTTON_SELECTED = 1;
-const BUTTON_UNSELECTED = -1;
 
 @Component({
     selector: 'app-button-response',
     templateUrl: './button-response.component.html',
     styleUrls: ['./button-response.component.scss'],
 })
-export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ButtonResponseComponent implements OnInit, AfterViewChecked, OnDestroy {
     @ViewChild('buttonFocus', { static: false }) buttonFocus: ElementRef;
+    @ViewChild('answerInput', { static: false }) answerInput: ElementRef;
     @Output() updateQuestionScore = new EventEmitter<number>();
-    buttons: Button[] = [];
-    currentGame: Game;
-    timerSubscription: Subscription;
-    isProcessing: boolean = false;
-    canLoadNextQuestion: boolean = false;
+    grades: number[] = GRADES;
+    maxQrlAnswerLength: number = Limit.MaxQrlAnswerLength;
+    currentAnswerIndex: number = 0;
     submitted: boolean = false;
-    submittedFromTimer: boolean = false;
-    bonusTimes: number = 0;
-    hasBonus: boolean = false;
-    isAnswerCorrect: boolean = true;
-    loadingMessage: string = '';
-    private clientSocket: ClientSocketService = inject(ClientSocketService);
+    isGamePaused: boolean = false;
+    isOrganizer: boolean = this.clientSocket.isOrganizer;
+    answerForm: FormControl = this.answerValidator.answerForm;
+    playerHasInteracted: boolean = false;
+    private hasFocusedOnce: boolean = false;
+    private studentGrades: { [studentName: string]: number } = {};
+    private initialPlayers = this.clientSocket.players;
+    private submittedFromTimer: boolean = false;
+    private timerSubscription: Subscription;
+    private currentGame: Game = this.gameService.currentGame;
+    private router: Router = inject(Router);
     private snackBar: MatSnackBar = inject(MatSnackBar);
+    private timer: TimerService = inject(TimerService);
+    private changeDetector: ChangeDetectorRef = inject(ChangeDetectorRef);
 
     constructor(
         private gameService: GameHandlingService,
-        private timer: TimerService,
-        private router: Router,
+        private answerValidator: AnswerValidatorService,
+        private clientSocket: ClientSocketService,
     ) {}
 
-    get isOrganizer() {
-        return this.clientSocket.isOrganizer;
+    // Utilisés dans le template
+    get pauseMessage(): string {
+        return this.isGamePaused ? UNPAUSE_MESSAGE : PAUSE_MESSAGE;
+    }
+
+    get isCurrentQuestionQcm(): boolean {
+        return this.gameService.isCurrentQuestionQcm();
+    }
+
+    get isPanicModeEnabled(): boolean {
+        return this.timer.isPanicModeEnabled;
+    }
+
+    get isPanicModeAvailable(): boolean {
+        return this.timer.count <= (this.isCurrentQuestionQcm ? Limit.QcmRequiredPanicCount : Limit.QrlRequiredPanicCount);
+    }
+
+    get remainingCountForPanic(): number {
+        return this.timer.count - (this.isCurrentQuestionQcm ? Limit.QcmRequiredPanicCount : Limit.QrlRequiredPanicCount);
+    }
+
+    get isQuestionTransition(): boolean {
+        return this.timer.isQuestionTransition;
+    }
+
+    get currentEvaluatedAnswer(): Answer {
+        return this.answerValidator.qrlAnswers[this.currentAnswerIndex];
+    }
+
+    get buttons(): Button[] {
+        return this.answerValidator.buttons;
+    }
+
+    get qrlAnswers(): Answer[] {
+        return this.answerValidator.qrlAnswers;
+    }
+
+    get buttonLoadingMessage(): string {
+        return this.gameService.currentQuestionId === this.gameService.currentGame.questions.length - 1
+            ? 'Charger les résultats'
+            : 'Charger la prochaine question';
+    }
+
+    get isEvaluationPhase(): boolean {
+        return this.answerValidator.isEvaluationPhase;
+    }
+
+    get canLoadNextQuestion(): boolean {
+        return this.answerValidator.canLoadNextQuestion;
+    }
+
+    get hasQuestionEnded(): boolean {
+        return this.answerValidator.hasQuestionEnded;
+    }
+
+    @HostListener('document:click', ['$event'])
+    onDocumentClick(event: MouseEvent): void {
+        const clickedElement = event.target as HTMLElement;
+        if (this.buttonFocus && !clickedElement.closest('#chatInput')) this.buttonFocus.nativeElement.focus();
     }
 
     ngOnInit(): void {
-        this.currentGame = this.gameService.currentGame;
         this.updateButtons();
+        this.populateHistogram();
         this.configureBaseSocketFeatures();
     }
 
     ngOnDestroy(): void {
-        if (this.timerSubscription) {
-            this.timerSubscription.unsubscribe();
-        }
-
-        this.clientSocket.socket.removeAllListeners('allSubmitted');
-        this.clientSocket.socket.removeAllListeners('countDownEnd');
-        this.clientSocket.socket.removeAllListeners('canLoadNextQuestion');
-        this.clientSocket.socket.removeAllListeners('noPlayers');
+        if (this.timerSubscription) this.timerSubscription.unsubscribe();
+        this.answerValidator.reset();
     }
 
-    configureBaseSocketFeatures() {
-        this.clientSocket.socket.on('allSubmitted', (bonusRecipient: string) => {
-            if (this.clientSocket.socket.id === bonusRecipient) this.hasBonus = true;
-            this.processAnswer();
-        });
+    ngAfterViewChecked(): void {
+        if (!this.hasFocusedOnce) {
+            if (this.buttonFocus) this.focusElement(this.buttonFocus);
+            else if (this.answerInput) this.focusElement(this.answerInput);
+        }
+    }
 
-        this.clientSocket.socket.on('countDownEnd', (lastCount: number) => {
-            this.timer.count = lastCount;
-            if (this.timer.isQuestionTransition) {
+    focusElement(elementRef: ElementRef): void {
+        elementRef.nativeElement.focus();
+        this.hasFocusedOnce = true;
+        this.changeDetector.detectChanges();
+    }
+
+    configureBaseSocketFeatures(): void {
+        this.clientSocket.socket.on('countdownEnd', () => {
+            if (this.isQuestionTransition) {
                 this.loadNextQuestion();
                 return;
             }
             this.onTimerEnded();
         });
-
-        this.clientSocket.socket.on('canLoadNextQuestion', () => {
-            this.timer.stopCountDown();
-            this.canLoadNextQuestion = true;
-        });
-
         this.clientSocket.socket.on('noPlayers', () => {
-            this.snackBar.open('Tous les joueurs ont quitté la partie.', '', snackBarErrorConfiguration);
-            this.timer.stopCountDown();
-            this.canLoadNextQuestion = false;
+            this.snackBar.open('Tous les joueurs ont quitté la partie.', '', SNACK_BAR_ERROR_CONFIGURATION);
+            this.timer.stopCountdown();
+            this.answerValidator.isEvaluationPhase = false;
+            this.answerValidator.hasQuestionEnded = true;
+            this.answerValidator.canLoadNextQuestion = false;
         });
     }
 
-    ngAfterViewInit(): void {
-        this.buttonFocus.nativeElement.focus();
-    }
-
-    onTimerEnded() {
-        this.verifyResponsesAndCallUpdate();
+    onTimerEnded(): void {
         this.submittedFromTimer = true;
+        if (!this.clientSocket.isOrganizer) this.submit();
     }
 
-    updateButtons() {
-        const questionOfInterest = this.currentGame.questions[this.gameService.currentQuestionId];
-
-        if (questionOfInterest.choices) {
-            this.buttons = [];
-            questionOfInterest.choices.forEach((choice: Choice, buttonIndex: number) => {
-                this.buttons.push({
-                    color: 'white',
-                    selected: false,
-                    text: choice.text,
-                    isCorrect: choice.isCorrect,
-                    id: buttonIndex + 1,
+    updateButtons(): void {
+        if (this.isCurrentQuestionQcm) {
+            const questionOfInterest = this.currentGame.questions[this.gameService.currentQuestionId];
+            if (questionOfInterest.choices) {
+                this.answerValidator.buttons = [];
+                questionOfInterest.choices.forEach((choice: Choice, buttonIndex: number) => {
+                    this.buttons.push({
+                        color: 'white',
+                        selected: false,
+                        text: choice.text,
+                        isCorrect: choice.isCorrect,
+                        id: buttonIndex + 1,
+                    });
                 });
-            });
-            if (this.gameService.gameMode === GameMode.RealGame) {
-                this.populateHistogram();
             }
         }
     }
 
     onButtonClick(button: Button) {
-        if (this.isProcessing) return;
+        if (this.answerValidator.isProcessing) return;
+        this.markFirstInteraction();
         button.selected = !button.selected;
-
-        const changeValue = button.selected ? BUTTON_SELECTED : BUTTON_UNSELECTED;
-
+        const changeValue: number = button.selected ? ButtonState.Selected : ButtonState.Unselected;
         if (this.gameService.gameMode === GameMode.RealGame) {
             const histogramUpdateData = { [button.text]: changeValue };
             this.clientSocket.sendUpdateHistogram(histogramUpdateData);
         }
     }
 
-    verifyResponsesAndCallUpdate() {
-        this.submitted = true;
-        if (this.isProcessing) return;
-        let clickedChoicesCount = 0;
-        let correctChoicesCount = 0;
-        this.buttons.forEach((button) => {
-            if (button.isCorrect) {
-                correctChoicesCount++;
-            }
-
-            if (button.selected) {
-                clickedChoicesCount++;
-                if (!button.isCorrect) {
-                    this.isAnswerCorrect = false;
-                }
-            }
-        });
-
-        if (clickedChoicesCount !== correctChoicesCount) {
-            this.isAnswerCorrect = false;
-        }
-        this.isProcessing = true;
-
-        if (this.gameService.gameMode === GameMode.Testing) {
-            this.processAnswer();
-            return;
-        }
-        this.clientSocket.socket.emit('answerSubmitted', this.isAnswerCorrect, this.submittedFromTimer);
-    }
-
-    playerEntries(event: KeyboardEvent) {
-        if (this.isProcessing) return;
-        if (event.key === 'Enter') {
+    playerEntries(event: KeyboardEvent): void {
+        if (this.answerValidator.isProcessing) return;
+        if (event.key === 'Enter' && !this.isAnswerEmpty()) {
             event.preventDefault();
-            this.verifyResponsesAndCallUpdate();
+            this.submit();
         } else {
             if (parseInt(event.key, 10) >= 1 && parseInt(event.key, 10) <= this.buttons.length) {
                 const button = this.buttons[parseInt(event.key, 10) - 1];
@@ -176,9 +211,8 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
         }
     }
 
-    updateGameQuestions() {
+    updateGameQuestions(): void {
         if (this.gameService.currentQuestionId === this.currentGame.questions.length - 1) {
-            this.timer.stopCountDown();
             if (this.gameService.gameMode === GameMode.Testing) {
                 this.router.navigate([Route.GameCreation]);
                 return;
@@ -186,67 +220,126 @@ export class ButtonResponseComponent implements OnInit, AfterViewInit, OnDestroy
             this.clientSocket.socket.emit('gameEnded');
         } else {
             this.gameService.setCurrentQuestionId(++this.gameService.currentQuestionId);
+            if (this.isOrganizer) this.clientSocket.socket.emit('resetPlayersActivityState');
+            this.playerHasInteracted = false;
             this.updateButtons();
+            this.populateHistogram();
             this.gameService.setCurrentQuestion(this.currentGame.questions[this.gameService.currentQuestionId].text);
             this.updateQuestionScore.emit(this.currentGame.questions[this.gameService.currentQuestionId].points);
-            this.timer.startCountDown(this.currentGame.duration);
-            this.buttonFocus.nativeElement.focus();
+            if (this.clientSocket.isOrganizer || this.gameService.gameMode === GameMode.Testing)
+                this.timer.startCountdown(this.gameService.getCurrentQuestionDuration());
+            this.hasFocusedOnce = false;
         }
-    }
-
-    processAnswer() {
-        this.timer.stopCountDown();
-        if (this.isAnswerCorrect) {
-            let rewardedPoints = this.currentGame.questions[this.gameService.currentQuestionId].points;
-            let message = `+${rewardedPoints} points ✅`;
-            if (this.hasBonus || this.gameService.gameMode === GameMode.Testing) {
-                const bonus = rewardedPoints * BONUS_POINTS;
-                rewardedPoints += bonus;
-                message += ` + ${bonus} points bonus 🎉🎊`;
-                this.bonusTimes++;
-                this.clientSocket.socket.emit('updateBonusTimes', this.bonusTimes);
-            }
-            this.gameService.incrementScore(rewardedPoints);
-            this.snackBar.open(message, '', snackBarNormalConfiguration);
-        } else {
-            this.snackBar.open('+0 points ❌', '', snackBarNormalConfiguration);
-        }
-
-        this.buttons.forEach((button) => {
-            if (button.isCorrect) button.showCorrectButtons = true;
-            if (!button.isCorrect) {
-                button.showWrongButtons = true;
-            }
-        });
-
-        if (this.gameService.gameMode === GameMode.Testing) this.timer.startCountDown(TIME_OUT, true);
     }
 
     loadNextQuestion(): void {
-        this.buttons.forEach((button) => {
-            button.showCorrectButtons = false;
-            button.showWrongButtons = false;
-        });
-        this.isProcessing = false;
+        this.answerValidator.prepareNextQuestion();
         this.submitted = false;
-        this.hasBonus = false;
-        this.isAnswerCorrect = true;
         this.submittedFromTimer = false;
         this.timer.isQuestionTransition = false;
+        this.isGamePaused = false;
+        this.currentAnswerIndex = 0;
         this.updateGameQuestions();
     }
 
-    populateHistogram() {
-        const changeValue = 0;
-        this.buttons.forEach((button) => {
-            const histogramUpdateData = { [button.text]: changeValue };
-            this.clientSocket.sendUpdateHistogram(histogramUpdateData);
-        });
+    populateHistogram(): void {
+        if (this.gameService.gameMode === GameMode.RealGame && this.isOrganizer) {
+            let initialValue = 0;
+            if (this.isCurrentQuestionQcm) this.buttons.forEach((button) => this.clientSocket.sendUpdateHistogram({ [button.text]: initialValue }));
+            else {
+                this.clientSocket.sendUpdateHistogram({ [ACTIVE_PLAYERS_TEXT]: initialValue++ });
+                this.initialPlayers.forEach((player) => {
+                    if (player.name !== 'Organisateur') this.clientSocket.sendUpdateHistogram({ [INACTIVE_PLAYERS_TEXT]: initialValue });
+                });
+            }
+        }
     }
 
-    startNextQuestionCountDown() {
+    startNextQuestionCountdown(): void {
         this.clientSocket.sendResetHistogram();
-        this.timer.startCountDown(TIME_OUT, true);
-        this.canLoadNextQuestion = false;
+        this.answerValidator.canLoadNextQuestion = false;
+        this.isGamePaused = false;
+        this.timer.startCountdown(TIME_OUT, { isQuestionTransition: true });
+    }
+
+    pause(): void {
+        if (this.isGamePaused) {
+            if (this.timer.isQuestionTransition) this.timer.startCountdown(this.timer.transitionCount);
+            else this.timer.startCountdown(this.timer.count, { isPanicModeEnabled: this.isPanicModeEnabled });
+            this.isGamePaused = !this.isGamePaused;
+            return;
+        }
+        this.timer.stopCountdown();
+        this.isGamePaused = !this.isGamePaused;
+    }
+
+    panic(): void {
+        this.clientSocket.socket.emit('enablePanicMode');
+        this.timer.stopCountdown();
+        this.timer.startCountdown(this.timer.count, { isPanicModeEnabled: true });
+    }
+
+    isAnswerEmpty(): boolean {
+        return this.answerForm.value.trim().length === 0 && !this.buttons.some((button) => button.selected === true);
+    }
+
+    evaluateAnswer(grade: number): void {
+        this.currentEvaluatedAnswer.grade = grade;
+        const studentName = this.currentEvaluatedAnswer.submitter;
+        if (studentName !== undefined) this.studentGrades[studentName] = this.currentEvaluatedAnswer.grade * HUNDRED;
+        this.updateHistogram();
+        if (this.currentAnswerIndex !== this.answerValidator.qrlAnswers.length - 1) ++this.currentAnswerIndex;
+    }
+
+    updateHistogram(): void {
+        let count0 = 0;
+        let count50 = 0;
+        let count100 = 0;
+        Object.values(this.studentGrades).forEach((grade) => {
+            switch (grade) {
+                case ZERO:
+                    count0++;
+                    break;
+                case FIFTY:
+                    count50++;
+                    break;
+                case HUNDRED:
+                    count100++;
+                    break;
+            }
+        });
+        const histogramUpdateData: { [key: string]: number } = {};
+        histogramUpdateData['0%'] = count0;
+        histogramUpdateData['50%'] = count50;
+        histogramUpdateData['100%'] = count100;
+        this.clientSocket.sendQrlUpdateHistogram(histogramUpdateData);
+    }
+
+    getPreviousAnswer(): void {
+        --this.currentAnswerIndex;
+    }
+
+    endEvaluationPhase(): void {
+        this.clientSocket.socket.emit('evaluationPhaseCompleted', this.answerValidator.qrlAnswers);
+    }
+
+    submit(): void {
+        this.submitted = true;
+        this.answerValidator.submitAnswer(this.submittedFromTimer);
+    }
+
+    markFirstInteraction() {
+        if (!this.playerHasInteracted) {
+            this.clientSocket.socket.emit('socketInteracted');
+            this.playerHasInteracted = true;
+        }
+    }
+
+    markInputActivity(): void {
+        if (this.gameService.gameMode === GameMode.RealGame) {
+            this.clientSocket.socket.emit('markInputActivity');
+            this.timer.startCountdown(DELAY_BEFORE_INPUT_INACTIVITY, { isInputInactivityCountdown: true });
+            this.markFirstInteraction();
+        }
     }
 }

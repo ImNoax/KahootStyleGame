@@ -1,6 +1,6 @@
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { ClientSocketService } from '@app/services/client-socket.service';
+import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
 import { Socket } from 'socket.io-client';
 import { SocketMock } from './socket-mock';
 

@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
+import { QuestionType } from '@common/game';
 import { GameMode } from '@common/game-mode';
-import { LobbyDetails, Pin, Player } from '@common/lobby';
+import { ACTIVE_PLAYERS_TEXT, Answer, LobbyDetails, Message, Pin, Player, PlayerColor } from '@common/lobby';
 import { Server } from 'app/server';
 import { expect } from 'chai';
 import * as sinon from 'sinon';
@@ -28,10 +29,10 @@ describe('SocketManager service tests', () => {
 
     beforeEach(async () => {
         server = Container.get(Server);
-        server.init();
+        await server.init();
         service = server['socketManager'];
         clientSocket = ioClient(urlString);
-        sinon.stub(console, 'log'); // stop console.log
+        sinon.stub(console, 'log');
     });
 
     afterEach(() => {
@@ -40,38 +41,38 @@ describe('SocketManager service tests', () => {
         sinon.restore();
     });
 
-    it('joinLobby should return failedLobbyConnection if the pin is invalid', (done) => {
-        const invalidPin = 'invalid';
+    it('should handle validatePin event by emitting invalidPin event if the pin is invalid', (done) => {
+        const invalidPin = '0000';
 
-        clientSocket.emit('joinLobby', invalidPin);
+        clientSocket.emit('validatePin', invalidPin);
 
-        clientSocket.on('failedLobbyConnection', (reason: string) => {
-            expect(reason).to.equal(`La partie de PIN ${invalidPin} n'a pas été trouvée. Elle a soit commencé ou le PIN n'existe pas.`);
+        clientSocket.on('invalidPin', (reason: string) => {
+            expect(reason).to.equal(`La partie de PIN ${invalidPin} n'a pas été trouvée. Êtes-vous sûr du PIN?`);
             done();
         });
     });
 
-    it('joinLobby should return failedLobbyConnection if the lobby is locked', (done) => {
+    it('should handle validatePin event by emitting invalidPin event if the lobby is locked', (done) => {
         createGame();
 
         setTimeout(() => {
             clientSocket.emit('toggleLock');
-            clientSocket.emit('joinLobby', roomPin);
+            clientSocket.emit('validatePin', roomPin);
 
-            clientSocket.on('failedLobbyConnection', (reason: string) => {
+            clientSocket.on('invalidPin', (reason: string) => {
                 expect(reason).to.equal(`La partie de PIN ${roomPin} a été verrouillée par l'organisateur. Attendez et réessayez.`);
                 done();
             });
         }, RESPONSE_DELAY);
     });
 
-    it('joinLobby should return successfulLobbyConnection in case of success', (done) => {
+    it('should handle validatePin event by emitting validPin event in case of success', (done) => {
         createGame();
 
         setTimeout(() => {
-            clientSocket.emit('joinLobby', roomPin);
+            clientSocket.emit('validatePin', roomPin);
 
-            clientSocket.on('successfulLobbyConnection', (gameId: string, pin: Pin) => {
+            clientSocket.on('validPin', (gameId: string, pin: Pin) => {
                 expect(pin).to.equal(roomPin);
                 expect(gameId).to.equal('');
                 done();
@@ -79,41 +80,57 @@ describe('SocketManager service tests', () => {
         }, RESPONSE_DELAY);
     });
 
-    it('validateName should return invalidName if the name is already taken', (done) => {
-        const name = 'test';
+    it('should handle joinLobby event by emitting failedLobbyConnection event if the name is already taken', (done) => {
+        const name = 'Organisateur';
         createGame();
 
-        clientSocket.emit('validateName', name);
-        clientSocket.emit('validateName', name);
+        setTimeout(() => {
+            clientSocket.emit('joinLobby', name);
 
-        clientSocket.on('invalidName', (reason: string) => {
-            expect(reason).to.equal('Nom réservé par un autre joueur');
-            done();
-        });
+            clientSocket.on('failedLobbyConnection', (reason: string) => {
+                expect(reason).to.equal('Nom réservé par un autre joueur');
+                done();
+            });
+        }, RESPONSE_DELAY);
     });
 
-    it('validateName should return invalidName if the name is banned', (done) => {
+    it('should handle joinLobby event by emitting failedLobbyConnection event if the name is banned', (done) => {
         const name = 'test';
         createGame();
 
         setTimeout(() => {
             service['lobbies'].get(roomPin).bannedNames.push(name);
-            clientSocket.emit('validateName', name);
+            clientSocket.emit('joinLobby', name);
 
-            clientSocket.on('invalidName', (reason: string) => {
+            clientSocket.on('failedLobbyConnection', (reason: string) => {
                 expect(reason).to.equal('Nom Banni');
                 done();
             });
         }, RESPONSE_DELAY);
     });
 
-    it('validateName should return validName if the name is correct', (done) => {
+    it('should handle joinLobby event by emitting failedLobbyConnection event if the lobby is locked', (done) => {
         const name = 'test';
         createGame();
 
-        clientSocket.emit('validateName', name);
+        setTimeout(() => {
+            clientSocket.emit('toggleLock');
+            clientSocket.emit('joinLobby', name);
 
-        clientSocket.on('validName', (validName: string) => {
+            clientSocket.on('failedLobbyConnection', (message: string) => {
+                expect(message).to.equal(`La partie de PIN ${roomPin} a été verrouillée par l'organisateur. Attendez et réessayez.`);
+                done();
+            });
+        }, RESPONSE_DELAY);
+    });
+
+    it('should handle joinLobby event by emitting successfulLobbyConnection event if the name is correct', (done) => {
+        const name = 'test';
+        createGame();
+
+        clientSocket.emit('joinLobby', name);
+
+        clientSocket.on('successfulLobbyConnection', (validName: string) => {
             expect(validName).to.equal(name);
             done();
         });
@@ -169,8 +186,8 @@ describe('SocketManager service tests', () => {
 
         setTimeout(() => {
             const pin = roomPin;
-            clientSocket2.emit('joinLobby', pin);
-            clientSocket2.emit('validateName', nameClient2);
+            clientSocket2.emit('validatePin', pin);
+            clientSocket2.emit('joinLobby', nameClient2);
 
             setTimeout(() => {
                 clientSocket.emit('banPlayer', { socketId: clientSocket2.id, name: nameClient2 });
@@ -224,8 +241,8 @@ describe('SocketManager service tests', () => {
         createGame();
 
         setTimeout(() => {
-            clientSocket2.emit('joinLobby', roomPin);
-            clientSocket2.emit('validateName', '');
+            clientSocket2.emit('validatePin', roomPin);
+            clientSocket2.emit('joinLobby', '');
 
             setTimeout(() => {
                 clientSocket.emit('leaveLobby');
@@ -261,93 +278,172 @@ describe('SocketManager service tests', () => {
         createGame();
 
         setTimeout(() => {
-            clientSocket2.emit('joinLobby', roomPin);
-            clientSocket2.emit('validateName', '');
+            clientSocket2.emit('validatePin', roomPin);
+            clientSocket2.emit('joinLobby', '');
 
             setTimeout(() => {
                 expect(service['lobbies'].get(roomPin).players.length).to.equal(2);
 
                 clientSocket2.emit('leaveLobby');
             }, RESPONSE_DELAY);
-        }, RESPONSE_DELAY);
 
-        clientSocket2.once('latestPlayerList', () => {
-            setTimeout(() => {
-                expect(service['lobbies'].get(roomPin).players.length).to.equal(1);
-                clientSocket2.close();
-                done();
-            }, RESPONSE_DELAY);
-        });
+            clientSocket2.once('latestPlayerList', () => {
+                setTimeout(() => {
+                    expect(service['lobbies'].get(roomPin).players.length).to.equal(1);
+                    clientSocket2.close();
+                    done();
+                }, RESPONSE_DELAY);
+            });
+        }, RESPONSE_DELAY);
     });
 
-    it('startCountDown should emit isQuestionTransition if the next question is loading', (done) => {
+    it('startCountdown should emit questionTransition event if the next question is loading', (done) => {
         createGame();
 
-        clientSocket.emit('startCountDown', 0, true);
+        setTimeout(() => {
+            clientSocket.emit('startCountdown', 0, { isQuestionTransition: true });
 
-        clientSocket.on('isQuestionTransition', (isQuestionTransition: boolean) => {
-            expect(isQuestionTransition).to.equal(true);
+            clientSocket.on('questionTransition', (isQuestionTransition: boolean) => {
+                expect(isQuestionTransition).to.equal(true);
+                done();
+            });
+        }, RESPONSE_DELAY);
+    });
+
+    it('startCountdown should emit countdown if the timer is greater than 0', (done) => {
+        let time = 4;
+
+        setTimeout(() => {
+            clientSocket.emit('startCountdown', time, { isPanicModeEnabled: true }, GameMode.Testing);
+
+            clientSocket.on('countdown', (count: number) => {
+                expect(count).to.equal(time);
+                clientSocket.on('countdown', (newCount: number) => {
+                    expect(newCount).to.equal(--time);
+                    done();
+                });
+                done();
+            });
+        }, RESPONSE_DELAY);
+    });
+
+    it('startCountdown should emit countdownEnd if the timer is less or equal than 1', (done) => {
+        createGame();
+        const spy = sinon.spy(service['sio'], 'to');
+
+        setTimeout(() => {
+            clientSocket.emit('startCountdown', 1, { isQuestionTransition: false, isPanicModeEnabled: false }, GameMode.RealGame);
+
+            clientSocket.on('countdownEnd', () => {
+                sinon.assert.called(spy);
+                done();
+            });
+        }, RESPONSE_DELAY);
+    });
+
+    it('startCountDown should update the histogram of active players when the reason is the inactivity of the player', (done) => {
+        createGame();
+        const nbActivePlayers = -1;
+
+        clientSocket.emit('startCountdown', 1, { isInputInactivityCountdown: true }, GameMode.RealGame);
+
+        clientSocket.once('updateHistogram', (histogram: { [key: string]: number }) => {
+            expect(histogram[ACTIVE_PLAYERS_TEXT]).to.equal(nbActivePlayers);
             done();
         });
     });
 
-    it('startCountDown should emit countDown if the timer is greater than 0', (done) => {
-        const time = 4;
-
-        setTimeout(() => {
-            clientSocket.emit('startCountDown', time, false, GameMode.Testing);
-
-            clientSocket.on('countDown', (timer: number) => {
-                expect(timer).to.equal(time - 1);
-                done();
-            });
-        }, RESPONSE_DELAY);
-    });
-
-    it('startCountDown should emit countDownEnd if the timer is less or equal than 1', (done) => {
-        createGame();
-
-        setTimeout(() => {
-            clientSocket.emit('startCountDown', 1, false, GameMode.RealGame);
-
-            clientSocket.on('countDownEnd', (timer: number) => {
-                expect(timer).to.equal(0);
-                done();
-            });
-        }, RESPONSE_DELAY);
-    });
-
-    it('stopCountDown should stop the timer', (done) => {
-        let countDownEnded = false;
+    it('stopCountdown should stop the timer', (done) => {
+        let countdownEnded = false;
         const waitTime = 2500;
-        clientSocket.emit('startCountDown', 2, false, GameMode.Testing);
+        clientSocket.emit('startCountdown', 2, { isQuestionTransition: false, isPanicModeEnabled: false }, GameMode.Testing);
 
-        clientSocket.emit('stopCountDown');
+        clientSocket.emit('stopCountdown');
 
-        clientSocket.on('countDownEnd', () => {
-            countDownEnded = true;
+        clientSocket.on('countdownEnd', () => {
+            countdownEnded = true;
         });
 
         setTimeout(() => {
-            expect(countDownEnded).to.equal(false);
+            expect(countdownEnded).to.equal(false);
             done();
         }, waitTime);
     });
 
-    it('chatMessage should return messageReceived', (done) => {
-        const message = 'Hello';
+    it('markInputActivity should update the histogram of active players', (done) => {
         createGame();
+        const nbActivePlayers = 1;
 
-        clientSocket.emit('chatMessage', { content: message });
+        clientSocket.emit('markInputActivity');
 
-        clientSocket.on('messageReceived', (messageData) => {
-            expect(messageData.sender).to.equal(clientSocket.id);
-            expect(messageData.content).to.equal(message);
-
+        clientSocket.once('updateHistogram', (histogram: { [key: string]: number }) => {
+            expect(histogram[ACTIVE_PLAYERS_TEXT]).to.equal(nbActivePlayers);
             done();
         });
     });
 
+    it('evaluationPhaseCompleted should emit qrlResults to the room', (done) => {
+        const clientSocket2 = ioClient(urlString);
+        const answer: Answer = { submitter: 'player', questionType: QuestionType.QRL, text: 'test', grade: null };
+        createGame();
+
+        setTimeout(() => {
+            clientSocket2.emit('validatePin', roomPin);
+            clientSocket2.emit('joinLobby', '');
+
+            setTimeout(() => {
+                clientSocket.emit('evaluationPhaseCompleted', [answer]);
+
+                clientSocket2.on('qrlResults', (answers: Answer[]) => {
+                    expect(answers).to.deep.equal([answer]);
+                    done();
+                });
+            }, RESPONSE_DELAY);
+        }, RESPONSE_DELAY);
+    });
+
+    it('chatMessage should return messageReceived', (done) => {
+        createGame();
+
+        setTimeout(() => {
+            const message: Message = { sender: clientSocket.id, content: 'content1', time: new Date() };
+            service['lobbies'].get(roomPin).chat = [];
+            clientSocket.emit('chatMessage', message);
+            clientSocket.on('messageReceived', (currentLobbyChat: Message[]) => {
+                expect(currentLobbyChat[0].content).to.equal('content1');
+                expect(currentLobbyChat[0].time).to.deep.equal(message.time.toISOString());
+                done();
+            });
+        }, RESPONSE_DELAY);
+    });
+
+    it('chatMessage should return PlayerMuted if the player is not allowed to chat', (done) => {
+        createGame();
+
+        setTimeout(() => {
+            const message: Message = { sender: clientSocket.id, content: 'content1', time: new Date() };
+            service['lobbies'].get(roomPin).players[0].isAbleToChat = false;
+            clientSocket.emit('chatMessage', message);
+            clientSocket.on('PlayerMuted', () => {
+                done();
+            });
+        }, RESPONSE_DELAY);
+    });
+
+    it('getChat should return chat', (done) => {
+        // const message1: Message = { sender: 'socket1', content: 'content1', time: new Date('date1') };
+        // setTimeout(()=> {
+        //     service['lobbies'].get(roomPin).chat = [];
+        //     service['lobbies'].get(roomPin).chat.push(message1);
+        //     clientSocket.emit('getChat');
+        // })
+        // clientSocket.on('messageReceived', (currentLobbyChat) => {
+        //     expect(currentLobbyChat[0].sender).to.equal(message1);
+        //     expect(message.content).to.equal(message);
+        //     done();
+        // });
+        done();
+    });
     it('answerSubmitted should do nothing if the player is not in a lobby', (done) => {
         let answerSubmitted = false;
 
@@ -366,40 +462,92 @@ describe('SocketManager service tests', () => {
         }, RESPONSE_DELAY);
     });
 
-    it('answerSubmitted should return canLoadNextQuestion to the host and all submitted to the others', (done) => {
+    it('answerSubmitted should return qcmEnd if the question is a qcm', (done) => {
         const clientSocket2 = ioClient(urlString);
         const clientSocket3 = ioClient(urlString);
-        let canLoadQuestion = false;
+        const answer: Answer = {
+            submitter: 'player',
+            questionType: QuestionType.QCM,
+            isCorrect: true,
+            grade: null,
+        };
         let nbSubmitted = 0;
         createGame();
 
         setTimeout(() => {
-            clientSocket2.emit('joinLobby', roomPin);
-            clientSocket2.emit('validateName', 'test1');
-            clientSocket3.emit('joinLobby', roomPin);
-            clientSocket3.emit('validateName', 'test2');
+            clientSocket2.emit('validatePin', roomPin);
+            clientSocket2.emit('joinLobby', 'test1');
+            clientSocket3.emit('validatePin', roomPin);
+            clientSocket3.emit('joinLobby', 'test2');
 
             setTimeout(() => {
-                clientSocket2.emit('answerSubmitted', true, false);
-                clientSocket3.emit('answerSubmitted', true, true);
-                clientSocket.on('canLoadNextQuestion', () => {
-                    canLoadQuestion = true;
-                });
-                clientSocket2.on('allSubmitted', (bonusRecipient: string) => {
+                clientSocket2.emit('answerSubmitted', answer, false);
+                clientSocket3.emit('answerSubmitted', answer, true);
+                clientSocket2.on('qcmEnd', (bonusRecipient: string) => {
                     expect(bonusRecipient).to.equal(clientSocket2.id);
                     nbSubmitted++;
                 });
-                clientSocket3.on('allSubmitted', (bonusRecipient: string) => {
+                clientSocket3.on('qcmEnd', (bonusRecipient: string) => {
                     expect(bonusRecipient).to.not.equal(clientSocket3.id);
                     nbSubmitted++;
                 });
 
                 setTimeout(() => {
                     expect(nbSubmitted).to.equal(2);
-                    expect(canLoadQuestion).to.equal(true);
                     done();
                 }, RESPONSE_DELAY);
             }, RESPONSE_DELAY);
+        }, RESPONSE_DELAY);
+    });
+
+    it('answerSubmitted should return qrlEnd if the question is a qrl', (done) => {
+        const clientSocket2 = ioClient(urlString);
+        const clientSocket3 = ioClient(urlString);
+        const answer: Answer = {
+            submitter: 'test',
+            questionType: QuestionType.QRL,
+            isCorrect: true,
+            grade: null,
+        };
+        let nbSubmitted = 0;
+        createGame();
+
+        setTimeout(() => {
+            clientSocket2.emit('validatePin', roomPin);
+            clientSocket2.emit('joinLobby', 'test1');
+            clientSocket3.emit('validatePin', roomPin);
+            clientSocket3.emit('joinLobby', 'test2');
+
+            setTimeout(() => {
+                clientSocket2.emit('answerSubmitted', answer, false);
+                clientSocket3.emit('answerSubmitted', answer, true);
+                clientSocket2.on('qrlEnd', (answers: [Answer]) => {
+                    expect(answers).to.deep.equal([answer, answer]);
+                    nbSubmitted++;
+                });
+                clientSocket3.on('qrlEnd', (answers: [Answer]) => {
+                    expect(answers).to.deep.equal([answer, answer]);
+                    nbSubmitted++;
+                });
+
+                setTimeout(() => {
+                    expect(nbSubmitted).to.equal(2);
+                    done();
+                }, RESPONSE_DELAY);
+            }, RESPONSE_DELAY);
+        }, RESPONSE_DELAY);
+    });
+
+    it('should handle enablePanicMode by emitting panicMode event to everyone in the room', (done) => {
+        createGame();
+        const spy = sinon.spy(service['sio'], 'to');
+
+        setTimeout(() => {
+            clientSocket.emit('enablePanicMode');
+            clientSocket.on('panicMode', () => {
+                sinon.assert.called(spy);
+                done();
+            });
         }, RESPONSE_DELAY);
     });
 
@@ -419,14 +567,14 @@ describe('SocketManager service tests', () => {
     });
 
     it('histogramUpdate should update the histogram and send updateHistogram', (done) => {
-        const data = { ['1']: 2 };
+        const data = { answer: 2 };
         createGame();
 
         setTimeout(() => {
             service['lobbies'].get(roomPin).histogram = {};
-            service['lobbies'].get(roomPin).histogram['1'] = 1;
+            service['lobbies'].get(roomPin).histogram['answer'] = 1;
 
-            clientSocket.emit('histogramUpdate', { ['1']: 1 });
+            clientSocket.emit('histogramUpdate', { answer: 1 });
 
             clientSocket.on('updateHistogram', (updateData: { [key: string]: number }) => {
                 expect(updateData).to.deep.equal(data);
@@ -436,7 +584,8 @@ describe('SocketManager service tests', () => {
     });
 
     it('histogramUpdate should create an histogram if one does not already exist', (done) => {
-        const data = { ['1']: 1 };
+        const data = { answer: 1 };
+        Object.getPrototypeOf(data).unwantedKey = 0;
         createGame();
 
         clientSocket.emit('histogramUpdate', data);
@@ -469,7 +618,7 @@ describe('SocketManager service tests', () => {
         clientSocket.emit('resetHistogram', data);
 
         clientSocket.on('updateHistogram', (updateData: { [key: string]: number }) => {
-            expect(updateData).to.deep.equal({});
+            expect(updateData).to.deep.equal(null);
             done();
         });
     });
@@ -583,6 +732,64 @@ describe('SocketManager service tests', () => {
                 expect(playerListReceived).to.equal(false);
                 done();
             }, RESPONSE_DELAY);
+        }, RESPONSE_DELAY);
+    });
+
+    it('toggleMute should toggle the isAbleToChat status of a player', (done) => {
+        const clientSocket2 = ioClient(urlString);
+        const nameClient2 = 'test';
+        createGame();
+
+        setTimeout(() => {
+            const pin = roomPin;
+            clientSocket2.emit('validatePin', pin);
+            clientSocket2.emit('joinLobby', nameClient2);
+
+            setTimeout(() => {
+                clientSocket.emit('toggleMute', {
+                    socketId: clientSocket2.id,
+                    name: nameClient2,
+                    answerSubmitted: true,
+                    score: 0,
+                    bonusTimes: 0,
+                    activityState: PlayerColor.Red,
+                    isAbleToChat: true,
+                });
+
+                clientSocket2.on('PlayerMuted', () => {
+                    done();
+                });
+            }, RESPONSE_DELAY);
+        }, RESPONSE_DELAY);
+    });
+
+    it('socketInteracted should change the status of the player of interacted to yellow', (done) => {
+        createGame();
+
+        setTimeout(() => {
+            clientSocket.emit('socketInteracted');
+
+            clientSocket.on('latestPlayerList', (lobby: LobbyDetails) => {
+                expect(lobby).to.deep.equal(service['lobbies'].get(roomPin));
+                expect(lobby.players[0].activityState).to.equal(PlayerColor.Yellow);
+                done();
+            });
+        }, RESPONSE_DELAY);
+    });
+
+    it('resetPlayersActivityState should reset the status of all players in lobby to red', (done) => {
+        createGame();
+
+        setTimeout(() => {
+            clientSocket.emit('resetPlayersActivityState');
+
+            clientSocket.on('latestPlayerList', (lobby: LobbyDetails) => {
+                expect(lobby).to.deep.equal(service['lobbies'].get(roomPin));
+                lobby.players.forEach((player) => {
+                    expect(player.activityState).to.equal(PlayerColor.Red);
+                });
+                done();
+            });
         }, RESPONSE_DELAY);
     });
 });

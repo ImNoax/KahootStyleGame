@@ -1,13 +1,15 @@
+import { formatDate } from '@angular/common';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router, RouterModule, convertToParamMap } from '@angular/router';
 import { GameImportPopupComponent } from '@app/components/game-import-popup/game-import-popup.component';
 import { HeaderComponent } from '@app/components/header/header.component';
-import { FormManagerService } from '@app/services/form-manager.service';
-import { GameHandlingService } from '@app/services/game-handling.service';
+import { FormManagerService } from '@app/services/form-manager/form-manager.service';
+import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
 import { Game, QuestionType } from '@common/game';
 import { Observable, of } from 'rxjs';
 import { AdminJeuPageComponent } from './admin-jeu-page.component';
@@ -19,6 +21,7 @@ interface MockEvent {
 }
 describe('AdminJeuPageComponent', () => {
     let mockRouter: jasmine.SpyObj<Router>;
+    let formManagerServiceSpy: jasmine.SpyObj<FormManagerService>;
     let component: AdminJeuPageComponent;
     let fixture: ComponentFixture<AdminJeuPageComponent>;
     let gameHandler: GameHandlingService;
@@ -29,20 +32,37 @@ describe('AdminJeuPageComponent', () => {
             title: 'Test Game',
             description: 'Test Description',
             duration: 10,
-            lastModification: '2023-09-30',
+            lastModification: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
             isVisible: true,
-            questions: [],
+            questions: [
+                {
+                    text: 'Question 1',
+                    points: 10,
+                    type: QuestionType.QCM,
+                    choices: [
+                        { text: 'Choice 1', isCorrect: true },
+                        { text: 'Choice 2', isCorrect: false },
+                    ],
+                },
+                {
+                    text: 'Question 2',
+                    points: 10,
+                    type: QuestionType.QRL,
+                },
+            ],
         },
     ];
 
     beforeEach(async () => {
         mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+        formManagerServiceSpy = jasmine.createSpyObj('FormManagerService', ['preventEmptyInput']);
+
         await TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule, MatIconModule, MatDialogModule, RouterModule],
+            imports: [HttpClientTestingModule, MatIconModule, MatDialogModule, RouterModule, MatSnackBarModule],
             declarations: [AdminJeuPageComponent, HeaderComponent],
             providers: [
                 GameHandlingService,
-                FormManagerService,
+                { provide: FormManagerService, useValue: formManagerServiceSpy },
                 { provide: Router, useValue: mockRouter },
                 FormBuilder,
                 {
@@ -73,37 +93,9 @@ describe('AdminJeuPageComponent', () => {
     });
 
     it('modifyGame should save the game information in the formManager', () => {
-        const mockQuestions = [
-            {
-                text: 'Test Question',
-                points: 10,
-                type: 'single-choice' as QuestionType,
-                choices: [
-                    { text: 'Choice 1', isCorrect: true },
-                    { text: 'Choice 2', isCorrect: false },
-                ],
-            },
-        ];
-
-        mockGames[0].questions = mockQuestions;
-        const formManager = component['formManager'];
         component.modifyGame(mockGames[0]);
-
-        expect(formManager.nameModif).toEqual(mockGames[0].title);
-
-        const questionsFormArray = formManager.gameForm.get('questions') as FormArray;
-
-        questionsFormArray.controls.forEach((control, index) => {
-            const questionGroup = control as FormGroup;
-            const choicesFormArray = questionGroup.get('choices') as FormArray;
-            expect(choicesFormArray instanceof FormArray).toBeTrue();
-
-            choicesFormArray.controls.forEach((choiceControl, choiceIndex) => {
-                const choiceGroup = choiceControl as FormGroup;
-                expect(choiceGroup.get('text')?.value).toEqual(mockQuestions[index].choices[choiceIndex].text);
-                expect(choiceGroup.get('isCorrect')?.value).toEqual(mockQuestions[index].choices[choiceIndex].isCorrect);
-            });
-        });
+        expect(formManagerServiceSpy.gameForm.value).toEqual(mockGames[0]);
+        expect(formManagerServiceSpy.nameModif).toEqual(mockGames[0].title);
     });
 
     it('should retrieve the list of games on initialization', () => {

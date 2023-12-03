@@ -1,13 +1,13 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { GameImportPopupComponent } from '@app/components/game-import-popup/game-import-popup.component';
-import { Route } from '@app/enums';
-import { FormManagerService } from '@app/services/form-manager.service';
-import { GameHandlingService } from '@app/services/game-handling.service';
-import { Game } from '@common/game';
+import { Route } from '@app/constants/enums';
+import { FormManagerService } from '@app/services/form-manager/form-manager.service';
+import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
+import { Choice, Game, Question, QuestionType } from '@common/game';
 import { Limit } from '@common/limit';
-import { saveAs } from 'file-saver';
+import { saveAs } from 'file-saver-es';
 
 const JSON_SPACE = 4;
 
@@ -18,6 +18,7 @@ const JSON_SPACE = 4;
 })
 export class AdminJeuPageComponent implements OnInit {
     quizCreationRoute: string = '/' + Route.QuizCreation;
+    historyRoute: string = '/' + Route.HistoryPage;
     games: Game[];
     fileName: string = '';
     isFileEmpty: boolean = false;
@@ -45,20 +46,27 @@ export class AdminJeuPageComponent implements OnInit {
             lastModification: game.lastModification,
             isVisible: game.isVisible,
             questions: fb.array(
-                game.questions.map((question) => {
-                    return fb.group({
+                game.questions.map((question: Question) => {
+                    const questionForm: FormGroup = fb.group({
                         text: [question.text, [Validators.required, this.formManager.preventEmptyInput]],
                         points: [question.points, [Validators.required, Validators.pattern('^[1-9][0-9]*0$'), Validators.max(Limit.MaxPoints)]],
                         type: question.type,
-                        choices: fb.array(
-                            question.choices.map((choice) => {
-                                return fb.group({
-                                    text: [choice.text, [Validators.required, this.formManager.preventEmptyInput]],
-                                    isCorrect: choice.isCorrect,
-                                });
-                            }),
-                        ),
                     });
+                    if (question.type === QuestionType.QCM) {
+                        if (question.choices) {
+                            const choices = fb.array(
+                                question.choices.map((choice: Choice) => {
+                                    return fb.group({
+                                        text: [choice.text, [Validators.required, this.formManager.preventEmptyInput]],
+                                        isCorrect: choice.isCorrect,
+                                    });
+                                }),
+                            ) as FormArray;
+
+                            questionForm.addControl('choices', choices);
+                        }
+                    }
+                    return questionForm;
                 }),
             ),
         });
