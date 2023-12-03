@@ -2,26 +2,27 @@
     display: flex;
     align-items: center;
     justify-content: flex-start;
+    font-size: 20pt;
+    margin-top: 5%;
 }
 
 .text-wrapper {
-    width: 250px; 
+    width: inherit;
     display: inline-flex;
-    justify-content: flex-end; 
+    justify-content: flex-end;
     padding-right: 10px;
 }
 
 .bar {
-    height: 20px; 
+    height: 20px;
     background-color: #3498db;
     margin: 5px 0;
 }
 
 .correct-answer {
-  color: green;
+    color: green;
 }
 
 .incorrect-answer {
-  color: red;
+    color: red;
 }
-
