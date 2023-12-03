@@ -1,7 +1,7 @@
 // Custom Theming for Angular Material
 // For more information: https://material.angular.io/guide/theming
 @use '@angular/material' as mat;
-@use './app/pages/material-page/material-page.component.theme' as material-page;
+@use './material.theme' as material;
 // Plus imports for other components in your app.
 
 // Include the common styles for Angular Material. We include this here so that you only
@@ -23,7 +23,7 @@ $indigo-pink-theme: mat.define-light-theme(
 // Alternatively, you can import and @include the theme mixins for each component
 // that you are using.
 @include mat.all-component-themes($indigo-pink-theme);
-@include material-page.theme($indigo-pink-theme);
+@include material.theme($indigo-pink-theme);
 
 .deeppurple-amber-theme {
     $deeppurple-amber-theme: mat.define-light-theme(
@@ -35,7 +35,7 @@ $indigo-pink-theme: mat.define-light-theme(
         )
     );
     @include mat.all-component-colors($deeppurple-amber-theme);
-    @include material-page.theme($deeppurple-amber-theme);
+    @include material.theme($deeppurple-amber-theme);
 }
 
 .pink-bluegrey-theme {
@@ -48,7 +48,7 @@ $indigo-pink-theme: mat.define-light-theme(
         )
     );
     @include mat.all-component-colors($pink-bluegrey-theme);
-    @include material-page.theme($pink-bluegrey-theme);
+    @include material.theme($pink-bluegrey-theme);
 }
 
 .purple-green-theme {
@@ -61,7 +61,7 @@ $indigo-pink-theme: mat.define-light-theme(
         )
     );
     @include mat.all-component-colors($purple-green-theme);
-    @include material-page.theme($purple-green-theme);
+    @include material.theme($purple-green-theme);
 }
 
 /* You can add global styles to this file, and also import other style files */
@@ -89,6 +89,8 @@ body {
 // }
 
 .mat-mdc-snack-bar-container {
+    padding: 5pt;
+    font-size: 20pt;
     &.snack-bar-error {
         --mdc-snackbar-container-color: rgb(222, 44, 44);
         // --mdc-snackbar-supporting-text-color:  !important;
@@ -97,4 +99,8 @@ body {
             // color: blue !important;
         }
     }
+}
+
+button {
+    cursor: pointer;
 }

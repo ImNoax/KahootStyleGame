@@ -1,7 +1,14 @@
 <div id="timer">
-    Temps restant : {{ count }} secondes
-
+    {{ count }} secondes
     <div class="progress-bar">
-        <div class="progress-fill" [style.width.%]="count && currentGame.duration ? (count / currentGame.duration) * 100 : 0"></div>
+        <div
+            [ngClass]="{
+                running: isCountdownRunning && !isPanicModeEnabled,
+                'panic-running': isCountdownRunning && isPanicModeEnabled,
+                stopped: !isCountdownRunning
+            }"
+            class="progress-fill"
+            [style.width.%]="count && currentQuestionDuration ? (count / currentQuestionDuration) * 100 : 0"
+        ></div>
     </div>
 </div>

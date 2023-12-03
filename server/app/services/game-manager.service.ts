@@ -1,3 +1,4 @@
+import { DatabaseService } from '@app/services/database.service';
 import { FileManagerService } from '@app/services/file-manager.service';
 import { Choice, Game, Question } from '@common/game';
 import { Limit } from '@common/limit';
@@ -6,17 +7,23 @@ import * as randomstring from 'randomstring';
 import { Service } from 'typedi';
 
 const JSON_SPACE = 4;
-const NOT_FOUND_INDEX = -1;
 const ID_LENGTH = 6;
 
 @Service()
 export class GameManagerService {
     error: Error;
-    constructor(private fileManager: FileManagerService) {}
+    constructor(
+        private databaseService: DatabaseService,
+        private fileManager: FileManagerService,
+    ) {}
 
     async getGames(): Promise<Game[]> {
-        const fileBuffer: Buffer = await this.fileManager.readJsonFile('./data/games.json');
-        return JSON.parse(fileBuffer.toString());
+        const db = this.databaseService.getDb();
+        const gamesCollection = db.collection('Games');
+
+        const games = (await gamesCollection.find({}).toArray()) as unknown as Game[];
+
+        return games;
     }
 
     async exportGame(id: string): Promise<string> {
@@ -31,48 +38,65 @@ export class GameManagerService {
     }
 
     async modifyGame(id: string, modifiedGame: Game): Promise<Game[]> {
-        const games: Game[] = await this.getGames();
-        const index = games.findIndex((game) => game.id === id);
-        if (index !== NOT_FOUND_INDEX) {
-            games[index] = modifiedGame;
-            this.fileManager.writeJsonFile('./data/games.json', JSON.stringify(games, null, JSON_SPACE));
-        } else {
-            this.addGame(modifiedGame);
+        const ajv = new Ajv({ allErrors: true });
+        const schemaContent = await this.fileManager.readJsonFile('./data/game-schema.json');
+        const schema = JSON.parse(schemaContent.toString());
+
+        const valid = ajv.validate(schema, modifiedGame) && this.validateGame(modifiedGame);
+        if (!valid) {
+            if (ajv.errors) {
+                this.error = new Error(ajv.errors[0].instancePath + ' ' + ajv.errors[0].message);
+            }
+            return null;
         }
+
+        const db = this.databaseService.getDb();
+        const gamesCollection = db.collection('Games');
+
+        await gamesCollection.updateOne({ id }, { $set: modifiedGame });
+
+        const games = (await gamesCollection.find({}).toArray()) as unknown as Game[];
 
         return games;
     }
 
     async modifyGameVisibility(id: string, newVisibility: { isVisible: boolean }): Promise<Game[]> {
-        const games: Game[] = await this.getGames();
-        const gameToUpdate = games.find((game) => game.id === id);
+        const db = this.databaseService.getDb();
+        const gamesCollection = db.collection('Games');
 
-        if (gameToUpdate) {
-            gameToUpdate.isVisible = newVisibility.isVisible;
-            await this.fileManager.writeJsonFile('./data/games.json', JSON.stringify(games, null, JSON_SPACE));
-        }
+        await gamesCollection.updateOne({ id }, { $set: { isVisible: newVisibility.isVisible } });
+
+        const games = (await gamesCollection.find({}).toArray()) as unknown as Game[];
 
         return games;
     }
 
     async addGame(newGame: Game): Promise<Game[]> {
         const ajv = new Ajv({ allErrors: true });
-        const schema = JSON.parse((await this.fileManager.readJsonFile('./data/game-schema.json')).toString());
-        const games: Game[] = await this.getGames();
+        const schemaContent = await this.fileManager.readJsonFile('./data/game-schema.json');
+        const schema = JSON.parse(schemaContent.toString());
+
+        const existingGames: Game[] = await this.getGames();
         do {
             newGame.id = randomstring.generate(ID_LENGTH);
-        } while (games.find((game) => game.id === newGame.id));
+        } while (existingGames.some((game) => game.id === newGame.id));
 
         const valid = ajv.validate(schema, newGame) && this.validateGame(newGame);
         if (!valid) {
-            if (ajv.errors) this.error = new Error(ajv.errors[0].instancePath + ' ' + ajv.errors[0].message);
+            if (ajv.errors) {
+                this.error = new Error(ajv.errors[0].instancePath + ' ' + ajv.errors[0].message);
+            }
             return null;
         }
-        games.push(newGame);
 
-        this.fileManager.writeJsonFile('./data/games.json', JSON.stringify(games, null, JSON_SPACE));
+        const db = this.databaseService.getDb();
+        const gamesCollection = db.collection('Games');
 
-        return games;
+        await gamesCollection.insertOne(newGame);
+
+        const allGames = (await gamesCollection.find({}).toArray()) as unknown as Game[];
+
+        return allGames;
     }
 
     validateGame(game: Game): boolean {
@@ -110,11 +134,12 @@ export class GameManagerService {
                 this.error = new Error(`Points de la question: "${question.text}" invalides`);
                 return false;
             }
-            if (question.choices.length < Limit.MinChoicesNumber || question.choices.length > Limit.MaxChoicesNumber) {
+            if (question.choices && (question.choices.length < Limit.MinChoicesNumber || question.choices.length > Limit.MaxChoicesNumber)) {
                 this.error = new Error(`Choix de la question: "${question.text}" invalides`);
                 return false;
             }
-            choicesValid = choicesValid && this.validateChoices(question.choices);
+
+            if (question.choices) choicesValid = this.validateChoices(question.choices);
         }
         return choicesValid;
     }
@@ -143,11 +168,9 @@ export class GameManagerService {
     }
 
     async deleteGameById(id: string): Promise<void> {
-        const games: Game[] = await this.getGames();
-        const index = games.findIndex((game) => game.id === id);
-        if (index !== NOT_FOUND_INDEX) {
-            games.splice(index, 1);
-            await this.fileManager.writeJsonFile('./data/games.json', JSON.stringify(games, null, JSON_SPACE));
-        }
+        const db = this.databaseService.getDb();
+        const gamesCollection = db.collection('Games');
+
+        await gamesCollection.deleteOne({ id });
     }
 }

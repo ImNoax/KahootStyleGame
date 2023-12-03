@@ -1,22 +1,59 @@
+import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock';
 import { SocketMock } from '@app/classes/socket-mock';
-import { ClientSocketService } from '@app/services/client-socket.service';
+import { HistogramComponent } from '@app/components/histogram/histogram.component';
+import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
+import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
+import { Game, Question, QuestionType } from '@common/game';
+import { PlayerColor } from '@common/lobby';
 import { EndResultComponent } from './end-result.component';
-
 describe('EndResultComponent', () => {
     let component: EndResultComponent;
     let fixture: ComponentFixture<EndResultComponent>;
     let clientSocketServiceMock: ClientSocketServiceMock;
+    let gameHandlingServiceMock: jasmine.SpyObj<GameHandlingService>;
     let socketMock: SocketMock;
-    let nEmittedEvents: number;
+    let questionMocks: Question[];
+    let gameMock: Game;
 
     beforeEach(() => {
         clientSocketServiceMock = new ClientSocketServiceMock();
+        questionMocks = [
+            {
+                text: 'What is the capital of France?',
+                points: 10,
+                type: QuestionType.QCM,
+                choices: [
+                    { text: 'Paris', isCorrect: true },
+                    { text: 'London', isCorrect: false },
+                    { text: 'Berlin', isCorrect: false },
+                    { text: 'Madrid', isCorrect: false },
+                ],
+            },
+        ];
 
+        gameMock = {
+            id: '1',
+            title: 'Game 1',
+            description: 'Test ',
+            duration: 5,
+            lastModification: '2018-11-13',
+            questions: [questionMocks[0], questionMocks[0]],
+        };
+        gameHandlingServiceMock = jasmine.createSpyObj('GameHandlingService', [
+            'getAllHistogramData',
+            'resetHistogramDataForQuestion',
+            'setCurrentQuestionId',
+            'getCorrectAnswersForCurrentQuestion',
+        ]);
         TestBed.configureTestingModule({
-            declarations: [EndResultComponent],
-            providers: [{ provide: ClientSocketService, useValue: clientSocketServiceMock }],
+            imports: [HttpClientModule],
+            declarations: [EndResultComponent, HistogramComponent],
+            providers: [
+                { provide: ClientSocketService, useValue: clientSocketServiceMock },
+                { provide: GameHandlingService, useValue: gameHandlingServiceMock },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(EndResultComponent);
@@ -24,7 +61,7 @@ describe('EndResultComponent', () => {
         socketMock = clientSocketServiceMock.socket as unknown as SocketMock;
         spyOn(socketMock, 'emit').and.callThrough();
         socketMock.clientUniqueEvents.clear();
-        nEmittedEvents = 0;
+        gameHandlingServiceMock.currentGame = gameMock;
     });
 
     it('should create', () => {
@@ -36,7 +73,44 @@ describe('EndResultComponent', () => {
         component.ngOnInit();
         expect(component.configureBaseSocketFeatures).toHaveBeenCalled();
         expect(socketMock.emit).toHaveBeenCalledWith('getPlayers');
-        expect(socketMock.nEmittedEvents).toEqual(++nEmittedEvents);
+    });
+
+    it('should not set the previous question if current question is the first question', () => {
+        component.currentQuestionId = 0;
+        component.previousQuestion();
+        expect(component.currentQuestionId).toBe(0);
+    });
+
+    it('should set the previous question if current question is not the first question', () => {
+        const updateQuestionSpy = spyOn(component, 'updateCurrentQuestionText');
+        component.currentQuestionId = 1;
+        component.previousQuestion();
+        expect(component.currentQuestionId).toBe(0);
+        expect(updateQuestionSpy).toHaveBeenCalled();
+    });
+
+    it('should not set the next question if current question is the last question', () => {
+        component.allHistogramData = {
+            [1]: { choice1: 10, choice2: 15 },
+            [2]: { choice1: 5, choice2: 20 },
+        };
+        component.currentQuestionId = 1;
+        component.nextQuestion();
+        expect(component.currentQuestionId).toBe(1);
+    });
+
+    it('should set the next question if current question is not the last question', () => {
+        const updateQuestionSpy = spyOn(component, 'updateCurrentQuestionText');
+        component.allHistogramData = {
+            [1]: { choice1: 10, choice2: 15 },
+            [2]: { choice1: 5, choice2: 20 },
+            [3]: { choice1: 8, choice2: 12 },
+        };
+        const un = 1;
+        component.currentQuestionId = un;
+        component.nextQuestion();
+        expect(component.currentQuestionId).toBe(un + un);
+        expect(updateQuestionSpy).toHaveBeenCalled();
     });
 
     it('should remove "latestPlayerList" listener on component destruction', () => {
@@ -54,8 +128,9 @@ describe('EndResultComponent', () => {
                     answerSubmitted: true,
                     score: 1,
                     bonusTimes: 1,
-                    isStillInGame: true,
+                    activityState: PlayerColor.Red,
                     isAbleToChat: true,
+                    isTyping: false,
                 },
             ],
         };
