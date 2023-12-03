@@ -1,5 +1,7 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { ConfirmationPopupComponent } from '@app/components/confirmation-popup/confirmation-popup.component';
 import { PANIC_SOUNDS } from '@app/constants/audio';
 import { Route } from '@app/constants/enums';
 import { AnswerValidatorService } from '@app/services/answer-validator/answer-validator.service';
@@ -34,6 +36,7 @@ export class InGamePageComponent implements OnInit, OnDestroy {
     private histogramSubscription: Subscription;
     private routeController: RouteControllerService = inject(RouteControllerService);
     private timer: TimerService = inject(TimerService);
+    private dialog: MatDialog = inject(MatDialog);
     private answerValidator: AnswerValidatorService = inject(AnswerValidatorService);
     private audio: AudioService = inject(AudioService);
 
@@ -157,11 +160,22 @@ export class InGamePageComponent implements OnInit, OnDestroy {
         this.currentQuestionScore = score;
     }
 
-    leaveGame(): void {
-        if (this.gameService.gameMode === GameMode.Testing) {
-            this.router.navigate([Route.GameCreation]);
-            return;
-        }
-        this.router.navigate([Route.MainMenu]);
+    abandonGame(): void {
+        this.dialog
+            .open(ConfirmationPopupComponent, {
+                backdropClass: 'backdropBackground',
+                disableClose: true,
+                data: { title: 'Abandon de partie', description: 'Voulez-vous vraiment abandonner la partie?', primaryAction: 'Abandonner' },
+            })
+            .afterClosed()
+            .subscribe((isLeaving: boolean) => {
+                if (isLeaving) {
+                    if (this.gameService.gameMode === GameMode.Testing) {
+                        this.router.navigate([Route.GameCreation]);
+                        return;
+                    }
+                    this.router.navigate([Route.MainMenu]);
+                }
+            });
     }
 }
