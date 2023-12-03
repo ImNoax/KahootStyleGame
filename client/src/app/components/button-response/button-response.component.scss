@@ -79,7 +79,7 @@
     background-color: #2478ff;
 }
 
-.btn-selected {
+button.btn-selected {
     background-color: #4d90fc;
 }
 
@@ -101,34 +101,110 @@
 
 #qrl-input {
     margin: auto;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: large;
+    font-family: 'Roboto', 'Helvetica Neue', sans-serif;
+    font-size: medium;
     padding: 0;
     margin-top: 5%;
-    width: 600px;
+    width: 525px;
 }
 
 #answer-field {
-    width: 600px;
+    width: 525px;
 }
 
-#answer-length {
+.answer-length,
+.answer-index {
     color: white;
     text-align: right;
+    font-size: small;
     padding: 0;
     margin: 0;
+}
+
+.answer-index {
+    margin-top: 2%;
 }
 
 textarea {
     resize: none;
 }
 
-.controls-container {
+#panic-availability {
+    position: relative;
+    font-size: 12px;
+    top: 3px;
+}
+
+.question-control {
     position: absolute;
     bottom: 20%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
 
+h5 {
+    margin: 0;
+    margin-bottom: 2%;
+}
+
+#evaluation-container {
+    margin-top: 5%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#answer {
+    width: 525px;
+    height: 100px;
+    font-family: 'Roboto', 'Helvetica Neue', sans-serif;
+    font-size: medium;
+    margin: 0;
+    overflow-wrap: break-word;
+    background-color: whitesmoke;
+    border: 3px solid #3f4faa;
+    border-radius: 10px;
+    text-align: left;
+    padding: 2%;
+    color: black;
+}
+
+p {
+    margin: 0;
+}
+
+#grade-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 5%;
+    margin-top: 2%;
+}
+
+#grade-container button {
+    font-size: large;
+    width: 150px;
+    padding: 4% 0;
+}
+
+.grade-button {
+    padding: 1%;
+    background-color: white;
+    border-radius: 10px;
+    border: 5px solid black;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.grade-button:hover:not(.btn-selected) {
+    background-color: rgb(181, 181, 181);
+}
+
+.evaluation-control {
+    margin-top: 2%;
+}
+
+.controls-container {
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -148,13 +224,4 @@ textarea {
 .controls-container button:disabled {
     background-color: silver;
     color: gray;
-}
-
-#panic-availability {
-    position: relative;
-    font-size: 12px;
-    top: 3px;
-}
-
-#answer-container {
 }

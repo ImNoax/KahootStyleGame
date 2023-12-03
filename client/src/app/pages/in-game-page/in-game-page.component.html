@@ -9,16 +9,12 @@
             <div id="question">{{ currentQuestion }} (+{{ currentQuestionScore }} points)</div>
             <div id="pointage" *ngIf="!isOrganizer">Score: {{ score }}</div>
         </div>
-        <app-button-response
-            *ngIf="!showResults"
-            (qrlEnd)="setEvaluationPhase($event)"
-            (updateQuestionScore)="onUpdateQuestionScore($event)"
-        ></app-button-response>
+        <app-button-response *ngIf="!showResults" (updateQuestionScore)="onUpdateQuestionScore($event)"></app-button-response>
     </div>
-    <p *ngIf="!isOrganizer && isEvaluationMessageVisible" id="evaluation-message">Évaluation des réponses en cours...</p>
+    <p *ngIf="!isOrganizer && isEvaluationPhase" id="evaluation-message">Évaluation des réponses en cours...</p>
     <div>
         <div *ngIf="isOrganizer && !showResults">
-            <app-histogram *ngIf="isHistogramVisible" [data]="histogramData" [correctAnswers]="correctAnswers"></app-histogram>
+            <app-histogram *ngIf="!isEvaluationPhase" [data]="histogramData" [correctAnswers]="correctAnswers"></app-histogram>
             <app-player-list></app-player-list>
         </div>
         <app-chat-box></app-chat-box>

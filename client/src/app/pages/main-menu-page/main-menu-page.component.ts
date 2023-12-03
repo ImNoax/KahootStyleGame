@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -16,7 +16,8 @@ import { BehaviorSubject } from 'rxjs';
     templateUrl: './main-menu-page.component.html',
     styleUrls: ['./main-menu-page.component.scss'],
 })
-export class MainMenuPageComponent implements OnInit, OnDestroy {
+export class MainMenuPageComponent implements OnInit, AfterViewInit, OnDestroy {
+    @ViewChild('pinInput', { static: false }) pinInput: ElementRef;
     gameCreationRoute: string = '/' + Route.GameCreation;
     title: string = 'Survey Genius';
     message: BehaviorSubject<string> = new BehaviorSubject<string>('');
@@ -24,6 +25,7 @@ export class MainMenuPageComponent implements OnInit, OnDestroy {
     serverErrorMessage: string = '';
     private routeController: RouteControllerService = inject(RouteControllerService);
     private dialog: MatDialog = inject(MatDialog);
+    private changeDetector: ChangeDetectorRef = inject(ChangeDetectorRef);
 
     constructor(
         private readonly gameHandler: GameHandlingService,
@@ -45,6 +47,13 @@ export class MainMenuPageComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this.clientSocket.socket.removeAllListeners('validPin');
         this.clientSocket.socket.removeAllListeners('invalidPin');
+    }
+
+    ngAfterViewInit(): void {
+        if (this.pinInput) {
+            this.pinInput.nativeElement.focus();
+            this.changeDetector.detectChanges();
+        }
     }
 
     adminLogin(): void {

@@ -34,13 +34,13 @@
             >
             </textarea>
         </mat-form-field>
-        <p id="answer-length">{{ answerForm.value.length }}/{{ maxQrlAnswerLength }}</p>
+        <p class="answer-length">{{ answerForm.value.length }}/{{ maxQrlAnswerLength }}</p>
     </div>
 
     <button type="button" class="validate-btn" (click)="submit()" [disabled]="submitted || isAnswerEmpty()">Soumettre</button>
 </div>
 <div *ngIf="isOrganizer">
-    <div *ngIf="!isEvaluationPhase" class="controls-container">
+    <div *ngIf="!isEvaluationPhase" class="controls-container question-control">
         <button mat-raised-button (click)="startNextQuestionCountdown()" [disabled]="!canLoadNextQuestion">{{ buttonLoadingMessage }}</button>
         <button mat-raised-button (click)="pause()" [disabled]="hasQuestionEnded">
             <i *ngIf="!isGamePaused" class="fa-solid fa-pause fa-2xl"></i>
@@ -56,26 +56,29 @@
         </button>
     </div>
 
-    <div *ngIf="isEvaluationPhase">
+    <div *ngIf="isEvaluationPhase" id="evaluation-container">
         <div id="answer-container">
-            <h3>Joueur: {{ currentEvaluatedAnswer.submitter }}</h3>
-            <p>{{ currentEvaluatedAnswer.text }}</p>
-            <p>{{ currentAnswerIndex + 1 }}/{{ qrlAnswers.length }}</p>
+            <h5>Joueur: {{ currentEvaluatedAnswer.submitter }}</h5>
+            <p id="answer">{{ currentEvaluatedAnswer.text }}</p>
+            <p class="answer-index">{{ currentAnswerIndex + 1 }}/{{ qrlAnswers.length }}</p>
         </div>
-        <div id="evaluation-button-container">
-            <div class="controls-container">
-                <button
-                    [ngClass]="{ btn: true, 'btn-selected': currentEvaluatedAnswer.pointsPercentage === pointsPercentage }"
-                    (click)="evaluateAnswer(pointsPercentage)"
-                    *ngFor="let pointsPercentage of pointsPercentages"
-                    mat-raised-button
-                >
-                    {{ pointsPercentage * 100 }}%
-                </button>
-            </div>
-            <button [disabled]="currentAnswerIndex === 0" (click)="getPreviousAnswer()" mat-raised-button>Réponse précédente</button>
+        <div id="grade-container">
             <button
-                [disabled]="currentAnswerIndex !== qrlAnswers.length - 1 || currentEvaluatedAnswer.pointsPercentage === undefined"
+                [ngClass]="{ 'grade-button': true, 'btn-selected': currentEvaluatedAnswer.grade === grade }"
+                (click)="evaluateAnswer(grade)"
+                *ngFor="let grade of grades"
+                mat-raised-button
+            >
+                {{ grade * 100 }}%
+            </button>
+        </div>
+        <div class="controls-container evaluation-control">
+            <button [disabled]="currentAnswerIndex === 0" (click)="getPreviousAnswer()" mat-raised-button>
+                <i class="fa-solid fa-backward fa-2xl"></i>
+                Réponse précédente
+            </button>
+            <button
+                [disabled]="currentAnswerIndex !== qrlAnswers.length - 1 || currentEvaluatedAnswer.grade === null"
                 (click)="endEvaluationPhase()"
                 mat-raised-button
             >

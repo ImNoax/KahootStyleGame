@@ -384,7 +384,7 @@ describe('SocketManager service tests', () => {
 
     it('evaluationPhaseCompleted should emit qrlResults to the room', (done) => {
         const clientSocket2 = ioClient(urlString);
-        const answer: Answer = { questionType: QuestionType.QRL, text: 'test' };
+        const answer: Answer = { submitter: 'player', questionType: QuestionType.QRL, text: 'test', grade: null };
         createGame();
 
         setTimeout(() => {
@@ -466,8 +466,10 @@ describe('SocketManager service tests', () => {
         const clientSocket2 = ioClient(urlString);
         const clientSocket3 = ioClient(urlString);
         const answer: Answer = {
+            submitter: 'player',
             questionType: QuestionType.QCM,
             isCorrect: true,
+            grade: null,
         };
         let nbSubmitted = 0;
         createGame();
@@ -505,6 +507,7 @@ describe('SocketManager service tests', () => {
             submitter: 'test',
             questionType: QuestionType.QRL,
             isCorrect: true,
+            grade: null,
         };
         let nbSubmitted = 0;
         createGame();

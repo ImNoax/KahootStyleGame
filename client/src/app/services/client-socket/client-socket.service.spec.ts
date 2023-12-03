@@ -131,6 +131,18 @@ describe('ClientSocketService', () => {
         socketMock.simulateServerEmit('updateHistogram', histogramData);
     });
 
+    it('should listen for qrl histogram update', (done) => {
+        const updateHistogramObservable = service.listenQrlUpdateHistogram();
+        const histogramData = { key1: 1, key2: 2, key3: 3 };
+
+        updateHistogramObservable.subscribe((data) => {
+            expect(data).toEqual(histogramData);
+            done();
+        });
+
+        socketMock.simulateServerEmit('qrlUpdateHistogram', histogramData);
+    });
+
     it('should emit a histogramUpdate event with histogram data', () => {
         const histogramData = { key1: 1, key2: 2, key3: 3 };
 
@@ -142,6 +154,14 @@ describe('ClientSocketService', () => {
     it('should emit a resetHistogram event to the server', () => {
         service.sendResetHistogram();
         expect(socketMock.emit).toHaveBeenCalledWith('resetHistogram');
+        expect(socketMock.nEmittedEvents).toEqual(++nEmittedEvents);
+    });
+
+    it('should emit a sendQrlUpdateHistogram event with histogram data', () => {
+        const histogramData = { key1: 1, key2: 2, key3: 3 };
+
+        service.sendQrlUpdateHistogram(histogramData);
+        expect(socketMock.emit).toHaveBeenCalledWith('qrlHistogramUpdate', histogramData);
         expect(socketMock.nEmittedEvents).toEqual(++nEmittedEvents);
     });
 });

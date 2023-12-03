@@ -7,4 +7,4 @@ export const PAUSE_MESSAGE = 'Pauser la partie';
 export const UNPAUSE_MESSAGE = 'Reprendre la partie';
 export const QRL_DURATION = 60;
 export const DELAY_BEFORE_INPUT_INACTIVITY = 5;
-export const POINTS_PERCENTAGES = [FULL_POINTS, HALF_POINTS, NO_POINTS];
+export const GRADES = [NO_POINTS, HALF_POINTS, FULL_POINTS];

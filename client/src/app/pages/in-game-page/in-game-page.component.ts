@@ -1,6 +1,9 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { PANIC_SOUNDS } from '@app/constants/audio';
 import { Route } from '@app/constants/enums';
+import { AnswerValidatorService } from '@app/services/answer-validator/answer-validator.service';
+import { AudioService } from '@app/services/audio/audio.service';
 import { ClientSocketService } from '@app/services/client-socket/client-socket.service';
 import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
 import { RouteControllerService } from '@app/services/route-controller/route-controller.service';
@@ -21,8 +24,6 @@ export class InGamePageComponent implements OnInit, OnDestroy {
     currentQuestion: string = '';
     currentQuestionScore: number;
     score: number;
-    isEvaluationMessageVisible: boolean = false;
-    isHistogramVisible: boolean = true;
     showResults: boolean = false;
     histogramData: { [key: string]: number };
     correctAnswers: string[];
@@ -33,6 +34,8 @@ export class InGamePageComponent implements OnInit, OnDestroy {
     private histogramSubscription: Subscription;
     private routeController: RouteControllerService = inject(RouteControllerService);
     private timer: TimerService = inject(TimerService);
+    private answerValidator: AnswerValidatorService = inject(AnswerValidatorService);
+    private audio: AudioService = inject(AudioService);
 
     constructor(
         private gameService: GameHandlingService,
@@ -54,6 +57,10 @@ export class InGamePageComponent implements OnInit, OnDestroy {
 
     get transitionMessage(): string {
         return this.timer.transitionMessage;
+    }
+
+    get isEvaluationPhase(): boolean {
+        return this.answerValidator.isEvaluationPhase;
     }
 
     ngOnInit(): void {
@@ -111,6 +118,11 @@ export class InGamePageComponent implements OnInit, OnDestroy {
         this.clientSocket.socket.on('showResults', () => {
             this.showResults = true;
         });
+
+        this.clientSocket.socket.on('panicMode', () => {
+            this.timer.isPanicModeEnabled = true;
+            this.audio.play(PANIC_SOUNDS);
+        });
     }
 
     ngOnDestroy(): void {
@@ -132,24 +144,17 @@ export class InGamePageComponent implements OnInit, OnDestroy {
 
         this.timer.reset();
         this.clientSocket.socket.removeAllListeners('showResults');
-        this.clientSocket.socket.removeAllListeners('qcmEnd');
-        this.clientSocket.socket.removeAllListeners('qrlEnd');
-        this.clientSocket.socket.removeAllListeners('qrlResults');
         this.clientSocket.socket.removeAllListeners('panicMode');
         this.clientSocket.socket.removeAllListeners('countdownEnd');
         this.clientSocket.socket.removeAllListeners('noPlayers');
         this.clientSocket.resetPlayerInfo();
         this.routeController.setRouteAccess(Route.InGame, false);
         this.clientSocket.players = [];
+        this.audio.pause();
     }
 
     onUpdateQuestionScore(score: number) {
         this.currentQuestionScore = score;
-    }
-
-    setEvaluationPhase(isEvaluationPhase: boolean) {
-        this.isEvaluationMessageVisible = isEvaluationPhase;
-        this.isHistogramVisible = !isEvaluationPhase;
     }
 
     leaveGame(): void {

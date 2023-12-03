@@ -21,15 +21,21 @@ export class AnswerValidatorService {
     answerForm: FormControl = new FormControl('', { nonNullable: true });
     bonusTimes: number = 0;
     hasBonus: boolean = false;
-    pointsPercentage: number | undefined = undefined;
+    grade: number | null = null;
     isAnswerCorrect: boolean = true;
+    canLoadNextQuestion: boolean = false;
+    hasQuestionEnded: boolean = false;
+    isEvaluationPhase: boolean = false;
+    qrlAnswers: Answer[] = [];
     private snackBar: MatSnackBar = inject(MatSnackBar);
 
     constructor(
         private gameService: GameHandlingService,
         private clientSocket: ClientSocketService,
         private timer: TimerService,
-    ) {}
+    ) {
+        this.listenForQuestionEnd();
+    }
 
     submitAnswer(submittedFromTimer: boolean) {
         if (this.isProcessing) return;
@@ -64,6 +70,7 @@ export class AnswerValidatorService {
             ...(this.gameService.isCurrentQuestionQcm()
                 ? { questionType: QuestionType.QCM, isCorrect: this.isAnswerCorrect }
                 : { questionType: QuestionType.QRL, text: this.answerForm.value.trim() }),
+            grade: null,
         };
 
         this.clientSocket.socket.emit('answerSubmitted', answer, submittedFromTimer);
@@ -72,7 +79,7 @@ export class AnswerValidatorService {
     processAnswer() {
         let rewardedPoints = this.gameService.currentGame.questions[this.gameService.currentQuestionId].points;
         if (!this.gameService.isCurrentQuestionQcm() && this.gameService.gameMode === GameMode.RealGame) {
-            rewardedPoints *= this.pointsPercentage as number;
+            rewardedPoints *= this.grade as number;
             if (rewardedPoints === 0) this.isAnswerCorrect = false;
         }
 
@@ -103,13 +110,17 @@ export class AnswerValidatorService {
         this.isProcessing = false;
         this.hasBonus = false;
         this.isAnswerCorrect = true;
-        this.pointsPercentage = undefined;
+        this.grade = null;
+        this.hasQuestionEnded = false;
+        this.canLoadNextQuestion = false;
+        this.isEvaluationPhase = false;
         this.answerForm.reset();
         this.answerForm.enable();
     }
 
     reset() {
         this.prepareNextQuestion();
+        this.qrlAnswers = [];
         this.buttons = [];
         this.bonusTimes = 0;
     }
@@ -123,5 +134,35 @@ export class AnswerValidatorService {
             this.clientSocket.socket.emit('updateBonusTimes', this.bonusTimes);
         }
         return bonus;
+    }
+
+    private listenForQuestionEnd() {
+        this.clientSocket.socket.on('qcmEnd', (bonusRecipient: string) => {
+            if (this.clientSocket.isOrganizer) {
+                this.timer.stopCountdown();
+                this.canLoadNextQuestion = true;
+                this.hasQuestionEnded = true;
+                return;
+            }
+            if (this.clientSocket.socket.id === bonusRecipient) this.hasBonus = true;
+            this.processAnswer();
+        });
+
+        this.clientSocket.socket.on('qrlEnd', (qrlAnswers: Answer[]) => {
+            this.timer.stopCountdown();
+            if (this.clientSocket.isOrganizer) this.qrlAnswers = qrlAnswers;
+            this.isEvaluationPhase = true;
+        });
+
+        this.clientSocket.socket.on('qrlResults', (qrlAnswers: Answer[]) => {
+            this.isEvaluationPhase = false;
+            if (this.clientSocket.isOrganizer) {
+                this.canLoadNextQuestion = true;
+                this.hasQuestionEnded = true;
+                return;
+            }
+            this.grade = (qrlAnswers.find((answer: Answer) => answer.submitter === this.clientSocket.playerName) as Answer).grade;
+            this.processAnswer();
+        });
     }
 }
