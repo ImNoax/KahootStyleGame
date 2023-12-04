@@ -60,7 +60,7 @@ describe('ChatBoxComponent', () => {
     it('should update chat when a new message is received', () => {
         component.chat = [];
         const event = 'messageReceived';
-        const chatMock: Message[] = [{ sender: 'sender1', content: 'content1', time: new Date('date1') }];
+        const chatMock: Message[] = [{ sender: 'sender1', content: 'content1', time: new Date('date1').toString() }];
 
         socketMock.simulateServerEmit(event, chatMock);
         expect(component.chat[0].sender).toBe(chatMock[0].sender);

@@ -26,8 +26,12 @@ const SUBMITTER1_SORTED_BEFORE = -1;
 const SUBMITTER1_SORTED_AFTER = 1;
 const ORIGINAL_ORDER = 0;
 const DATE_LENGTH = 19;
-const DATE_SLICE = 13;
-// const TESTER = 'Testeur';
+const DATE_SLICE = 11;
+const HOUR_SLICE = 13;
+const HOUR_PER_DAY = 24;
+const MINUTES_PER_HOUR = 60;
+const TESTER = 'Testeur';
+const BASE = 10;
 
 export class SocketManager {
     private sio: io.Server;
@@ -276,7 +280,7 @@ export class SocketManager {
             });
 
             socket.on('startCountdown', (initialCount: number, configuration: TimerConfiguration, gameMode: GameMode) => {
-                if (configuration.isQuestionTransition) this.sio.emit('questionTransition', configuration.isQuestionTransition);
+                if (configuration.isQuestionTransition) this.sio.to(pin).emit('questionTransition', configuration.isQuestionTransition);
                 if (gameMode === GameMode.Testing) pin = socket.id;
                 if (configuration.isInputInactivityCountdown) clearInterval(counter);
                 this.sio.to(pin).emit('countdownStarted');
@@ -302,15 +306,18 @@ export class SocketManager {
                 }
             });
 
-            socket.on('getChat', (/* gameMode: GameMode*/) => {
-                // if (gameMode === GameMode.Testing) {
-                //     pin = socket.id;
-                //     this.lobbies.set(pin, {
-                //         isLocked: false,
-                //         players: [{ socketId: socket.id, name: TESTER, isAbleToChat: true }],
-                //         chat: [],
-                //     });
-                // }
+            socket.on('getChat', (gameMode: GameMode) => {
+                if (gameMode === GameMode.Testing) {
+                    pin = socket.id;
+                    this.lobbies.set(pin, {
+                        isLocked: false,
+                        players: [
+                            { socketId: socket.id, name: TESTER, isAbleToChat: true, isTyping: true, score: 0, activityState: PlayerColor.Green },
+                        ],
+                        chat: [],
+                        qrlAnswers: [],
+                    });
+                }
                 const currentLobby = this.lobbies.get(pin);
                 if (currentLobby) {
                     this.sio.to(pin).emit('messageReceived', currentLobby.chat);
@@ -447,7 +454,10 @@ export class SocketManager {
 
             socket.on('gameStarted', () => {
                 nbPlayers = this.lobbies.get(pin).players.length - 1;
-                startDate = new Date().toLocaleString().slice(0, DATE_SLICE) + new Date().toISOString().slice(DATE_SLICE, DATE_LENGTH);
+                let hours = parseInt(new Date().toISOString().slice(DATE_SLICE, HOUR_SLICE), BASE);
+                hours -= new Date().getTimezoneOffset() / MINUTES_PER_HOUR;
+                hours = (hours + HOUR_PER_DAY) % HOUR_PER_DAY;
+                startDate = new Date().toLocaleString().slice(0, DATE_SLICE) + hours + new Date().toISOString().slice(HOUR_SLICE, DATE_LENGTH);
             });
         });
     }

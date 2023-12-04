@@ -42,7 +42,7 @@ export interface Player {
 export interface Message {
     sender: string;
     content: string;
-    time: Date;
+    time: string;
 }
 
 export interface Answer {

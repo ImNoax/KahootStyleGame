@@ -1,6 +1,7 @@
+/* eslint-disable max-lines */
 import { Choice, Game, Question } from '@common/game';
 import { expect } from 'chai';
-import { Collection, Db, FindCursor, UpdateResult } from 'mongodb';
+import { Collection, Db, FindCursor, InsertOneResult, UpdateResult } from 'mongodb';
 import * as Sinon from 'sinon';
 import { DatabaseService } from './database.service';
 import { FileManagerService } from './file-manager.service';
@@ -12,7 +13,6 @@ describe('GameManagerService', () => {
     let mockFileManagerService: Sinon.SinonStubbedInstance<FileManagerService>;
     let mockCollection: Sinon.SinonStubbedInstance<Collection<Game>>;
     let mockCursor: Sinon.SinonStubbedInstance<FindCursor<Game>>;
-
     const games: Game[] = [
         {
             id: '0',
@@ -45,17 +45,14 @@ describe('GameManagerService', () => {
     }
 
     beforeEach(() => {
-        // Creating Sinon stub instances for DatabaseService and FileManagerService
         mockDatabaseService = Sinon.createStubInstance(DatabaseService);
         mockFileManagerService = Sinon.createStubInstance(FileManagerService);
 
-        // Creating stubs for Collection and FindCursor
         mockCollection = {
             find: Sinon.stub(),
             insertOne: Sinon.stub(),
             updateOne: Sinon.stub(),
             deleteOne: Sinon.stub(),
-            // Add other necessary methods from the Collection interface
         } as unknown as Sinon.SinonStubbedInstance<Collection<Game>>;
 
         mockCursor = {
@@ -66,13 +63,10 @@ describe('GameManagerService', () => {
 
         mockFileManagerService.readJsonFile.resolves(schemaBuffer);
 
-        // Link FindCursor stub to the Collection find method
-
         mockCollection.find.returns(mockCursor as unknown as FindCursor<Game>);
 
         mockDatabaseService.getDb.returns({ collection: () => mockCollection } as unknown as Db);
 
-        // Initialize GameManagerService with mocked services
         gameManager = new GameManagerService(
             mockDatabaseService as unknown as DatabaseService,
             mockFileManagerService as unknown as FileManagerService,
@@ -93,30 +87,24 @@ describe('GameManagerService', () => {
     });
 
     it('modifyGame should update a game in the database', async () => {
-        // Ensure the modified game meets all validation criteria
         const validQuestion = {
             text: 'Valid Question Text',
-            points: 10, // Assuming this is a valid point value
-            type: QuestionType.QCM, // Use enum value from QuestionType
-            // Include any other required properties of a Question
+            points: 10,
+            type: QuestionType.QCM,
             choices: [
                 { text: 'Choice 1', isCorrect: true },
                 { text: 'Choice 2', isCorrect: false },
-                // Add more choices if required
             ],
         };
 
-        // Ensure the modified game meets all validation criteria
         const validModifiedGame: Game = {
             ...modifiedGame,
             title: 'Valid Title',
             description: 'Valid Description',
-            duration: 30, // within valid range
+            duration: 30,
             questions: [validQuestion],
-            // ... other fields as needed
         };
 
-        // Mock setup
         const updateResult: UpdateResult<Game> = {
             matchedCount: 1,
             modifiedCount: 1,
@@ -128,10 +116,8 @@ describe('GameManagerService', () => {
         mockCursor.toArray.resolves([validModifiedGame]);
         mockFileManagerService.readJsonFile.resolves(Buffer.from(JSON.stringify(schemaObject)));
 
-        // Call the method under test
         const result = await gameManager.modifyGame('0', validModifiedGame);
 
-        // Check the result
         expect(result).to.not.equal(null);
         expect(result.length).to.not.equal(0);
         expect(result[0]).to.deep.equal(validModifiedGame);
@@ -313,5 +299,97 @@ describe('GameManagerService', () => {
 
         expect(gameManager.validateChoices(choices)).to.equal(false);
         expect(gameManager.error.message).to.equal('Nombre de bons choix invalides');
+    });
+
+    it('should return null and set error if validation fails when modifyGame', async () => {
+        const invalidGame: Game = {
+            id: 'string',
+            title: 'string',
+            description: 'string',
+            duration: 0,
+            lastModification: 'string',
+            questions: [],
+        };
+        const result = await gameManager.modifyGame('someId', invalidGame);
+
+        expect(result).to.equal(null);
+        expect(gameManager.error).to.not.equal(null);
+    });
+
+    it('modifyGame should return null if there are errors in the game provided', async () => {
+        mockFileManagerService.readJsonFile.resolves(Buffer.from('{"type":"string"}'));
+
+        const result = await gameManager.modifyGame('', JSON.parse('{"test":"0"}'));
+
+        expect(result).to.equal(null);
+    });
+
+    it('should return null and set error if validation fails when adding a new game', async () => {
+        const gameToAdd: Game = {
+            id: '0',
+            title: 'test',
+            description: 'description of test',
+            duration: 20,
+            lastModification: '2023-09-30',
+            isVisible: true,
+            questions: [], // empty array so should call error
+        };
+        mockFileManagerService.readJsonFile.resolves(Buffer.from(JSON.stringify(schemaObject)));
+        mockCursor.toArray.onCall(0).resolves([]);
+
+        const result = await gameManager.addGame(gameToAdd);
+        expect(result).to.equal(null);
+    });
+
+    it('should add a new game', async () => {
+        const gameToAdd: Game = {
+            id: '0',
+            title: 'test1',
+            description: 'description of test',
+            duration: 20,
+            lastModification: '2023-09-30',
+            isVisible: true,
+            questions: [],
+        };
+        const qcmQuestion: Question = {
+            text: 'test',
+            points: 10,
+            type: QuestionType.QCM,
+            choices: [
+                { text: 'firsttest', isCorrect: true },
+                { text: 'secondtest', isCorrect: false },
+            ],
+        };
+        const qrlQuestion: Question = {
+            text: 'test',
+            points: 10,
+            type: QuestionType.QRL,
+        };
+
+        gameToAdd.questions.push(qcmQuestion, qrlQuestion);
+        const insertResult: InsertOneResult<Game> = {
+            acknowledged: true,
+            insertedId: null,
+        };
+
+        mockFileManagerService.readJsonFile.resolves(Buffer.from(JSON.stringify(schemaObject)));
+        mockCursor.toArray.onCall(0).resolves([games[0]]);
+        mockCursor.toArray.onCall(1).resolves([games[0], gameToAdd]);
+        mockCollection.insertOne.resolves(insertResult);
+
+        const result = await gameManager.addGame(gameToAdd);
+        expect(result).to.not.equal(null);
+        expect(result.length).to.not.equal(0);
+        expect(result[0]).to.deep.equal(games[0]);
+        expect(result[1]).to.deep.equal(gameToAdd);
+    });
+
+    it('addGame should return null if there are errors in the game provided', async () => {
+        Sinon.stub(gameManager, 'getGames').resolves([]);
+        mockFileManagerService.readJsonFile.resolves(Buffer.from('{"type":"string"}'));
+
+        const result = await gameManager.addGame(JSON.parse('{"test":"0"}'));
+
+        expect(result).to.equal(null);
     });
 });
