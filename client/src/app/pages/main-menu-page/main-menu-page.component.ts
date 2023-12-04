@@ -8,6 +8,7 @@ import { ClientSocketService } from '@app/services/client-socket/client-socket.s
 import { GameHandlingService } from '@app/services/game-handling/game-handling.service';
 import { RouteControllerService } from '@app/services/route-controller/route-controller.service';
 import { Game } from '@common/game';
+import { GameMode } from '@common/game-mode';
 import { Pin, REQUIRED_PIN_LENGTH } from '@common/lobby';
 import { BehaviorSubject } from 'rxjs';
 
@@ -66,6 +67,7 @@ export class MainMenuPageComponent implements OnInit, AfterViewInit, OnDestroy {
     configureBaseSocketFeatures() {
         this.clientSocket.socket.on('validPin', (game: Game, pin: Pin) => {
             this.routeController.setRouteAccess(Route.Lobby, true);
+            this.gameHandler.gameMode = GameMode.RealGame;
             this.clientSocket.pin = pin;
             this.gameHandler.currentGame = game;
             this.router.navigate([Route.Lobby]);

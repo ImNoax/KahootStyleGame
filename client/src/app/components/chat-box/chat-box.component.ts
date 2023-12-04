@@ -53,7 +53,7 @@ export class ChatBoxComponent implements OnInit, OnDestroy, AfterViewInit {
             const messageData = {
                 sender: this.clientSocket.socket.id,
                 content: this.newMessage,
-                time: new Date(),
+                time: new Date().toString(),
             };
             this.clientSocket.socket.emit('chatMessage', messageData);
             this.newMessage = '';

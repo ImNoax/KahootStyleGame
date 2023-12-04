@@ -10,9 +10,10 @@
     justify-content: center;
     background-color: rgba(255, 255, 255, 0.3);
     padding: 2%;
-    margin: 2% 20%;
+    margin: 2% 10%;
     align-items: stretch;
-    height: 100%;
+    height: 99%;
+    width: 75%;
 }
 
 .table-container {
@@ -22,7 +23,7 @@
 .game-block {
     flex: 2;
     background-color: #42424275;
-    height: 100%;
+    height: 99%;
     text-align: center;
 }
 
@@ -31,11 +32,12 @@
     margin: 2% 5%;
     border: 2px solid black;
     padding: 5%;
+    width: 87%;
 }
 
 .questions {
     margin: 5%;
-    max-height: 100px;
+    max-height: 150px;
     overflow-y: auto;
 }
 
@@ -43,7 +45,7 @@ table {
     table-layout: fixed;
     border: 2px solid black;
     border-collapse: collapse;
-    width: 100%;
+    width: 99%;
     text-align: center;
 }
 
@@ -53,13 +55,22 @@ table tr:last-child {
 
 .table-container tr {
     display: table;
-    width: 100%;
+    width: 99%;
 }
 
 td {
     background-color: #ffffff;
     padding: 8px;
     border-bottom: 1px solid black;
+}
+
+tr,
+div {
+    width: 99%;
+    display: table;
+    table-layout: fixed;
+    font-size: 15pt;
+    overflow-y: auto;
 }
 
 th {
@@ -83,6 +94,10 @@ tbody {
     overflow-y: auto;
 }
 
+.question-list {
+    height: 150px;
+}
+
 .selected-game {
     background-color: #7a5591;
 }
@@ -98,6 +113,7 @@ tbody {
 
 #underlined {
     border-bottom: 1px solid black;
+    font-size: 18pt;
 }
 
 .bott {
