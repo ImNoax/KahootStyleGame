@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable no-console */
 import * as fs from 'fs';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 import { Service } from 'typedi';
@@ -56,7 +56,4 @@ export class DatabaseService {
         }
     }
 }
-
-// test
-
 export default DatabaseService;
