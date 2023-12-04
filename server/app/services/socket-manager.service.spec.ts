@@ -1135,15 +1135,6 @@ describe('SocketManager service tests', () => {
     });
 
     it('gameStarted should update the date and the number of players', (done) => {
-        const DATE_LENGTH = 19;
-        const DATE_SLICE = 11;
-        const HOUR_SLICE = 13;
-        const HOUR_PER_DAY = 24;
-        const MINUTES_PER_HOUR = 60;
-        const BASE = 10;
-        let hours = parseInt(new Date().toISOString().slice(DATE_SLICE, HOUR_SLICE), BASE);
-        hours -= new Date().getTimezoneOffset() / MINUTES_PER_HOUR;
-        hours = (hours + HOUR_PER_DAY) % HOUR_PER_DAY;
         createGame();
 
         clientSocket.emit('gameStarted');
@@ -1154,7 +1145,7 @@ describe('SocketManager service tests', () => {
                 mockCollection.insertOne.calledOnceWith({
                     numberPlayers: 0,
                     name: service['lobbies'].get(roomPin).game.title,
-                    date: new Date().toLocaleString().slice(0, DATE_SLICE) + hours + new Date().toISOString().slice(HOUR_SLICE, DATE_LENGTH),
+                    date: new Date().toLocaleString('sv', { timeZone: 'America/New_York' }),
                     bestScore: service['lobbies'].get(roomPin).players.sort((a, b) => {
                         return b.score - a.score;
                     })[0].score,
