@@ -1,6 +1,13 @@
 table {
     border-collapse: collapse;
     background-color: #f9c2e3;
+    position: absolute;
+    right: inherit;
+    bottom: inherit;
+}
+
+ng-container {
+    overflow-y: auto;
 }
 
 th,

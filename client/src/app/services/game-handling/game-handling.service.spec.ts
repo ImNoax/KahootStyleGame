@@ -201,4 +201,54 @@ describe('GameHandlingService', () => {
             expect(response).toEqual([]);
         });
     });
+
+    it('resetHistogramDataForQuestion should reset histogram data', () => {
+        const questionId = 1;
+        const newData = { answer1: 10, answer2: 5 };
+        service.updateHistogramDataForQuestion(questionId, newData);
+        service.resetHistogramDataForQuestion();
+        expect(service.getAllHistogramData()).toEqual({});
+    });
+    it('getCorrectAnswersForCurrentQuestion should return correct answers for the current question', () => {
+        service.currentGame = {
+            ...MOCK_GAME,
+            questions: [
+                {
+                    ...MOCK_QUESTIONS[0],
+                },
+            ],
+        };
+        service.currentQuestionId = 0;
+        const correctAnswers = service.getCorrectAnswersForCurrentQuestion();
+        expect(correctAnswers).toEqual(['Paris']);
+    });
+
+    it('isCurrentQuestionQcm should return true if current question is of type QCM', () => {
+        service.currentGame = {
+            ...MOCK_GAME,
+            questions: [
+                {
+                    ...MOCK_QUESTIONS[0],
+                },
+            ],
+        };
+        service.currentQuestionId = 0;
+        const isQcm = service.isCurrentQuestionQcm();
+        expect(isQcm).toBeTrue();
+    });
+    it('getCorrectAnswersForCurrentQuestion should return an empty array if current question has no choices', () => {
+        service.currentGame = {
+            ...MOCK_GAME,
+            questions: [
+                {
+                    text: 'Test',
+                    points: 10,
+                    type: QuestionType.QCM,
+                },
+            ],
+        };
+        service.currentQuestionId = 0;
+        const correctAnswers = service.getCorrectAnswersForCurrentQuestion();
+        expect(correctAnswers).toEqual([]);
+    });
 });

@@ -3,12 +3,37 @@
     position: fixed;
     top: 35%;
     left: 35%;
+    align-items: center;
+    text-align: center;
 }
 
 table {
     border-collapse: collapse;
     background-color: #f9c2e3;
     margin: auto;
+}
+
+app-histogram,
+#histogramTitle,
+.histogram-navigation {
+    position: fixed;
+    right: 35%;
+}
+
+#histogramTitle {
+    top: 35%;
+}
+app-histogram {
+    top: 41%;
+}
+
+.histogram-navigation {
+    top: 61%;
+}
+
+button {
+    font-size: 15pt;
+    margin-right: 10px;
 }
 
 th,

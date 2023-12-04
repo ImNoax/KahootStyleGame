@@ -44,9 +44,8 @@ export class GameManagerService {
 
         const valid = ajv.validate(schema, modifiedGame) && this.validateGame(modifiedGame);
         if (!valid) {
-            if (ajv.errors) {
-                this.error = new Error(ajv.errors[0].instancePath + ' ' + ajv.errors[0].message);
-            }
+            if (ajv.errors) this.error = new Error(ajv.errors[0].instancePath + ' ' + ajv.errors[0].message);
+
             return null;
         }
 
@@ -83,9 +82,8 @@ export class GameManagerService {
 
         const valid = ajv.validate(schema, newGame) && this.validateGame(newGame);
         if (!valid) {
-            if (ajv.errors) {
-                this.error = new Error(ajv.errors[0].instancePath + ' ' + ajv.errors[0].message);
-            }
+            if (ajv.errors) this.error = new Error(ajv.errors[0].instancePath + ' ' + ajv.errors[0].message);
+
             return null;
         }
 

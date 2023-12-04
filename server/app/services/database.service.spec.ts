@@ -27,6 +27,10 @@ describe('DatabaseService', () => {
         databaseService['client'] = mockClient as unknown as MongoClient;
     });
 
+    afterEach(() => {
+        Sinon.restore();
+    });
+
     it('should connect to the database', async () => {
         await databaseService.connect();
         expect(mockClient.connect.calledOnce).to.equal(true);
@@ -44,9 +48,7 @@ describe('DatabaseService', () => {
 
     it('should import games from a file', async () => {
         const filePath = 'path/to/games.json';
-        const gamesData: WithId<Game>[] = [
-            // Define Game object here
-        ];
+        const gamesData: WithId<Game>[] = [];
 
         Sinon.stub(fs, 'readFileSync').returns(JSON.stringify(gamesData));
 
@@ -63,7 +65,42 @@ describe('DatabaseService', () => {
         expect(mockCollection.insertMany.calledWith(gamesData)).to.equal(true);
     });
 
-    afterEach(() => {
-        Sinon.restore(); // Reset all stubs
+    it('should log an error if connection fails', async () => {
+        const errorMessage = 'Connection error';
+        mockClient.connect.rejects(new Error('Connection error'));
+
+        const consoleErrorStub = Sinon.stub(console, 'error');
+
+        await databaseService.connect();
+
+        expect(consoleErrorStub.calledOnce).to.equal(true);
+        expect(consoleErrorStub.calledWith('Error connecting to MongoDB:', Sinon.match.instanceOf(Error))).to.equal(true);
+        expect(consoleErrorStub.getCall(0).args[1].message).to.equal(errorMessage);
+    });
+
+    it('should log an error if disconnect fails', async () => {
+        const errorMessage = 'Disconnect error';
+        mockClient.close.rejects(new Error('Disconnect error'));
+
+        const consoleErrorStub = Sinon.stub(console, 'error');
+
+        await databaseService.disconnect();
+
+        expect(consoleErrorStub.calledOnce).to.equal(true);
+        expect(consoleErrorStub.calledWith('Error disconnecting from MongoDB:', Sinon.match.instanceOf(Error))).to.equal(true);
+        expect(consoleErrorStub.getCall(0).args[1].message).to.equal(errorMessage);
+    });
+
+    it('should handle errors during game import', async () => {
+        const errorMessage = 'Connection error';
+        mockClient.connect.rejects(new Error('Connection error'));
+
+        const consoleErrorStub = Sinon.stub(console, 'error');
+
+        await databaseService.importGames('path/Log2990_database');
+
+        expect(consoleErrorStub.calledOnce).to.equal(true);
+        expect(consoleErrorStub.calledWith('Error importing games data:', Sinon.match.instanceOf(Error))).to.equal(true);
+        expect(consoleErrorStub.getCall(0).args[1].message).to.equal(errorMessage);
     });
 });
