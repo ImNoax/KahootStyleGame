@@ -3,9 +3,10 @@
     position: fixed;
     bottom: 5%;
     left: 0;
-    width: 300px;
+    width: 16%;
+    min-width: 100px;
     background-color: rgba(200, 200, 200, 0.6);
-    height: 500px;
+    height: 56%;
     border: 4px solid rgb(0, 0, 0);
     border-radius: 8px 8px 0 0;
 }
@@ -28,7 +29,8 @@
     position: fixed;
     bottom: 0;
     left: 0;
-    width: 280px;
+    width: 16%;
+    min-width: 100px;
     border: none;
     border-radius: 10px;
     padding: 10px;

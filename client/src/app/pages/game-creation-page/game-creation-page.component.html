@@ -36,12 +36,16 @@
                     </div>
                     <div class="questions">
                         <table>
-                            <th>Questions</th>
-                            <tr class="table-question" *ngFor="let question of selectedGame!.questions">
-                                {{
-                                    question.text
-                                }}
-                            </tr>
+                            <thead>
+                                <th>Questions</th>
+                            </thead>
+                            <tbody class="question-list">
+                                <tr class="table-question" *ngFor="let question of selectedGame!.questions">
+                                    {{
+                                        question.text
+                                    }}
+                                </tr>
+                            </tbody>
                         </table>
                     </div>
 
