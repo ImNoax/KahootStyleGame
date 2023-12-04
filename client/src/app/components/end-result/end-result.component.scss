@@ -2,7 +2,7 @@
     color: white;
     position: fixed;
     top: 35%;
-    left: 35%;
+    left: 30%;
     align-items: center;
     text-align: center;
 }
@@ -17,18 +17,20 @@ app-histogram,
 #histogramTitle,
 .histogram-navigation {
     position: fixed;
-    right: 35%;
+    left: 55%;
 }
 
 #histogramTitle {
     top: 35%;
+    text-align: left;
+    font-size: 20pt;
 }
 app-histogram {
-    top: 41%;
+    top: 43%;
 }
 
 .histogram-navigation {
-    top: 61%;
+    top: 65%;
 }
 
 button {
