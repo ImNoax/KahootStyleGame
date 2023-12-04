@@ -12,7 +12,7 @@ import { ClientSocketServiceMock } from '@app/classes/client-socket-service-mock
 import { SocketMock } from '@app/classes/socket-mock';
 import { ButtonResponseComponent } from '@app/components/button-response/button-response.component';
 import { Route } from '@app/constants/enums';
-import { PAUSE_MESSAGE, TIME_OUT, UNPAUSE_MESSAGE } from '@app/constants/in-game';
+import { DELAY_BEFORE_INPUT_INACTIVITY, PAUSE_MESSAGE, TIME_OUT, UNPAUSE_MESSAGE } from '@app/constants/in-game';
 import { SNACK_BAR_ERROR_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { Button } from '@app/interfaces/button-model';
 import { AnswerValidatorService } from '@app/services/answer-validator/answer-validator.service';
@@ -22,7 +22,7 @@ import { TimerService } from '@app/services/timer/timer.service';
 import { Game, Question, QuestionType } from '@common/game';
 import { GameMode } from '@common/game-mode';
 import { Limit } from '@common/limit';
-import { Answer } from '@common/lobby';
+import { Answer, PlayerColor } from '@common/lobby';
 
 describe('ButtonResponseComponent', () => {
     let mockButtons: Button[];
@@ -142,6 +142,15 @@ describe('ButtonResponseComponent', () => {
         spyOn(socketMock, 'emit').and.callThrough();
         socketMock.clientUniqueEvents.clear();
         gameHandlingServiceMock.gameMode = GameMode.RealGame;
+        component['answerValidator'].qrlAnswers = [
+            { submitter: 'player1', questionType: QuestionType.QRL, grade: 0 },
+            { submitter: 'player2', questionType: QuestionType.QRL, grade: 0 },
+        ];
+        component['studentGrades'] = {
+            player1: 0,
+            player2: 0,
+        };
+        component['currentAnswerIndex'] = 0;
     });
 
     it('should create', () => {
@@ -178,10 +187,7 @@ describe('ButtonResponseComponent', () => {
     it('isPanicModeAvailable getter should return true if the current count is lower or equal than the required count for panic mode', () => {
         const count = 10;
         timerMock.count = count;
-        gameHandlingServiceMock.currentQuestionId = 0;
-        expect(component.isPanicModeAvailable).toBeTrue();
-
-        gameHandlingServiceMock.currentQuestionId = 1;
+        spyOnProperty(component, 'isCurrentQuestionQcm').and.returnValue(true);
         expect(component.isPanicModeAvailable).toBeTrue();
     });
 
@@ -378,7 +384,6 @@ describe('ButtonResponseComponent', () => {
         clientSocketServiceMock.isOrganizer = true;
         gameHandlingServiceMock.gameMode = GameMode.RealGame;
         gameHandlingServiceMock.getCurrentQuestionDuration.and.returnValue(currentQuestionDuration);
-
         component.updateGameQuestions();
         expect(gameHandlingServiceMock.getCurrentQuestionDuration).toHaveBeenCalled();
         expect(timerMock.startCountdown).toHaveBeenCalledWith(currentQuestionDuration);
@@ -390,7 +395,6 @@ describe('ButtonResponseComponent', () => {
         clientSocketServiceMock.isOrganizer = false;
         gameHandlingServiceMock.gameMode = GameMode.Testing;
         gameHandlingServiceMock.getCurrentQuestionDuration.and.returnValue(currentQuestionDuration);
-
         component.updateGameQuestions();
         expect(gameHandlingServiceMock.getCurrentQuestionDuration).toHaveBeenCalled();
         expect(timerMock.startCountdown).toHaveBeenCalledWith(currentQuestionDuration);
@@ -411,20 +415,10 @@ describe('ButtonResponseComponent', () => {
         expect(component.currentAnswerIndex).toEqual(0);
         expect(component.updateGameQuestions).toHaveBeenCalled();
     });
-
-    // it('populateHistogram should call sendUpdateHistogram from ClientSocketService for each button', () => {
-    //     spyOn(clientSocketServiceMock, 'sendUpdateHistogram');
-    //     component.buttons = mockButtons;
-    //     component.populateHistogram();
-    //     expect(clientSocketServiceMock.sendUpdateHistogram).toHaveBeenCalledTimes(mockButtons.length);
-    //     for (const button of component.buttons) expect(clientSocketServiceMock.sendUpdateHistogram).toHaveBeenCalledWith({ [button.text]: 0 });
-    // });
-
     it('startNextQuestionCountDown should reset histogram, start countdown and set canLoadNextQuestion and isGamePaused to false', () => {
         spyOn(clientSocketServiceMock, 'sendResetHistogram');
         answerValidatorMock.canLoadNextQuestion = true;
         component.isGamePaused = true;
-
         component.startNextQuestionCountdown();
         expect(clientSocketServiceMock.sendResetHistogram).toHaveBeenCalled();
         expect(component.canLoadNextQuestion).toBeFalse();
@@ -434,11 +428,9 @@ describe('ButtonResponseComponent', () => {
 
     it('pause should restart transition countdown if game was paused during a question transition', () => {
         const transitionCount = 20;
-
         component.isGamePaused = true;
         timerMock.isQuestionTransition = true;
         timerMock.transitionCount = transitionCount;
-
         component.pause();
         expect(timerMock.startCountdown).toHaveBeenCalledWith(transitionCount);
         expect(component.isGamePaused).toBeFalse();
@@ -447,11 +439,9 @@ describe('ButtonResponseComponent', () => {
     it('pause should restart countdown if game was paused during an ongoing question', () => {
         const count = 10;
         timerMock.isPanicModeEnabled = true;
-
         component.isGamePaused = true;
         timerMock.isQuestionTransition = false;
         timerMock.count = count;
-
         component.pause();
         expect(timerMock.startCountdown).toHaveBeenCalledWith(count, { isPanicModeEnabled: true });
         expect(component.isGamePaused).toBeFalse();
@@ -459,7 +449,6 @@ describe('ButtonResponseComponent', () => {
 
     it('pause should stop countdown if game was not paused', () => {
         component.isGamePaused = false;
-
         component.pause();
         expect(timerMock.stopCountdown).toHaveBeenCalled();
         expect(component.isGamePaused).toBeTrue();
@@ -478,5 +467,149 @@ describe('ButtonResponseComponent', () => {
         component.currentAnswerIndex = 1;
         component.getPreviousAnswer();
         expect(component.currentAnswerIndex).toEqual(0);
+    });
+
+    it('should return qrlAnswers from AnswerValidatorService', () => {
+        const mockQrlAnswers: Answer[] = [
+            {
+                submitter: 'Alice',
+                questionType: QuestionType.QRL,
+                isCorrect: true,
+                text: 'Answer 1',
+                grade: 0.8,
+            },
+        ];
+        answerValidatorMock.qrlAnswers = mockQrlAnswers;
+        expect(component.qrlAnswers).toEqual(mockQrlAnswers);
+    });
+
+    it('should return "Charger les résultats" if it is the last question', () => {
+        gameHandlingServiceMock.currentQuestionId = mockGame.questions.length - 1;
+        expect(component.buttonLoadingMessage).toEqual('Charger les résultats');
+    });
+
+    it('should not return "Charger les résultats" if it isnt the last question', () => {
+        gameHandlingServiceMock.currentQuestionId = mockGame.questions.length - 2;
+        expect(component.buttonLoadingMessage).toEqual('Charger la prochaine question');
+    });
+
+    it('should call focus on buttonFocus when clicking outside #chatInput', () => {
+        component.buttonFocus = {
+            nativeElement: jasmine.createSpyObj('nativeElement', ['focus']),
+        };
+        const mockDiv = document.createElement('div');
+        const mockEvent = new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+        });
+        Object.defineProperty(mockEvent, 'target', { writable: true, value: mockDiv });
+        component.onDocumentClick(mockEvent);
+        expect(component.buttonFocus.nativeElement.focus).toHaveBeenCalled();
+    });
+
+    it('should populate histogram events for QCM question but not sendUpdateHistogram  ', () => {
+        component.isOrganizer = true;
+        const mockClientSocketService = {
+            sendUpdateHistogram: jasmine.createSpy(),
+        };
+        component.populateHistogram();
+        expect(mockClientSocketService.sendUpdateHistogram).toHaveBeenCalledTimes(0);
+    });
+
+    it('should call sendUpdateHistogram for all players except Organisateur', () => {
+        clientSocketServiceMock.players = [
+            { socketId: '123', name: 'Player1', score: 0, activityState: PlayerColor.Red, isAbleToChat: true, isTyping: false },
+            { socketId: '124', name: 'Organisateur', score: 0, activityState: PlayerColor.Red, isAbleToChat: true, isTyping: false },
+        ];
+        clientSocketServiceMock.isOrganizer = true;
+        spyOn(clientSocketServiceMock, 'sendUpdateHistogram').and.callThrough();
+        fixture = TestBed.createComponent(ButtonResponseComponent);
+        component = fixture.componentInstance;
+        component.populateHistogram();
+        expect(clientSocketServiceMock.sendUpdateHistogram).toHaveBeenCalledTimes(2);
+    });
+
+    it('should correctly update the grade of the current answer ', () => {
+        const newGrade = 0;
+        component.evaluateAnswer(newGrade);
+        expect(component.currentEvaluatedAnswer.grade).toEqual(0);
+    });
+
+    it('should correctly count grades and send histogram update', () => {
+        component['studentGrades'] = {
+            player1: 100,
+            player2: 50,
+            player3: 0,
+        };
+        const oneHundredPercent = '100%';
+        const fiftyPercent = '50%';
+        const zeroPercent = '0%';
+        const test = { [oneHundredPercent]: 1, [fiftyPercent]: 1, [zeroPercent]: 1 };
+        const histogramUpdateDataSpy = spyOn(clientSocketServiceMock, 'sendQrlUpdateHistogram');
+        component.updateHistogram();
+        expect(histogramUpdateDataSpy).toHaveBeenCalledWith(test);
+    });
+
+    it('should emit evaluationPhaseCompleted event with qrlAnswers on endEvaluationPhase', () => {
+        answerValidatorMock.qrlAnswers = qrlAnswers;
+        component.endEvaluationPhase();
+        expect(clientSocketServiceMock.socket.emit).toHaveBeenCalledWith('evaluationPhaseCompleted', qrlAnswers);
+    });
+
+    it('should set submitted to true ', () => {
+        component.submit();
+        expect(component.submitted).toBeTrue();
+    });
+    it('should emit markInputActivity and start countdown when game mode is RealGame', () => {
+        gameHandlingServiceMock.gameMode = GameMode.RealGame;
+        spyOn(component, 'markFirstInteraction');
+        component.markInputActivity();
+        expect(clientSocketServiceMock.socket.emit).toHaveBeenCalledWith('markInputActivity');
+        expect(timerMock.startCountdown).toHaveBeenCalledWith(DELAY_BEFORE_INPUT_INACTIVITY, { isInputInactivityCountdown: true });
+        expect(component.markFirstInteraction).toHaveBeenCalled();
+    });
+
+    it('should populate histogram events for QCM question but not sendUpdateHistogram for 0 players  ', () => {
+        component.isOrganizer = true;
+        spyOnProperty(component, 'isCurrentQuestionQcm').and.returnValue(true);
+        const mockClientSocketService = {
+            sendUpdateHistogram: jasmine.createSpy(),
+        };
+        component.populateHistogram();
+        expect(mockClientSocketService.sendUpdateHistogram).toHaveBeenCalledTimes(0);
+    });
+
+    it('should emit resetPlayersActivityState when the user is the organizer', () => {
+        component.isOrganizer = true;
+        component.updateGameQuestions();
+        expect(clientSocketServiceMock.socket.emit).toHaveBeenCalledWith('resetPlayersActivityState');
+    });
+
+    it('should call focusElement with buttonFocus when buttonFocus is present', () => {
+        component['hasFocusedOnce'] = false;
+        component.buttonFocus = {
+            nativeElement: {
+                focus: () => {
+                    return;
+                },
+            },
+        };
+        spyOn(component, 'focusElement');
+        component.ngAfterViewChecked();
+        expect(component.focusElement).toHaveBeenCalledWith(component.buttonFocus);
+    });
+    it('should call focusElement with answerInput when answerInput is present', () => {
+        component['hasFocusedOnce'] = false;
+        component.answerInput = {
+            nativeElement: {
+                focus: () => {
+                    return;
+                },
+            },
+        };
+        spyOn(component, 'focusElement');
+        component.ngAfterViewChecked();
+        expect(component.focusElement).toHaveBeenCalledWith(component.answerInput);
     });
 });
