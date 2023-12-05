@@ -47,6 +47,8 @@ export class QuizCreationPageComponent implements OnInit, OnDestroy {
         this.formManager.resetGameForm();
     }
 
+    // Verification des requis pour un quiz
+
     verifyName(event: Event): void {
         this.isNameEmpty = !(event.target as HTMLInputElement).value.trim();
 

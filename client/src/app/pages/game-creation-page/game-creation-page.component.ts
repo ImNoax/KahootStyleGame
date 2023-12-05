@@ -65,7 +65,7 @@ export class GameCreationPageComponent implements OnInit, OnDestroy {
         }
         return this.games.every((game) => !game.isVisible);
     }
-
+    // Creation d'une partie test ou multijoueur
     initializeGame(mode: GameMode = GameMode.RealGame) {
         this.gameHandler.getGames().subscribe((games: Game[]) => {
             this.games = games;

@@ -5,13 +5,14 @@ import { Route } from '@app/constants/enums';
 import { SNACK_BAR_ERROR_CONFIGURATION } from '@app/constants/snack-bar-configuration';
 import { Pin, Player } from '@common/lobby';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { io, Socket } from 'socket.io-client';
+import { Socket, io } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
     providedIn: 'root',
 })
 export class ClientSocketService {
+    // Service qui s'occupe de la communication des sockets
     socket: Socket;
     isOrganizer: boolean = false;
     playerName: string = '';

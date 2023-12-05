@@ -15,6 +15,7 @@ import { Answer } from '@common/lobby';
     providedIn: 'root',
 })
 export class AnswerValidatorService {
+    // Service de validation des reponses
     buttons: Button[] = [];
     rewardMessage: string = '';
     isProcessing: boolean = false;

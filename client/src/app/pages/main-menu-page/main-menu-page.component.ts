@@ -63,7 +63,7 @@ export class MainMenuPageComponent implements OnInit, AfterViewInit, OnDestroy {
             disableClose: true,
         });
     }
-
+    // Setup des listeners de base
     configureBaseSocketFeatures() {
         this.clientSocket.socket.on('validPin', (game: Game, pin: Pin) => {
             this.routeController.setRouteAccess(Route.Lobby, true);
@@ -77,11 +77,11 @@ export class MainMenuPageComponent implements OnInit, AfterViewInit, OnDestroy {
             this.serverErrorMessage = message;
         });
     }
-
+    // Controle des caracteres du PIN entry
     containsNonNumeric(control: AbstractControl): null | { containsNonNumeric: boolean } {
         return /^\d+$/.test(control.value) ? null : { containsNonNumeric: true };
     }
-
+    // Controle des caracteres du PIN entry
     pinContainsNonNumeric(): boolean {
         return this.pinForm.controls['pin'].dirty && this.pinForm.invalid;
     }

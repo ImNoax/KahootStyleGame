@@ -44,6 +44,7 @@ export class ChatBoxComponent implements OnInit, OnDestroy, AfterViewInit {
             this.snackBar.open('Vous pouvez maintenant clavarder ✅', '', SNACK_BAR_NORMAL_CONFIGURATION);
         });
     }
+
     ngAfterViewInit() {
         this.scrollChatBottom();
     }

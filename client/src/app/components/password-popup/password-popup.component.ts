@@ -26,7 +26,7 @@ export class PasswordPopupComponent {
         private gameHandler: GameHandlingService,
         private routeController: RouteControllerService,
     ) {}
-
+    // Permettre l'accès à la page admin si c'est correct
     validatePassword(): void {
         this.gameHandler.verifyAdminPassword(this.passwordForm.value).subscribe({
             next: (response) => {

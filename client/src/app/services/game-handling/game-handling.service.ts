@@ -12,6 +12,7 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root',
 })
 export class GameHandlingService {
+    // Service qui s'occupe des jeux questionnaires
     currentGame: Game;
     gameMode: GameMode = GameMode.RealGame;
     currentQuestionId: number = 0;

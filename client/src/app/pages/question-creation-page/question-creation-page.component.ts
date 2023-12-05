@@ -34,7 +34,7 @@ export class QuestionCreationPageComponent {
         if (question.type === QuestionType.QCM) return { background: QCM_COLOR };
         return { background: QRL_COLOR };
     }
-
+    // Gestion du drag and drop des choix
     drop(event: CdkDragDrop<Question[]>): void {
         moveItemInArray(this.questionsFormArray.controls, event.previousIndex, event.currentIndex);
     }

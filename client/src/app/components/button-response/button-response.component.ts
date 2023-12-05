@@ -140,7 +140,7 @@ export class ButtonResponseComponent implements OnInit, AfterViewChecked, OnDest
             else if (this.answerInput) this.focusElement(this.answerInput);
         }
     }
-
+    // Pour le focus de la page sur les boutons
     focusElement(elementRef: ElementRef): void {
         elementRef.nativeElement.focus();
         this.hasFocusedOnce = true;

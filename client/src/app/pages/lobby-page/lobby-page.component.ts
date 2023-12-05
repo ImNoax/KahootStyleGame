@@ -61,7 +61,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         if (this.gameStarted) return;
         this.clientSocket.resetPlayerInfo();
     }
-
+    // Setup des listeners de base
     configureBaseSocketFeatures() {
         this.clientSocket.socket.on('latestPlayerList', (lobbyDetails: LobbyDetails) => {
             this.isLocked = lobbyDetails.isLocked;
@@ -98,7 +98,7 @@ export class LobbyPageComponent implements OnInit, OnDestroy {
         this.countdownStarted = true;
         this.timer.startCountdown(GAME_START_INITIAL_COUNT);
     }
-
+    // Debuter la partie avec les autres joueurs
     startGame() {
         this.clientSocket.socket.emit('gameStarted');
         if (this.clientSocket.playerName) {

@@ -86,6 +86,7 @@ export class QuestionCreationPopupComponent implements OnInit {
     }
 
     drop(event: CdkDragDrop<Question[]>): void {
+        // Gestion du deplacement par drag and drop
         moveItemInArray(this.choices.controls, event.previousIndex, event.currentIndex);
     }
 

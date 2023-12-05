@@ -26,9 +26,11 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     configureBaseSocketFeatures() {
         this.clientSocket.socket.on('latestPlayerList', (lobbyDetails: LobbyDetails) => {
             if (this.players.length === 0) {
+                // Initialise quand la liste est vide
                 this.players = lobbyDetails.players;
             } else {
                 this.players.forEach((player) => {
+                    // Change les proprietes des joueurs sans les enlever de la liste
                     const updatedPlayer = lobbyDetails.players.find((p) => p.socketId === player.socketId);
                     if (!updatedPlayer) {
                         player.activityState = PlayerColor.Black;
@@ -41,6 +43,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
         });
 
         this.clientSocket.socket.on('scoreUpdated', (updatedPlayer: Player) => {
+            // update le score du joueur
             const player = this.players.find((p) => p.socketId === updatedPlayer.socketId);
             if (player) {
                 player.score = updatedPlayer.score;
@@ -54,6 +57,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     }
 
     sortPlayers() {
+        // Fonction de sorting
         this.players.sort((a, b) => {
             if (this.ascendingOrder) {
                 return this.compare(a, b);
@@ -70,7 +74,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
                 return scoreComparison !== 0
                     ? scoreComparison
                     : this.ascendingOrder
-                    ? a.name.localeCompare(b.name)
+                    ? a.name.localeCompare(b.name) // Compare les noms si les scores sont les memes.
                     : REVERT_SORT * a.name.localeCompare(b.name);
             }
             default: {
@@ -82,7 +86,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
                 return activityComparison !== 0
                     ? activityComparison
                     : this.ascendingOrder
-                    ? a.name.localeCompare(b.name)
+                    ? a.name.localeCompare(b.name) // Compare les noms si les states couleurs sont les memes.
                     : REVERT_SORT * a.name.localeCompare(b.name);
             }
         }
@@ -96,6 +100,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
         this.sortPlayers();
     }
     getActivityClass(player: Player): string {
+        // Pour le css et html de la couleur de chaque joueur
         return player.activityState;
     }
 }

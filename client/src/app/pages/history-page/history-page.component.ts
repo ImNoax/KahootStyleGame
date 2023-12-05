@@ -38,7 +38,7 @@ export class HistoryPageComponent implements OnInit {
     listIsEmpty(): boolean {
         return this.games.length === 0;
     }
-
+    // Sort les parties selon leur nom
     sortName() {
         if (!this.isNameSortedAscending) {
             this.games.sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? SORT_TRUE : SORT_FALSE));
@@ -52,7 +52,7 @@ export class HistoryPageComponent implements OnInit {
         this.isDateSortedAscending = false;
         this.arrowDate = '';
     }
-
+    // Sort les parties selon la date de jeu
     sortDate() {
         if (!this.isDateSortedAscending) {
             this.games.sort((a, b) => (a.date > b.date ? SORT_TRUE : SORT_FALSE));

@@ -42,7 +42,7 @@ export class NameDefinitionComponent implements OnDestroy {
             this.nameIsInvalid = true;
         });
     }
-
+    // Validation du nom se fait cote serveur
     onSubmit() {
         const nameToValidate: string = this.nameForm.value.name.trim();
         this.clientSocket.socket.emit('joinLobby', nameToValidate);
